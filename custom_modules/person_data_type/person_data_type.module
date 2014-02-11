@@ -1,0 +1,186 @@
+<?php
+/**
+ * @file
+ * Code for the Person Data Type feature.
+ */
+
+include_once 'person_data_type.features.inc';
+
+function person_data_type_menu() {
+  $items = array();
+  $items['people'] = array(
+    'title' => 'People',
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('person_data_type_people_form'),
+    'access arguments' => array('access people listing'),
+    'type' => MENU_CALLBACK,
+  );
+  return $items;
+}
+
+function person_data_type_permission() {
+  return array(
+    'access people listing' => array(
+      'title' => t("Access People Listing"),
+      'description' => t("Allow users to view listing of all people"),
+    ),
+    'access clergy directory' => array(
+      'title' => t("Access Clergy Directory"),
+      'description' => t("Allow user to access a directory of clergy"),
+    ),
+  );
+}
+
+function person_data_type_people_form($form,&$form_state,$type="all",$last="",$first="") {
+  if (isset($form_state['values']['type'])) {
+    $type = $form_state['values']['type'];
+  }
+  if (isset($form_state['values']['last'])) {
+    $last = $form_state['values']['last'];
+  }
+  if (isset($form_state['values']['first'])) {
+    $first = $form_state['values']['first'];
+  }
+  $people = person_data_type_fetch_people($type,$last,$first);
+  $people_table = array(
+      'header' => array('Name','Location','E-Mail','Phone','edit'),
+      'rows' => array(),
+      'attributes' => array(),
+      'caption' => '',
+      'colgroups' => array(),
+      'sticky' => FALSE,
+      'empty' => '',
+      );
+  foreach ($people['nodes'] as $person) {
+    $name = $person->field_person_last_name['und'][0]['value'].", ";
+    if (isset($person->field_person_title['und']['0']['value'])) {
+      $name .= $person->field_person_title['und']['0']['value']." ";
+    }
+    if (isset($person->field_person_first_name['und']['0']['value'])) {
+      $name .=  $person->field_person_first_name['und']['0']['value']." ";
+    }
+    if (isset($person->field_person_middle_name['und']['0']['value'])) {
+      $name .= $person->field_person_middle_name['und']['0']['value']." ";
+    }
+    if (isset($person->field_person_suffix['und']['0']['value'])) {
+      $name .= $person->field_person_suffix['und']['0']['value']." ";
+    }
+    $name = l(rtrim($name," ,"),"node/".$person->nid);
+    $location = "";
+    if (isset($person->field_person_home_city['und']['0']['value'])) {
+      $location .= $person->field_person_home_city['und']['0']['value'].", ";
+    }
+    if (isset($person->field_person_home_state['und']['0']['value'])) {
+      $location .= $person->field_person_home_state['und']['0']['value'];
+    }
+    if (isset($person->field_person_home_other['und']['0']['value'])) {
+      $location .= $person->field_person_home_other['und']['0']['value'];
+    }
+    $email = "";
+    if (isset($person->field_person_email_pref['und']['0']['value'])) {
+      $email .= $person->field_person_email_pref['und']['0']['value'];
+      $email = l($email,"mailto:".$email);
+    }
+    $phone = "";
+    if (isset($person->field_person_phone_pref['und']['0']['value'])) {
+      $phone .= $person->field_person_phone_pref['und']['0']['value'];
+    }
+    $edit = "";
+    if (node_access("update",$person)) {
+      $edit = l("edit","node/".$person->nid."/edit");
+    }
+    $row = array(
+      'title' => $name,
+      'Location' => $location,
+      'E-Mail' => $email,
+      'Phone' => $phone,
+      'edit' => $edit,
+    );
+    $people_table['rows'][] = $row;
+  }
+  $form['filters'] = array(
+    '#type' => 'fieldset',
+    '#title' => 'Filters',
+  );
+  $form['filters']['type'] = array(
+    '#type' => 'select',
+    '#title' => 'Listing Type',
+    '#options' => array(
+      'all' => 'All',
+      'clergy' => 'Clergy',
+      'laity' => 'Laity',
+    ),
+    '#default_value' => $type,
+  );
+  $form['filters']['last'] = array(
+    '#type' => 'textfield',
+    '#default_value' => $last,
+    '#title' => "Last Name",
+  );
+  $form['filters']['first'] = array(
+    '#type' => 'textfield',
+    '#default_value' => $first,
+    '#title' => "First Name",
+  );
+  $form['filters']['submit'] = array(
+    '#type' => 'submit',
+    '#value' => 'Search',
+  );
+  $form['people'] = array(
+    '#type' => 'item',
+    '#markup' => theme_table($people_table)
+  );
+  $form['#submit'] = array('person_data_type_people_form_submit');
+  return $form;
+}
+
+function person_data_type_people_form_submit($form, &$form_state) {
+  if (isset($form_state['values']['type'])) {
+    $form_state['values']['type'] = $form_state['values']['type'];
+  }
+  if (isset($form_state['values']['last'])) {
+    $form_state['values']['last'] = $form_state['values']['last'];
+  }
+  if (isset($form_state['values']['first'])) {
+    $form_state['values']['first'] = $form_state['values']['first'];
+  }
+  $form_state['rebuild'] = TRUE;  
+}
+
+function person_data_type_fetch_people($type="all",$last="",$first="") {
+  $query = db_select("node","n");
+    $query->leftJoin("field_data_field_person_last_name","l","l.entity_id = n.nid");
+    $query->leftJoin("field_data_field_person_first_name","f","f.entity_id = n.nid");
+    $query->leftJoin("field_data_field_person_priesthood","p","p.entity_id = n.nid");
+    $query->leftJoin("field_data_field_person_diaconate","d","d.entity_id = n.nid");
+    $query->leftJoin("field_data_field_person_consecration","c","c.entity_id = n.nid");
+    $query->fields('n',array('nid'))
+    ->condition("n.type","person","=")
+    ->orderBy('l.field_person_last_name_value','ASC')
+    ->orderBy('f.field_person_first_name_value','ASC')
+    ->condition('n.status', 1);
+    if (!empty($last)) {
+      $query->condition('l.field_person_last_name_value',"%".check_plain($last)."%",'LIKE');
+    }
+    if (!empty($first)) {
+      $query->condition('f.field_person_first_name_value',"%".check_plain($first)."%",'LIKE');
+    }
+  if ($type == "clergy") {
+    $is_clergy = db_or()
+      ->isNotNull('p.field_person_priesthood_value')
+      ->isNotNull('d.field_person_diaconate_value')
+      ->isNotNull('c.field_person_consecration_value');
+    $query->condition($is_clergy);
+  }
+  if ($type == "laity") {
+    $query->isNull('p.field_person_priesthood_value')
+      ->isNull('d.field_person_diaconate_value')
+      ->isNull('c.field_person_consecration_value');
+  }
+  $result = $query->execute();
+  $people = array('nodes' => array(), 'pager' => '');
+  while ($record = $result->fetchAssoc()) {
+    $people['nodes'][] = node_load($record['nid']);
+  }
+  return $people;
+}

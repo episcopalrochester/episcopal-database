@@ -1,0 +1,27 @@
+<?php
+
+function user_generator_run() { 
+  $persons = user_generator_scan_persons();
+  $emails = array();
+  foreach ($persons as $person) {
+    if (isset($person->field_person_email_pref['und'])) {
+      $emails[] = strtolower(check_plain($person->field_person_email_pref['und'][0]['value']));
+    }
+  }
+  foreach (array_unique($emails) as $email) {
+    var_dump($email);
+  }
+}
+
+function user_generator_scan_persons() {
+  $query = new EntityFieldQuery();
+  $entities = $query->entityCondition('entity_type', 'node')
+    ->entityCondition('bundle', 'person')
+    ->propertyCondition('status', 1)
+    ->execute();
+  if ($entities['node']) {
+    $nodes = entity_load('node', array_keys($entities['node']));
+    return $nodes;
+  }
+  return array();
+}

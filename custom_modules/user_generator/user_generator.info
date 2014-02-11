@@ -1,0 +1,6 @@
+name = Database User Generator
+description = Create database users based upon their existing records in the system.
+core = 7.x
+version = 7.x-1.0
+dependencies[] = person_data_type
+
