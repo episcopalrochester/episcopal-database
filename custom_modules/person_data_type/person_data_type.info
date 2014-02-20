@@ -4,6 +4,7 @@ core = 7.x
 package = Features
 version = 7.x-1.2
 project = person_data_type
+stylesheets[print][] = print.css
 dependencies[] = date
 dependencies[] = features
 dependencies[] = field_group

@@ -1,0 +1,15 @@
+#toolbar,
+.region-page-top,
+#subfooter,
+#breadcrumb,
+#header,
+#main-navigation,
+#person-data-type-directory-form #edit-filters {
+  display: none;
+  visibility: hidden;
+}
+
+#main-content,
+body {
+  padding-top: 10px !important;
+}

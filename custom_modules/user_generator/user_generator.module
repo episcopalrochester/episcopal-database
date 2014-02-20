@@ -3,14 +3,55 @@
 function user_generator_run() { 
   $persons = user_generator_scan_persons();
   $emails = array();
+  $rid = user_role_load_by_name('database user')->rid;
   foreach ($persons as $person) {
-    if (isset($person->field_person_email_pref['und'])) {
-      $emails[] = strtolower(check_plain($person->field_person_email_pref['und'][0]['value']));
+    $email_field = field_get_items('node',$person,'field_person_email_pref');
+    if ($email_field) {
+      $email = trim(strtolower($email_field[0]['value']));
+      if(!user_generator_check_mail($email)) {
+        user_generator_create_account($email,$person,$rid);
+      }
+      $uid = user_generator_check_mail($email);
+      if ($uid && $person->uid <> $uid) {
+        $person->uid = $uid;
+        node_save($person);
+      }
     }
   }
-  foreach (array_unique($emails) as $email) {
-    var_dump($email);
+}
+
+function user_generator_create_account($email,$person,$rid) {
+  if (person_data_type_is_alive($person)) {
+    $name = person_data_type_get_full_name($person);
+    if (user_generator_check_name($name)) {
+      $name = $email;
+    }
+    $account->name = $name;
+    $acount->pass = $email;
+    $account->mail = $email;
+    $account->status = 1;
+    $roles = array($rid => TRUE);
+    $account->roles = $roles;
+    user_save($account);
   }
+}
+
+function user_generator_check_mail($email) {
+  $uid = db_select('users','u')
+    ->fields("u",array('uid'))
+    ->condition('mail',$email,"=")
+    ->execute()
+    ->fetchField();
+  return $uid;
+}
+
+function user_generator_check_name($name) {
+  $uid = db_select('users','u')
+    ->fields("u",array('name'))
+    ->condition('name',$name,"=")
+    ->execute()
+    ->fetchField();
+  return $name;
 }
 
 function user_generator_scan_persons() {

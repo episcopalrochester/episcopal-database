@@ -15,7 +15,27 @@ function person_data_type_menu() {
     'access arguments' => array('access people listing'),
     'type' => MENU_CALLBACK,
   );
+  $items['directory'] = array(
+    'title' => 'Clergy Directory',
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('person_data_type_directory_form'),
+    'access arguments' => array('access clergy directory'),
+    'type' => MENU_CALLBACK,
+  );
   return $items;
+}
+
+/****************************
+  Implementation of hook_theme()
+****************************/
+
+function person_data_type_theme() {
+  return array(
+    'directory_person' => array(
+      'variables' => array('person'=>NULL),
+      'template' => 'theme/directory-person',
+    ),
+  );
 }
 
 function person_data_type_permission() {
@@ -31,6 +51,58 @@ function person_data_type_permission() {
   );
 }
 
+function person_data_type_directory_form($form,&$form_state,$type="all",$last="",$first="") {
+  if (isset($form_state['values']['last'])) {
+    $last = $form_state['values']['last'];
+  }
+  if (isset($form_state['values']['first'])) {
+    $first = $form_state['values']['first'];
+  }
+  $people = person_data_type_fetch_people('clergy',$last,$first);
+  $weight = 1000;
+  foreach ($people['nodes'] as $person) {
+    $form['person'.$person->uid] = array(
+      '#type'=>'markup',
+      '#markup'=>theme('directory_person',array('person'=>$person)),
+      '#weight'=>$weight,
+    );
+    $weight++;
+  }
+  $form['filters'] = array(
+    '#type' => 'fieldset',
+    '#title' => 'Filters',
+  );
+  $form['filters']['last'] = array(
+    '#type' => 'textfield',
+    '#default_value' => $last,
+    '#title' => "Last Name",
+  );
+  $form['filters']['first'] = array(
+    '#type' => 'textfield',
+    '#default_value' => $first,
+    '#title' => "First Name",
+  );
+  $form['filters']['submit'] = array(
+    '#type' => 'submit',
+    '#value' => 'Search',
+  );
+  $form['#submit'] = array('person_data_type_directory_form_submit');
+  return $form;
+}
+
+function person_data_type_directory_form_submit($form, &$form_state) {
+  if (isset($form_state['values']['type'])) {
+    $form_state['values']['type'] = $form_state['values']['type'];
+  }
+  if (isset($form_state['values']['last'])) {
+    $form_state['values']['last'] = $form_state['values']['last'];
+  }
+  if (isset($form_state['values']['first'])) {
+    $form_state['values']['first'] = $form_state['values']['first'];
+  }
+  $form_state['rebuild'] = TRUE;  
+}
+
 function person_data_type_people_form($form,&$form_state,$type="all",$last="",$first="") {
   if (isset($form_state['values']['type'])) {
     $type = $form_state['values']['type'];
@@ -43,14 +115,14 @@ function person_data_type_people_form($form,&$form_state,$type="all",$last="",$f
   }
   $people = person_data_type_fetch_people($type,$last,$first);
   $people_table = array(
-      'header' => array('Name','Location','E-Mail','Phone','edit'),
-      'rows' => array(),
-      'attributes' => array(),
-      'caption' => '',
-      'colgroups' => array(),
-      'sticky' => FALSE,
-      'empty' => '',
-      );
+    'header' => array('Name','Location','E-Mail','Phone','edit'),
+    'rows' => array(),
+    'attributes' => array(),
+    'caption' => '',
+    'colgroups' => array(),
+    'sticky' => FALSE,
+    'empty' => '',
+  );
   foreach ($people['nodes'] as $person) {
     $name = $person->field_person_last_name['und'][0]['value'].", ";
     if (isset($person->field_person_title['und']['0']['value'])) {
@@ -149,22 +221,22 @@ function person_data_type_people_form_submit($form, &$form_state) {
 
 function person_data_type_fetch_people($type="all",$last="",$first="") {
   $query = db_select("node","n");
-    $query->leftJoin("field_data_field_person_last_name","l","l.entity_id = n.nid");
-    $query->leftJoin("field_data_field_person_first_name","f","f.entity_id = n.nid");
-    $query->leftJoin("field_data_field_person_priesthood","p","p.entity_id = n.nid");
-    $query->leftJoin("field_data_field_person_diaconate","d","d.entity_id = n.nid");
-    $query->leftJoin("field_data_field_person_consecration","c","c.entity_id = n.nid");
-    $query->fields('n',array('nid'))
+  $query->leftJoin("field_data_field_person_last_name","l","l.entity_id = n.nid");
+  $query->leftJoin("field_data_field_person_first_name","f","f.entity_id = n.nid");
+  $query->leftJoin("field_data_field_person_priesthood","p","p.entity_id = n.nid");
+  $query->leftJoin("field_data_field_person_diaconate","d","d.entity_id = n.nid");
+  $query->leftJoin("field_data_field_person_consecration","c","c.entity_id = n.nid");
+  $query->fields('n',array('nid'))
     ->condition("n.type","person","=")
     ->orderBy('l.field_person_last_name_value','ASC')
     ->orderBy('f.field_person_first_name_value','ASC')
     ->condition('n.status', 1);
-    if (!empty($last)) {
-      $query->condition('l.field_person_last_name_value',"%".check_plain($last)."%",'LIKE');
-    }
-    if (!empty($first)) {
-      $query->condition('f.field_person_first_name_value',"%".check_plain($first)."%",'LIKE');
-    }
+  if (!empty($last)) {
+    $query->condition('l.field_person_last_name_value',"%".check_plain($last)."%",'LIKE');
+  }
+  if (!empty($first)) {
+    $query->condition('f.field_person_first_name_value',"%".check_plain($first)."%",'LIKE');
+  }
   if ($type == "clergy") {
     $is_clergy = db_or()
       ->isNotNull('p.field_person_priesthood_value')
@@ -183,4 +255,58 @@ function person_data_type_fetch_people($type="all",$last="",$first="") {
     $people['nodes'][] = node_load($record['nid']);
   }
   return $people;
+}
+
+function person_data_type_is_alive($person) {
+  if (field_get_items('node',$person,'field_person_dod')) {
+    return false;
+  }
+  return true; 
+}
+
+function person_data_type_get_full_name($person) {
+  $first = field_get_items('node',$person,'field_person_first_name');
+  $middle = field_get_items('node',$person,'field_person_middle_name');
+  $last = field_get_items('node',$person,'field_person_last_name');
+  return trim(preg_replace('!\s+!', ' ', implode(" ",array(
+    $first[0]['value'],
+    $middle[0]['value'],
+    $last[0]['value'],
+  ))));
+}
+
+function person_data_type_get_address($person,$type) {
+  $pfx = "field_person_".$type."_";
+  $address = array(
+    'line1' => _get_value($person,$pfx."1"),
+    'line2' => _get_value($person,$pfx."2"),
+    'city' => _get_value($person,$pfx."city"),
+    'state' => _get_value($person,$pfx."state"),
+    'other' => _get_value($person,$pfx."other"),
+    'postal' => _get_value($person,$pfx."postal"),
+  );
+  return $address;
+}
+
+function person_data_type_get_phone($person,$type) {
+    $pfx = "field_person_phone_".$type;
+    $phone = array(
+      'number' => _get_value($person,$pfx),
+      'type' => _get_value($person,$pfx."_type"),
+      );
+    return $phone;
+}
+
+function person_data_type_get_email($person,$type) {
+    $pfx = "field_person_email_".$type;
+    $email = array(
+      'addy' => _get_value($person,$pfx),
+      'type' => _get_value($person,$pfx."_type"),
+      );
+    return $email;
+}
+
+function _get_value($node,$field,$type = "value") {
+  $array = field_get_items('node',$node,$field);
+  return $array[0][$type];
 }
