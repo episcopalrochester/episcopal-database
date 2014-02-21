@@ -20,6 +20,20 @@ function user_generator_run() {
   }
 }
 
+function user_generator_flush_users() {
+  $result = db_select('users','u')
+    ->fields("u",array('uid'))
+    ->condition('init','user_generator','=')
+    ->execute();
+  while($record = $result->fetchAssoc()) {
+    $update = db_update('node')
+      ->fields(array('uid'=>0))
+      ->condition('uid',$record['uid'],'=')
+      ->execute();
+    user_delete($record['uid']);
+  }
+}
+
 function user_generator_create_account($email,$person,$rid) {
   if (person_data_type_is_alive($person)) {
     $name = person_data_type_get_full_name($person);
@@ -27,12 +41,13 @@ function user_generator_create_account($email,$person,$rid) {
       $name = $email;
     }
     $account->name = $name;
-    $acount->pass = $email;
     $account->mail = $email;
+    $account->init = "user_generator";
     $account->status = 1;
     $roles = array($rid => TRUE);
     $account->roles = $roles;
-    user_save($account);
+    $edit = array('pass'=>$email);
+    user_save($account,$edit);
   }
 }
 
@@ -51,7 +66,7 @@ function user_generator_check_name($name) {
     ->condition('name',$name,"=")
     ->execute()
     ->fetchField();
-  return $name;
+  return $uid;
 }
 
 function user_generator_scan_persons() {

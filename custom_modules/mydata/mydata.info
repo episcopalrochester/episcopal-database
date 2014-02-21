@@ -1,0 +1,6 @@
+name = My Data
+description = Dashboard presenting users with data they can edit.
+core = 7.x
+version = 7.x-1.0
+package = Episcopal Database
+
