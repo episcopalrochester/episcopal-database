@@ -58,7 +58,7 @@ function person_data_type_directory_form($form,&$form_state,$type="all",$last=""
   if (isset($form_state['values']['first'])) {
     $first = $form_state['values']['first'];
   }
-  $people = person_data_type_fetch_people('clergy',$last,$first);
+  $people = person_data_type_fetch_people('clergy',$last,$first,$status);
   $weight = 1000;
   foreach ($people['nodes'] as $person) {
     $form['person'.$person->uid] = array(
@@ -83,6 +83,7 @@ function person_data_type_directory_form($form,&$form_state,$type="all",$last=""
     '#title' => "First Name",
   );
   $form['filters']['submit'] = array(
+
     '#type' => 'submit',
     '#value' => 'Search',
   );
@@ -103,7 +104,7 @@ function person_data_type_directory_form_submit($form, &$form_state) {
   $form_state['rebuild'] = TRUE;  
 }
 
-function person_data_type_people_form($form,&$form_state,$type="all",$last="",$first="") {
+function person_data_type_people_form($form,&$form_state,$type="all",$last="",$first="",$status="living") {
   if (isset($form_state['values']['type'])) {
     $type = $form_state['values']['type'];
   }
@@ -113,7 +114,10 @@ function person_data_type_people_form($form,&$form_state,$type="all",$last="",$f
   if (isset($form_state['values']['first'])) {
     $first = $form_state['values']['first'];
   }
-  $people = person_data_type_fetch_people($type,$last,$first);
+  if (isset($form_state['values']['status'])) {
+    $status = $form_state['values']['status'];
+  }
+  $people = person_data_type_fetch_people($type,$last,$first,$status);
   $people_table = array(
     'header' => array('Name','Location','E-Mail','Phone','edit'),
     'rows' => array(),
@@ -194,6 +198,12 @@ function person_data_type_people_form($form,&$form_state,$type="all",$last="",$f
     '#default_value' => $first,
     '#title' => "First Name",
   );
+  $form['filters']['status'] = array(
+    '#type' => 'select',
+    '#default_value' => $status,
+    '#title' => "Status",
+    '#options' => array('living'=>'Living','deceased'=>'Deceased'),
+  );
   $form['filters']['submit'] = array(
     '#type' => 'submit',
     '#value' => 'Search',
@@ -219,13 +229,14 @@ function person_data_type_people_form_submit($form, &$form_state) {
   $form_state['rebuild'] = TRUE;  
 }
 
-function person_data_type_fetch_people($type="all",$last="",$first="") {
+function person_data_type_fetch_people($type="all",$last="",$first="",$status="living") {
   $query = db_select("node","n");
   $query->leftJoin("field_data_field_person_last_name","l","l.entity_id = n.nid");
   $query->leftJoin("field_data_field_person_first_name","f","f.entity_id = n.nid");
   $query->leftJoin("field_data_field_person_priesthood","p","p.entity_id = n.nid");
   $query->leftJoin("field_data_field_person_diaconate","d","d.entity_id = n.nid");
   $query->leftJoin("field_data_field_person_consecration","c","c.entity_id = n.nid");
+  $query->leftJoin("field_data_field_person_dod","m","m.entity_id = n.nid");
   $query->fields('n',array('nid'))
     ->condition("n.type","person","=")
     ->orderBy('l.field_person_last_name_value','ASC')
@@ -236,6 +247,12 @@ function person_data_type_fetch_people($type="all",$last="",$first="") {
   }
   if (!empty($first)) {
     $query->condition('f.field_person_first_name_value',"%".check_plain($first)."%",'LIKE');
+  }
+  if ($status == "deceased") {
+    $query->isNotNull('m.field_person_dod_value');
+  }
+  else {
+        $query->isNull('m.field_person_dod_value');
   }
   if ($type == "clergy") {
     $is_clergy = db_or()
