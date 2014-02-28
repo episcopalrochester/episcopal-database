@@ -1,4 +1,35 @@
 <h3 style="text-decoration: underline;"><?php print person_data_type_get_full_name($person); ?></h3>
+<?php if ($personal_relationships = person_data_type_find_personal_relationships($person->nid)): ?>
+<h4>Personal Relationships</h4>
+<?php foreach ($personal_relationships as $relationship):
+$lang = $relationship->language;
+if ($relationship->field_pr_first[$lang][0]['nid'] <> $person->nid) {
+  $person2 = node_load($relationship->field_pr_first[$lang][0]['nid']);
+}
+else {
+  $person2 = node_load($relationship->field_pr_second[$lang][0]['nid']);
+}
+?>
+  <p><?php $type = "Personal relationship with ";
+switch($relationship->field_pr_type[$lang][0]['value']) {
+case "marriage":
+$type = "Married to ";
+  break;
+case "partnership":
+  $type = "Partnered with ";
+  break;
+case "cohabitate":
+  $type = "Cohabitating with ";
+  break;
+case  "sibling":
+  $type = "Sibling to ";
+  break;
+case "parent":
+  $type = "Parent/child to ";
+  break;
+}; ?><?php print $type.person_data_type_get_full_name($person2); ?></p>
+<?php endforeach; ?>
+<?php endif; ?>
 <?php $home = person_data_type_get_address($person,'home');
 if ($home['line1'] || $home['line2'] || $home['city'] || $home['state'] || $home['other']): ?>
 <h4>Home Address</h4>
