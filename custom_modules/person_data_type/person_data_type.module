@@ -22,6 +22,13 @@ function person_data_type_menu() {
     'access arguments' => array('access people listing'),
     'type' => MENU_CALLBACK,
   );
+  $items['partners'] = array(
+    'title' => 'Partner/Marriage Editor',
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('person_data_type_partners_form'),
+    'access arguments' => array('access people listing'),
+    'type' => MENU_CALLBACK,
+  );
   $items['directory'] = array(
     'title' => 'Clergy Directory',
     'page callback' => 'drupal_get_form',
@@ -58,6 +65,114 @@ function person_data_type_permission() {
   );
 }
 
+function person_data_type_partners_form($form,&$form_state) {
+  $people = person_data_type_fetch_people('clergy');
+  $form['single_people'] = array(
+    '#theme' => 'table',
+    '#caption' => 'Unpartnered People',
+    '#header' => array('Person','Add'),
+    '#rows'=> array(),
+    '#tree' => true,
+  );
+
+  $form['partnered_people'] = array(
+    '#theme' => 'table',
+    '#caption' => 'Partnered People',
+    '#header' => array('Person 1','Person 2','Type','edit'),
+    '#rows'=> array(),
+    '#tree' => true,
+  );
+  $expired = "";
+  foreach ($people['nodes'] as $person) {
+    $name = person_data_type_get_full_name($person);
+    $name = l(rtrim($name," ,"),"node/".$person->nid);
+    $partnerships = person_data_type_find_partnerships($person);
+    $types = _partnership_types();
+    $row = array();
+    $row['person1'] = $name;
+    $table = "single";
+    $edit = l("Add Relationship","node/add/personal-relationship",array(
+      'query'=>array('destination'=>"partners",'edit[field_pr_first][und]'=>$person->nid),
+    ));
+    $row['person2'] = "";
+    foreach ($partnerships as $partnership) {
+      $table = "partnered";
+      if ($partnership['partner']) {
+        $row['person2'] .= person_data_type_get_full_name($partnership['partner']);
+      }
+      else {
+        $row['person2'] .= "";
+      }
+      $row['type'] = $types[$partnership['type']];
+      if (node_access("update",$partnership['node'])) {
+        $edit = l("edit","node/".$partnership['node']->nid."/edit",array(
+          'query'=>array('destination'=>"partners"),
+        ));
+      }
+    }
+    $row['edit'] = $edit;
+    $form[$table.'_people']['#rows'][] = array('data'=>$row);
+    unset($partner_field);
+    unset($type_field);
+  }
+  $form['submit'] = array(
+
+    '#type' => 'submit',
+    '#value' => 'Save Changes / Process CSV',
+  );
+  $form['#submit'] = array('person_data_type_partners_form_submit');
+  return $form;
+}
+
+function person_data_type_nodereference_options($element, $edit = FALSE) {
+  $field_key  = $element['#columns'][0];
+  return array($field_key => NULL);
+}
+
+function person_data_type_find_partnerships($person,$inactive = FALSE) {
+  $query = db_select("node","n");
+  $query->leftJoin("field_data_field_pr_first","f","f.entity_id = n.nid");
+  $query->leftJoin("field_data_field_pr_second","s","s.entity_id = n.nid");
+  $query->leftJoin("field_data_field_pr_type","t","t.entity_id = n.nid");
+  $query->leftJoin("field_data_field_pr_end","e","e.entity_id = n.nid");
+  $query->fields('n',array('nid'))
+    ->fields('t',array('field_pr_type_value'))
+    ->fields('f',array('field_pr_first_nid'))
+    ->fields('s',array('field_pr_second_nid'))
+    ->condition("n.type","personal_relationship","=")
+    ->condition(db_or()->condition('t.field_pr_type_value','partnership')->condition('t.field_pr_type_value','marriage'))
+    ->condition(db_or()->condition('f.field_pr_first_nid',$person->nid)->condition('s.field_pr_second_nid',$person->nid))
+    ->condition('n.status', 1);
+  if (!$inactive) {
+    $query->isNull('e.field_pr_end_value');
+  }
+  $result = $query->execute();
+  if (!$result) {
+    return false;
+  }
+  $partnerships = array();
+  while ($record = $result->fetchAssoc()) {
+    $partnership = array('type'=>$record['field_pr_type_value']);
+    $partnership['node'] = node_load($record['nid']);
+    if ($person->nid == $record["field_pr_first_nid"]) {
+      $partnership['partner'] = node_load($record['field_pr_second_nid']);
+    }
+    elseif ($person->nid == $record['field_pr_second_nid']) {
+      $partnership['partner'] = node_load($record['field_pr_first_nid']);
+    }
+    else {
+      $partnership['partner'] = false; 
+    }
+    $partnerships[] = $partnership;
+  }
+  return $partnerships;
+}
+
+function person_data_type_partners_form_submit($form, &$form_state) {
+  exit;
+}
+
+
 function person_data_type_safe_form($form,&$form_state) {
   $form['csv'] = array(
     '#type' => 'file',
@@ -92,8 +207,8 @@ function person_data_type_safe_form($form,&$form_state) {
       $name .= $person->field_person_suffix['und']['0']['value']." ";
     }
     if (isset($person->field_person_email_pref['und']['0']['value'])) {
-            $email = $person->field_person_email_pref['und']['0']['value'];
-                }
+      $email = $person->field_person_email_pref['und']['0']['value'];
+    }
     $required = 0;
     if (isset($person->field_person_safe_church['und'][0]['value'])) {
       $required = $person->field_person_safe_church['und'][0]['value'];
@@ -110,7 +225,7 @@ function person_data_type_safe_form($form,&$form_state) {
       if (isset($email)) {
         $expired.=" <".$email.">";
       }
-        $expired .="\n";
+      $expired .="\n";
     }
     $name = l(rtrim($name," ,"),"node/".$person->nid);
     $edit = "";
@@ -436,29 +551,6 @@ function person_data_type_people_form_submit($form, &$form_state) {
   $form_state['rebuild'] = TRUE;  
 }
 
-function person_data_type_find_personal_relationships($nid) {
-  $fields = array("field_pr_first","field_pr_second");
-  $nodes = array();
-  foreach ($fields as $field) {
-    $query = new EntityFieldQuery();
-    $result = $query
-      ->entityCondition('entity_type', 'node')
-      ->entityCondition('bundle', 'personal_relationship')
-      ->fieldCondition($field, "nid","$nid")
-      ->propertyCondition('status', 1)
-      ->range(0,1)
-      ->execute();
-    if (isset($result['node'])) {
-      $nids = array_keys($result['node']);
-      $nodes = array_merge(node_load_multiple( $nids),$nodes);
-    } 
-  }
-  if (count($nodes)) {
-    return $nodes;
-  }
-  return false;
-}
-
 function person_data_type_fetch_people($type="all",$last="",$first="",$status="living") {
   $query = db_select("node","n");
   $query->leftJoin("field_data_field_person_last_name","l","l.entity_id = n.nid");
@@ -556,4 +648,112 @@ function person_data_type_get_email($person,$type) {
 function _get_value($node,$field,$type = "value") {
   $array = field_get_items('node',$node,$field);
   return $array[0][$type];
+}
+
+function person_data_type_node_load($nodes, $types) {
+  if (in_array("person",$types)) {
+    foreach ($nodes as $key => $node) {
+      $nodes[$key]->title = person_data_type_get_full_name($node);
+    }
+  }
+}
+
+function person_data_type_node_view($node, $view_mode, $langcode) {
+  if ($node->type == "person") {
+    $partnerships = person_data_type_find_partnerships($node,TRUE);
+    foreach ($partnerships as $partnership) {
+      $nid = $partnership['node']->nid;
+      $node->content['#group_children']['field_pr_partnership_'.$nid] = "group_personal_relationships";
+      if ($partnership['partner']) {
+        $partner = person_data_type_get_full_name($partnership['partner']);
+      }
+      else {
+        $partner = "No record entered for partner/spouse";
+      }
+      $node->content['field_pr_partnership_'.$nid] = array(
+        '#theme' => 'field',
+        '#label_display' => 'inline',
+        '#field_name' => 'field_pr_partnership',
+        '#field_type' => 'textfield',
+        '#view_mode' => 'full',
+        '#title' => ucwords($partnership['type']),
+        '#bundle' => 'person',
+        '#weight' => 10,
+        '#items' => array(0 => array('value'=>$partner)),
+        '#formatter' => 'text_default',
+        0 => array('#markup' => $partner),
+      );
+    }
+  }
+}
+
+function person_data_type_form_person_node_form_alter(&$form, &$form_state, $form_id) {
+    $partnerships = person_data_type_find_partnerships($form['#node'],TRUE);
+    foreach ($partnerships as $partnership) {
+      $pr_node = $partnership['node'];
+      $nid = $pr_node->nid;
+      $form['#group_children']['field_pr_partnership_'.$nid] = "group_personal_relationships";
+      $form['#group_children']['field_pr_type_'.$nid] = "group_personal_relationships";
+      $form['#group_children']['field_pr_start_'.$nid] = "group_personal_relationships";
+      $form['#group_children']['field_pr_end_'.$nid] = "group_personal_relationships";
+if ($partnership['partner']) {
+        $partner = person_data_type_get_full_name($partnership['partner']);
+      }
+      else {
+        $partner = "No record entered for partner/spouse";
+      }
+
+      $form['field_pr_partnership_'.$nid] = array(
+        '#type'=> 'item',
+        '#title' => 'Partner:',
+        '#markup'=>$partner,
+      );
+      $form['field_pr_type_'.$nid] = array(
+        '#type'=> 'select',
+        '#title' => 'Partnership Type:',
+        '#options' => _partnership_types(),
+        '#default_value' => $partnership['type'],
+      );
+      $form['field_pr_start_'.$nid] = array(
+        '#type'=> 'textfield',
+        '#title' => 'Partnership Start Date:',
+        '#description' => 'Format: '.date('m/d/Y'),
+      );
+      $form['field_pr_end_'.$nid] = array(
+        '#type'=> 'textfield',
+        '#title' => 'Partnership End Date:',
+        '#description' => 'Format: '.date('m/d/Y'),
+      );
+      if (isset($pr_node->field_pr_start['und'][0]['value'])) {
+      $form['field_pr_start_'.$nid]['#default_value'] = $pr_node->field_pr_start['und'][0]['value'];
+      }
+  if (isset($pr_node->field_pr_end['und'][0]['value'])) {
+      $form['field_pr_end_'.$nid]['#default_value'] = $pr_node->field_pr_end['und'][0]['value'];
+      }
+
+    }
+}
+
+function person_data_type_node_update($node) {
+  if ($node->type == "person") {
+    $partnerships = person_data_type_find_partnerships($node,TRUE);
+    foreach ($partnerships as $partnership) {
+      $pr_node = $partnership['node'];
+      $nid = $pr_node->nid;
+      $lang = $pr_node->language;
+      eval("\$pr_node->field_pr_type[\$lang][0]['value']=\$node->field_pr_type_".$nid.";");
+      eval("\$pr_node->field_pr_start[\$lang][0]['value']=\$node->field_pr_start_".$nid.";");
+      eval("\$pr_node->field_pr_end[\$lang][0]['value']=\$node->field_pr_end_".$nid.";");
+      node_save($pr_node);
+    }
+  }
+}
+
+function _partnership_types() {
+  return array(
+    '_none'=>'',
+    'marriage'=>'Marriage',
+    'partnership'=>'Partnership',
+    'cohabitate'=>'Cohabitating',
+    );
 }
