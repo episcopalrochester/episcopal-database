@@ -25,7 +25,7 @@ function mydata_page_form($form,&$form_state) {
     ->fields('n',array('nid','type','title','changed'))
     ->condition('status','1')
     ->orderBy('type','ASC')
-    ->orderBy('changed','ASC');
+    ->orderBy('changed','DESC');
   if ($user->uid <> 1 && !in_array('database editor', $user->roles) && !in_array('administrator', $user->roles)){
     $query->condition('uid',$user->uid);
   }
