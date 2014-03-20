@@ -9,6 +9,7 @@ dependencies[] = list
 dependencies[] = node_reference
 dependencies[] = options
 dependencies[] = text
+dependencies[] = person
 features[features_api][] = api:2
 features[field_base][] = body
 features[field_base][] = field_person_2_nr

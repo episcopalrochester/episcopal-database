@@ -1,13 +1,13 @@
 <?php
 /**
  * @file
- * person_data_type.features.field_instance.inc
+ * person.features.field_instance.inc
  */
 
 /**
  * Implements hook_field_default_field_instances().
  */
-function person_data_type_field_default_field_instances() {
+function person_field_default_field_instances() {
   $field_instances = array();
 
   // Exported field_instance: 'node-person-field_person_baptism'
@@ -1360,6 +1360,49 @@ function person_data_type_field_default_field_instances() {
     ),
   );
 
+  // Exported field_instance: 'node-person-field_person_safe_church'
+  $field_instances['node-person-field_person_safe_church'] = array(
+    'bundle' => 'person',
+    'default_value' => array(
+      0 => array(
+        'value' => 1,
+      ),
+    ),
+    'deleted' => 0,
+    'description' => 'Disable only if this person is no longer canonically required to complete Safe Church training.',
+    'display' => array(
+      'default' => array(
+        'label' => 'above',
+        'module' => 'list',
+        'settings' => array(),
+        'type' => 'list_default',
+        'weight' => 48,
+      ),
+      'teaser' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 0,
+      ),
+    ),
+    'entity_type' => 'node',
+    'field_name' => 'field_person_safe_church',
+    'label' => 'Safe Church Training Required',
+    'required' => 0,
+    'settings' => array(
+      'user_register_form' => FALSE,
+    ),
+    'widget' => array(
+      'active' => 1,
+      'module' => 'options',
+      'settings' => array(
+        'display_label' => 1,
+      ),
+      'type' => 'options_onoff',
+      'weight' => 53,
+    ),
+  );
+
   // Exported field_instance: 'node-person-field_person_suffix'
   $field_instances['node-person-field_person_suffix'] = array(
     'bundle' => 'person',
@@ -1440,6 +1483,59 @@ function person_data_type_field_default_field_instances() {
     ),
   );
 
+  // Exported field_instance: 'node-person-field_safe_church_training_date'
+  $field_instances['node-person-field_safe_church_training_date'] = array(
+    'bundle' => 'person',
+    'deleted' => 0,
+    'description' => '',
+    'display' => array(
+      'default' => array(
+        'label' => 'above',
+        'module' => 'date',
+        'settings' => array(
+          'format_type' => 'long',
+          'fromto' => 'both',
+          'multiple_from' => '',
+          'multiple_number' => '',
+          'multiple_to' => '',
+        ),
+        'type' => 'date_default',
+        'weight' => 49,
+      ),
+      'teaser' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 0,
+      ),
+    ),
+    'entity_type' => 'node',
+    'field_name' => 'field_safe_church_training_date',
+    'label' => 'Last Safe Church Training Date',
+    'required' => 0,
+    'settings' => array(
+      'default_value' => 'blank',
+      'default_value2' => 'same',
+      'default_value_code' => '',
+      'default_value_code2' => '',
+      'user_register_form' => FALSE,
+    ),
+    'widget' => array(
+      'active' => 1,
+      'module' => 'date',
+      'settings' => array(
+        'increment' => 15,
+        'input_format' => 'm/d/Y - H:i:s',
+        'input_format_custom' => '',
+        'label_position' => 'above',
+        'text_parts' => array(),
+        'year_range' => '-3:+3',
+      ),
+      'type' => 'date_select',
+      'weight' => 54,
+    ),
+  );
+
   // Translatables
   // Included for use with string extractors like potx.
   t('Address (Line 1)');
@@ -1451,11 +1547,13 @@ function person_data_type_field_default_field_instances() {
   t('Date of Birth');
   t('Date of Death');
   t('Diaconate Ordination');
+  t('Disable only if this person is no longer canonically required to complete Safe Church training.');
   t('First Name');
   t('Gender');
   t('Honorific');
   t('If outside of the U.S., enter State/Province and Country here.');
   t('Last Name');
+  t('Last Safe Church Training Date');
   t('Middle Name');
   t('Nickname');
   t('Other');
@@ -1468,6 +1566,7 @@ function person_data_type_field_default_field_instances() {
   t('Preferred Phone');
   t('Preferred Phone Type');
   t('Priesthood Ordination');
+  t('Safe Church Training Required');
   t('State/Province');
   t('Suffix');
   t('ZIP/Postal Code');

@@ -1,13 +1,13 @@
 <?php
 /**
  * @file
- * person_data_type.features.inc
+ * person.features.inc
  */
 
 /**
  * Implements hook_ctools_plugin_api().
  */
-function person_data_type_ctools_plugin_api($module = NULL, $api = NULL) {
+function person_ctools_plugin_api($module = NULL, $api = NULL) {
   if ($module == "field_group" && $api == "field_group") {
     return array("version" => "1");
   }
@@ -16,7 +16,7 @@ function person_data_type_ctools_plugin_api($module = NULL, $api = NULL) {
 /**
  * Implements hook_node_info().
  */
-function person_data_type_node_info() {
+function person_node_info() {
   $items = array(
     'person' => array(
       'name' => t('Person'),

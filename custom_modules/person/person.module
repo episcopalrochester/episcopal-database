@@ -4,35 +4,28 @@
  * Code for the Person Data Type feature.
  */
 
-include_once 'person_data_type.features.inc';
+include_once 'person.features.inc';
 
-function person_data_type_menu() {
+function person_menu() {
   $items = array();
   $items['people'] = array(
     'title' => 'People',
     'page callback' => 'drupal_get_form',
-    'page arguments' => array('person_data_type_people_form'),
+    'page arguments' => array('person_people_form'),
     'access arguments' => array('access people listing'),
     'type' => MENU_CALLBACK,
   );
   $items['safe-training'] = array(
     'title' => 'Update Safe Training Data',
     'page callback' => 'drupal_get_form',
-    'page arguments' => array('person_data_type_safe_form'),
-    'access arguments' => array('access people listing'),
-    'type' => MENU_CALLBACK,
-  );
-  $items['partners'] = array(
-    'title' => 'Partner/Marriage Editor',
-    'page callback' => 'drupal_get_form',
-    'page arguments' => array('person_data_type_partners_form'),
+    'page arguments' => array('person_safe_form'),
     'access arguments' => array('access people listing'),
     'type' => MENU_CALLBACK,
   );
   $items['directory'] = array(
     'title' => 'Clergy Directory',
     'page callback' => 'drupal_get_form',
-    'page arguments' => array('person_data_type_directory_form'),
+    'page arguments' => array('person_directory_form'),
     'access arguments' => array('access clergy directory'),
     'type' => MENU_CALLBACK,
   );
@@ -43,7 +36,7 @@ function person_data_type_menu() {
   Implementation of hook_theme()
 ****************************/
 
-function person_data_type_theme() {
+function person_theme() {
   return array(
     'directory_person' => array(
       'variables' => array('person'=>NULL),
@@ -52,7 +45,7 @@ function person_data_type_theme() {
   );
 }
 
-function person_data_type_permission() {
+function person_permission() {
   return array(
     'access people listing' => array(
       'title' => t("Access People Listing"),
@@ -65,145 +58,23 @@ function person_data_type_permission() {
   );
 }
 
-function person_data_type_partners_form($form,&$form_state) {
-  $people = person_data_type_fetch_people('clergy');
-  $form['single_people'] = array(
-    '#theme' => 'table',
-    '#caption' => 'Unpartnered People',
-    '#header' => array('Person','Add'),
-    '#rows'=> array(),
-    '#tree' => true,
-  );
-
-  $form['partnered_people'] = array(
-    '#theme' => 'table',
-    '#caption' => 'Partnered People',
-    '#header' => array('Person 1','Person 2','Type','edit'),
-    '#rows'=> array(),
-    '#tree' => true,
-  );
-  $expired = "";
-  foreach ($people['nodes'] as $person) {
-    $name = person_data_type_get_full_name($person);
-    $name = l(rtrim($name," ,"),"node/".$person->nid);
-    $partnerships = person_data_type_find_partnerships($person);
-    $types = _partnership_types();
-    $row = array();
-    $row['person1'] = $name;
-    $table = "single";
-    $edit = l("Add Relationship","node/add/personal-relationship",array(
-      'query'=>array('destination'=>"partners",'edit[field_pr_first][und]'=>$person->nid),
-    ));
-    $row['person2'] = "";
-    foreach ($partnerships as $partnership) {
-      $table = "partnered";
-      if ($partnership['partner']) {
-        $row['person2'] .= person_data_type_get_full_name($partnership['partner']);
-      }
-      else {
-        $row['person2'] .= "";
-      }
-      $row['type'] = $types[$partnership['type']];
-      if (node_access("update",$partnership['node'])) {
-        $edit = l("edit","node/".$partnership['node']->nid."/edit",array(
-          'query'=>array('destination'=>"partners"),
-        ));
-      }
-    }
-    $row['edit'] = $edit;
-    $form[$table.'_people']['#rows'][] = array('data'=>$row);
-    unset($partner_field);
-    unset($type_field);
-  }
-  $form['submit'] = array(
-
-    '#type' => 'submit',
-    '#value' => 'Save Changes / Process CSV',
-  );
-  $form['#submit'] = array('person_data_type_partners_form_submit');
-  return $form;
-}
-
-function person_data_type_nodereference_options($element, $edit = FALSE) {
+function person_nodereference_options($element, $edit = FALSE) {
   $field_key  = $element['#columns'][0];
   return array($field_key => NULL);
 }
 
-function person_data_type_find_partnerships($person,$inactive = FALSE) {
-  $query = db_select("node","n");
-  $query->leftJoin("field_data_field_pr_first","f","f.entity_id = n.nid");
-  $query->leftJoin("field_data_field_pr_second","s","s.entity_id = n.nid");
-  $query->leftJoin("field_data_field_pr_type","t","t.entity_id = n.nid");
-  $query->leftJoin("field_data_field_pr_start","p","p.entity_id = n.nid");
-  $query->leftJoin("field_data_field_pr_end","e","e.entity_id = n.nid");
-  $query->leftJoin("field_data_field_pr_end_reason","r","r.entity_id = n.nid");
-  $query->fields('n',array('nid'))
-    ->fields('t',array('field_pr_type_value'))
-    ->fields('f',array('field_pr_first_nid'))
-    ->fields('s',array('field_pr_second_nid'))
-    ->fields('p',array('field_pr_start_value'))
-    ->fields('e',array('field_pr_end_value'))
-    ->fields('r',array('field_pr_end_reason_value'))
-    ->condition("n.type","personal_relationship","=")
-    ->condition(db_or()->condition('t.field_pr_type_value','partnership')->condition('t.field_pr_type_value','marriage'))
-    ->condition(db_or()->condition('f.field_pr_first_nid',$person->nid)->condition('s.field_pr_second_nid',$person->nid))
-    ->condition('n.status', 1);
-  if (!$inactive) {
-    $query->isNull('e.field_pr_end_value');
-    $query->isNull('r.field_pr_end_reason_value');
-  }
-  $result = $query->execute();
-  if (!$result) {
-    return false;
-  }
-  $partnerships = array();
-  while ($record = $result->fetchAssoc()) {
-    $partnership = array('type'=>$record['field_pr_type_value']);
-    $partnership['start'] = "";
-    if ($record['field_pr_start_value']) {
-      $partnership['start'] = _date_to_human($record['field_pr_start_value']);
-    }
-    $partnership['end'] = "";
-    if ($record['field_pr_end_value']) {
-      $partnership['end'] = _date_to_human($record['field_pr_end_value']);
-    }
-    $partnership['end_reason'] = "";
-    if ($record['field_pr_end_reason_value']) {
-      $partnership['end_reason'] = $record['field_pr_end_reason_value'];
-    }
-    $partnership['node'] = node_load($record['nid']);
-    if ($person->nid == $record["field_pr_first_nid"]) {
-      $partnership['partner'] = node_load($record['field_pr_second_nid']);
-    }
-    elseif ($person->nid == $record['field_pr_second_nid']) {
-      $partnership['partner'] = node_load($record['field_pr_first_nid']);
-    }
-    else {
-      $partnership['partner'] = false; 
-    }
-    if (!empty($record['field_pr_end_value']) || !empty($record['field_pr_end_reason_value'])) {
-      $partnership['active'] = FALSE;
-    }
-    else {
-      $partnership['active'] = TRUE;
-    }
-    $partnerships[] = $partnership;
-  }
-  return $partnerships;
-}
-
-function person_data_type_partners_form_submit($form, &$form_state) {
+function person_partners_form_submit($form, &$form_state) {
   exit;
 }
 
 
-function person_data_type_safe_form($form,&$form_state) {
+function person_safe_form($form,&$form_state) {
   $form['csv'] = array(
     '#type' => 'file',
     '#title' => "Upload a CSV",
     '#tree' => TRUE,
   );
-  $people = person_data_type_fetch_people();
+  $people = person_fetch_people();
   $form['requireall'] = array(
     '#type' => 'checkbox',
     '#tree' => true,
@@ -292,12 +163,12 @@ function person_data_type_safe_form($form,&$form_state) {
     '#type' => 'submit',
     '#value' => 'Save Changes / Process CSV',
   );
-  $form['#submit'] = array('person_data_type_safe_form_submit');
+  $form['#submit'] = array('person_safe_form_submit');
   return $form;
 }
 
-function person_data_type_safe_form_submit($form, &$form_state) {
-  $people = person_data_type_fetch_people();
+function person_safe_form_submit($form, &$form_state) {
+  $people = person_fetch_people();
   foreach ($people['nodes'] as $person) {
     if (isset($form_state['input']['requireall'])) {
       $person->field_person_safe_church['und'] = array('0' => array('value' => 1));  
@@ -343,7 +214,7 @@ function person_data_type_safe_form_submit($form, &$form_state) {
       else {
         $email = false;
       }
-      $person = person_data_type_find_person($name,$email);
+      $person = person_find_person($name,$email);
       if ($person) {
         if (strlen($date) == "4") {
           $date = "12/31/".$date;
@@ -363,7 +234,7 @@ function person_data_type_safe_form_submit($form, &$form_state) {
   $form_state['rebuild'] = TRUE;  
 }
 
-function person_data_type_find_person($name,$email=FALSE) {
+function person_find_person($name,$email=FALSE) {
   $name_query = new EntityFieldQuery();
   $name_result = $name_query
     ->entityCondition('entity_type', 'node')
@@ -397,14 +268,14 @@ function person_data_type_find_person($name,$email=FALSE) {
   return false;
 }
 
-function person_data_type_directory_form($form,&$form_state,$type="all",$last="",$first="",$status="living") {
+function person_directory_form($form,&$form_state,$type="all",$last="",$first="",$status="living") {
   if (isset($form_state['values']['last'])) {
     $last = $form_state['values']['last'];
   }
   if (isset($form_state['values']['first'])) {
     $first = $form_state['values']['first'];
   }
-  $people = person_data_type_fetch_people('clergy',$last,$first,$status);
+  $people = person_fetch_people('clergy',$last,$first,$status);
   $weight = 1000;
   foreach ($people['nodes'] as $person) {
     $form['person'.$person->uid] = array(
@@ -433,11 +304,11 @@ function person_data_type_directory_form($form,&$form_state,$type="all",$last=""
     '#type' => 'submit',
     '#value' => 'Search',
   );
-  $form['#submit'] = array('person_data_type_directory_form_submit');
+  $form['#submit'] = array('person_directory_form_submit');
   return $form;
 }
 
-function person_data_type_directory_form_submit($form, &$form_state) {
+function person_directory_form_submit($form, &$form_state) {
   if (isset($form_state['values']['type'])) {
     $form_state['values']['type'] = $form_state['values']['type'];
   }
@@ -450,7 +321,7 @@ function person_data_type_directory_form_submit($form, &$form_state) {
   $form_state['rebuild'] = TRUE;  
 }
 
-function person_data_type_people_form($form,&$form_state,$type="all",$last="",$first="",$status="living") {
+function person_people_form($form,&$form_state,$type="all",$last="",$first="",$status="living") {
   if (isset($form_state['values']['type'])) {
     $type = $form_state['values']['type'];
   }
@@ -463,7 +334,7 @@ function person_data_type_people_form($form,&$form_state,$type="all",$last="",$f
   if (isset($form_state['values']['status'])) {
     $status = $form_state['values']['status'];
   }
-  $people = person_data_type_fetch_people($type,$last,$first,$status);
+  $people = person_fetch_people($type,$last,$first,$status);
   $people_table = array(
     'header' => array('Name','Location','E-Mail','Phone','edit'),
     'rows' => array(),
@@ -558,11 +429,11 @@ function person_data_type_people_form($form,&$form_state,$type="all",$last="",$f
     '#type' => 'item',
     '#markup' => theme_table($people_table)
   );
-  $form['#submit'] = array('person_data_type_people_form_submit');
+  $form['#submit'] = array('person_people_form_submit');
   return $form;
 }
 
-function person_data_type_people_form_submit($form, &$form_state) {
+function person_people_form_submit($form, &$form_state) {
   if (isset($form_state['values']['type'])) {
     $form_state['values']['type'] = $form_state['values']['type'];
   }
@@ -575,7 +446,7 @@ function person_data_type_people_form_submit($form, &$form_state) {
   $form_state['rebuild'] = TRUE;  
 }
 
-function person_data_type_fetch_people($type="all",$last="",$first="",$status="living") {
+function person_fetch_people($type="all",$last="",$first="",$status="living") {
   $query = db_select("node","n");
   $query->leftJoin("field_data_field_person_last_name","l","l.entity_id = n.nid");
   $query->leftJoin("field_data_field_person_first_name","f","f.entity_id = n.nid");
@@ -620,14 +491,14 @@ function person_data_type_fetch_people($type="all",$last="",$first="",$status="l
   return $people;
 }
 
-function person_data_type_is_alive($person) {
+function person_is_alive($person) {
   if (field_get_items('node',$person,'field_person_dod')) {
     return false;
   }
   return true; 
 }
 
-function person_data_type_get_full_name($person) {
+function person_get_full_name($person) {
   $first = field_get_items('node',$person,'field_person_first_name');
   $middle = field_get_items('node',$person,'field_person_middle_name');
   $last = field_get_items('node',$person,'field_person_last_name');
@@ -638,7 +509,7 @@ function person_data_type_get_full_name($person) {
   ))));
 }
 
-function person_data_type_get_address($person,$type) {
+function person_get_address($person,$type) {
   $pfx = "field_person_".$type."_";
   $address = array(
     'line1' => _get_value($person,$pfx."1"),
@@ -651,7 +522,7 @@ function person_data_type_get_address($person,$type) {
   return $address;
 }
 
-function person_data_type_get_phone($person,$type) {
+function person_get_phone($person,$type) {
   $pfx = "field_person_phone_".$type;
   $phone = array(
     'number' => _get_value($person,$pfx),
@@ -660,7 +531,7 @@ function person_data_type_get_phone($person,$type) {
   return $phone;
 }
 
-function person_data_type_get_email($person,$type) {
+function person_get_email($person,$type) {
   $pfx = "field_person_email_".$type;
   $email = array(
     'addy' => _get_value($person,$pfx),
@@ -674,18 +545,18 @@ function _get_value($node,$field,$type = "value") {
   return $array[0][$type];
 }
 
-function person_data_type_node_load($nodes, $types) {
+function person_node_load($nodes, $types) {
   if (in_array("person",$types)) {
     foreach ($nodes as $key => $node) {
-      $nodes[$key]->title = person_data_type_get_full_name($node);
+      $nodes[$key]->title = person_get_full_name($node);
     }
   }
 }
 
-function person_data_type_node_view($node, $view_mode, $langcode) {
+function person_node_view($node, $view_mode, $langcode) {
   if ($node->type == "person") {
     $count = 1;
-    $partnerships = person_data_type_find_partnerships($node,TRUE);
+    $partnerships = find_partnerships($node,TRUE);
     foreach ($partnerships as $partnership) {
       $pr_node = $partnership['node'];
       $lang = $pr_node->language;
@@ -696,7 +567,7 @@ function person_data_type_node_view($node, $view_mode, $langcode) {
       $node->content['#group_children']['field_pr_end_'.$nid] = "group_personal_relationships";
       $node->content['#group_children']['field_pr_end_reason_'.$nid] = "group_personal_relationships";
       if ($partnership['partner']) {
-        $partner = person_data_type_get_full_name($partnership['partner']);
+        $partner = person_get_full_name($partnership['partner']);
       }
       elseif(isset($pr_node->field_person_2_nr[$lang][0]['value'])) {
         $partner = $pr_node->field_person_2_nr[$lang][0]['value'];
@@ -766,7 +637,7 @@ function person_data_type_node_view($node, $view_mode, $langcode) {
         '#bundle' => 'person',
         '#items' => array(0 => array('value'=>$partnership['end_reason'])),
         '#formatter' => 'text_default',
-        0 => array('#markup' =>_partnership_splits($partnership['end_reason'])),
+        0 => array('#markup' =>partnership_splits($partnership['end_reason'])),
       );
       }
 
@@ -776,8 +647,8 @@ function person_data_type_node_view($node, $view_mode, $langcode) {
   }
 }
 
-function person_data_type_form_person_node_form_alter(&$form, &$form_state, $form_id) {
-    $partnerships = person_data_type_find_partnerships($form['#node'],TRUE);
+function person_form_person_node_form_alter(&$form, &$form_state, $form_id) {
+    $partnerships = find_partnerships($form['#node'],TRUE);
     $count = 1;
     foreach ($partnerships as $partnership) {
       $pr_node = $partnership['node'];
@@ -790,7 +661,7 @@ function person_data_type_form_person_node_form_alter(&$form, &$form_state, $for
       $form['#group_children']['field_pr_end_'.$nid] = "group_personal_relationships";
       $form['#group_children']['field_pr_end_reason_'.$nid] = "group_personal_relationships";
 if ($partnership['partner']) {
-        $partner = person_data_type_get_full_name($partnership['partner']);
+        $partner = person_get_full_name($partnership['partner']);
       }
     elseif(isset($pr_node->field_person_2_nr[$lang][0]['value'])) {
         $partner = $pr_node->field_person_2_nr[$lang][0]['value'];
@@ -814,7 +685,7 @@ if ($partnership['partner']) {
       $form['field_pr_type_'.$nid] = array(
         '#type'=> 'select',
         '#title' => 'Partnership Type:',
-        '#options' => _partnership_types(),
+        '#options' => partnership_types(),
         '#default_value' => $partnership['type'],
       );
       $form['field_pr_start_'.$nid] = array(
@@ -832,17 +703,17 @@ if ($partnership['partner']) {
       $form['field_pr_end_reason_'.$nid] = array(
         '#type'=> 'select',
         '#title' => 'Partnership End Reason:',
-        '#options' => _partnership_splits(),
+        '#options' => partnership_splits(),
         '#default_value' => $partnership['end_reason'],
       );
       $count++;
     }
 }
 
-function person_data_type_node_update($node) {
+function person_node_update($node) {
   if ($node->type == "person") {
-    $node->title = person_data_type_get_full_name($node);
-    $partnerships = person_data_type_find_partnerships($node,TRUE);
+    $node->title = person_get_full_name($node);
+    $partnerships = find_partnerships($node,TRUE);
     foreach ($partnerships as $partnership) {
       $pr_node = $partnership['node'];
       $nid = $pr_node->nid;
@@ -884,26 +755,4 @@ function _date_to_human($date) {
   return date_format($object,'m/d/Y');
 }
 
-function _partnership_types() {
-  return array(
-    ''=>'',
-    'marriage'=>'Marriage',
-    'partnership'=>'Partnership',
-    'cohabitate'=>'Cohabitating',
-    );
-}
-
-function _partnership_splits($key = FALSE) {
-    $splits =  array(
-      '' => '',
-      "death"=>"Death",
-      "divorce"=>"Divorce",
-      "separation"=>"Separation",
-      "other"=>"Other (see notes)",
-    );
-    if ($key && !empty($key)) {
-      return $splits[$key];
-    }
-    return $splits;
-}
 

@@ -1,5 +1,5 @@
-<h3 style="text-decoration: underline;"><?php print person_data_type_get_full_name($person); ?></h3>
-<?php if ($partnerships = person_data_type_find_partnerships($person,FALSE)): $partnership = $partnerships[0]; ?>
+<h3 style="text-decoration: underline;"><?php print person_get_full_name($person); ?></h3>
+<?php if ($partnerships = find_partnerships($person,FALSE)): $partnership = $partnerships[0]; ?>
 <h4>Partnership</h4>
 <?php $lang = $partnership['node']->language;
 ?>
@@ -22,14 +22,14 @@ case "parent":
   break;
 }; ?><?php
 if ($partnership['partner']) {  
-  print $type.person_data_type_get_full_name($partnership['partner']);
+  print $type.person_get_full_name($partnership['partner']);
 }
 else {
   $type = explode(" ",$type); print $type[0];
 }
 ?></p>
 <?php endif; ?>
-<?php $home = person_data_type_get_address($person,'home');
+<?php $home = person_get_address($person,'home');
 if ($home['line1'] || $home['line2'] || $home['city'] || $home['state'] || $home['other']): ?>
 <h4>Home Address</h4>
 <p>
@@ -54,7 +54,7 @@ if ($home['line1'] || $home['line2'] || $home['city'] || $home['state'] || $home
 </p>
 <?php endif; ?>
 
-<?php $mail = person_data_type_get_address($person,'mail'); 
+<?php $mail = person_get_address($person,'mail'); 
 if ($mail['line1'] || $mail['line2'] || $mail['city'] || $mail['state'] || $mail['other']): ?>
 <h4>Mailing Address</h4>
 <p>
@@ -81,8 +81,8 @@ if ($mail['line1'] || $mail['line2'] || $mail['city'] || $mail['state'] || $mail
 <table width="100%" border="0" style="border: 0px;">
 <tr>
 <td style="padding: 0px;">
-<?php $pref_phone = person_data_type_get_phone($person,"pref");
-$other_phone = person_data_type_get_phone($person,"other");
+<?php $pref_phone = person_get_phone($person,"pref");
+$other_phone = person_get_phone($person,"other");
 if ($pref_phone['number'] || $other_phone['number']): ?>
 <h4 style="margin-top: 0px;">Phone</h4>
 <?php if ($pref_phone['number']): ?>
@@ -103,8 +103,8 @@ if ($pref_phone['number'] || $other_phone['number']): ?>
 <?php endif; ?>
 </td>
 <td style="padding: 0px;">
-<?php $pref_email = person_data_type_get_email($person,"pref");
-$other_email = person_data_type_get_email($person,"other");
+<?php $pref_email = person_get_email($person,"pref");
+$other_email = person_get_email($person,"other");
 if ($pref_email['addy'] || $other_email['addy']): ?>
 <h4 style="margin-top: 0px;">E-Mail</h4>
 <?php if ($pref_email['addy']): ?>
