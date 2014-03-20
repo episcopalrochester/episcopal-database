@@ -22,17 +22,15 @@ function edb_init() {
 function edb_mydata_page_form($form,&$form_state) {
   global $user;
   $query = db_select('node','n');
-    $query->leftJoin("field_data_field_editors","e","e.entity_id = n.nid");
-    $query->fields('n',array('nid','type','title','changed'))
+  $query->leftJoin("field_data_field_editors","e","e.entity_id = n.nid");
+  $query->fields('n',array('nid','type','title','changed'))
     ->condition('status','1')
     ->orderBy('type','ASC')
     ->orderBy('changed','DESC');
-  if ($user->uid <> 1 && !in_array('database editor', $user->roles) && !in_array('administrator', $user->roles)){
-    $or = db_or();
-    $or->condition('uid',$user->uid);
-    $or->condition('e.field_editors_uid',$user->uid);
-    $query->condition($or);
-  }
+  $or = db_or();
+  $or->condition('uid',$user->uid);
+  $or->condition('e.field_editors_uid',$user->uid);
+  $query->condition($or);
   $result = $query->execute();
   $tables = array();
   $variables = array(
