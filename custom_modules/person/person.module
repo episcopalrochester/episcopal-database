@@ -665,6 +665,7 @@ function person_node_view($node, $view_mode, $langcode) {
 }
 
 function person_form_person_node_form_alter(&$form, &$form_state, $form_id) {
+  if (isset($form['#node']->nid)) {
     $partnerships = find_relationships(array_filter(array_keys(partnership_types())),$form['#node'],TRUE);
     $count = 1;
     foreach ($partnerships as $partnership) {
@@ -725,10 +726,11 @@ if ($partnership['relative']) {
       );
       $count++;
     }
+  }
 }
 
 function person_node_update($node) {
-  if ($node->type == "person") {
+  if ($node->type == "person" && isset($node->nid)) {
     $node->title = person_get_full_name($node);
     $partnerships = find_relationships(array_filter(array_keys(partnership_types())),$node,TRUE);
     foreach ($partnerships as $partnership) {
