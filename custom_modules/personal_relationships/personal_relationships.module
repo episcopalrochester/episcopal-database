@@ -8,13 +8,14 @@ include_once 'personal_relationships.features.inc';
 
 function personal_relationships_menu() {
   $items = array();
-    $items['partners'] = array(
-          'title' => 'Partner/Marriage Editor',
-              'page callback' => 'drupal_get_form',
-                  'page arguments' => array('personal_relationships_partners_form'),
-                      'access arguments' => array('access people listing'),
-                          'type' => MENU_CALLBACK,
-                            );
+  $items['partners'] = array(
+      'title' => 'Partner/Marriage Editor',
+      'page callback' => 'drupal_get_form',
+      'page arguments' => array('personal_relationships_partners_form'),
+      'access arguments' => array('access people listing'),
+      'type' => MENU_CALLBACK,
+      );
+  return $items;
 }
 
 function personal_relationships_partners_form($form,&$form_state) {
@@ -37,22 +38,24 @@ function personal_relationships_partners_form($form,&$form_state) {
   foreach ($people['nodes'] as $person) {
     $name = person_get_full_name($person);
     $name = l(rtrim($name," ,"),"node/".$person->nid);
-    $partnerships = find_partnerships($person);
     $types = partnership_types();
+    $partnerships = find_relationships(array_filter(array_keys($types)),$person);
     $row = array();
     $row['person1'] = $name;
     $table = "single";
     $edit = l("Add Relationship","node/add/personal-relationship",array(
       'query'=>array('destination'=>"partners",'edit[field_pr_first][und]'=>$person->nid),
     ));
-    $row['person2'] = "";
     foreach ($partnerships as $partnership) {
       $table = "partnered";
-      if ($partnership['partner']) {
-        $row['person2'] .= person_get_full_name($partnership['partner']);
+      if ($partnership['relative']) {
+        $row['person2'] = person_get_full_name($partnership['relative']);
+      }
+      elseif (isset($partnership['node']->field_person_2_nr['und'][0]['value'])) {
+        $row['person2'] = $partnership['node']->field_person_2_nr['und'][0]['value'];
       }
       else {
-        $row['person2'] .= "";
+        $row['person2'] = "";
       }
       $row['type'] = $types[$partnership['type']];
       if (node_access("update",$partnership['node'])) {
@@ -66,15 +69,10 @@ function personal_relationships_partners_form($form,&$form_state) {
     unset($partner_field);
     unset($type_field);
   }
-  $form['submit'] = array(
-    '#type' => 'submit',
-    '#value' => 'Save Changes / Process CSV',
-  );
-  $form['#submit'] = array('person_partners_form_submit');
   return $form;
 }
 
-function find_partnerships($person,$inactive = FALSE) {
+function find_relationships($types = FALSE, $person,$inactive = FALSE) {
   $query = db_select("node","n");
   $query->leftJoin("field_data_field_pr_first","f","f.entity_id = n.nid");
   $query->leftJoin("field_data_field_pr_second","s","s.entity_id = n.nid");
@@ -88,10 +86,15 @@ function find_partnerships($person,$inactive = FALSE) {
     ->fields('s',array('field_pr_second_nid'))
     ->fields('p',array('field_pr_start_value'))
     ->fields('e',array('field_pr_end_value'))
-    ->fields('r',array('field_pr_end_reason_value'))
-    ->condition("n.type","personal_relationship","=")
-    ->condition(db_or()->condition('t.field_pr_type_value','partnership')->condition('t.field_pr_type_value','marriage'))
-    ->condition(db_or()->condition('f.field_pr_first_nid',$person->nid)->condition('s.field_pr_second_nid',$person->nid))
+    ->fields('r',array('field_pr_end_reason_value'));
+  if ($types) {
+    $or = db_or();
+    foreach ($types as $type) {
+      $or->condition('t.field_pr_type_value',$type);
+    }
+    $query->condition($or);
+  }
+   $query->condition(db_or()->condition('f.field_pr_first_nid',$person->nid)->condition('s.field_pr_second_nid',$person->nid))
     ->condition('n.status', 1);
   if (!$inactive) {
     $query->isNull('e.field_pr_end_value');
@@ -101,40 +104,40 @@ function find_partnerships($person,$inactive = FALSE) {
   if (!$result) {
     return false;
   }
-  $partnerships = array();
+  $relationships = array();
   while ($record = $result->fetchAssoc()) {
-    $partnership = array('type'=>$record['field_pr_type_value']);
-    $partnership['start'] = "";
+    $relationship = array('type'=>$record['field_pr_type_value']);
+    $relationship['start'] = "";
     if ($record['field_pr_start_value']) {
-      $partnership['start'] = _date_to_human($record['field_pr_start_value']);
+      $relationship['start'] = _date_to_human($record['field_pr_start_value']);
     }
-    $partnership['end'] = "";
+    $relationship['end'] = "";
     if ($record['field_pr_end_value']) {
-      $partnership['end'] = _date_to_human($record['field_pr_end_value']);
+      $relationship['end'] = _date_to_human($record['field_pr_end_value']);
     }
-    $partnership['end_reason'] = "";
+    $relationship['end_reason'] = "";
     if ($record['field_pr_end_reason_value']) {
-      $partnership['end_reason'] = $record['field_pr_end_reason_value'];
+      $relationship['end_reason'] = $record['field_pr_end_reason_value'];
     }
-    $partnership['node'] = node_load($record['nid']);
+    $relationship['node'] = node_load($record['nid']);
     if ($person->nid == $record["field_pr_first_nid"]) {
-      $partnership['partner'] = node_load($record['field_pr_second_nid']);
+      $relationship['relative'] = node_load($record['field_pr_second_nid']);
     }
     elseif ($person->nid == $record['field_pr_second_nid']) {
-      $partnership['partner'] = node_load($record['field_pr_first_nid']);
+      $relationship['relative'] = node_load($record['field_pr_first_nid']);
     }
     else {
-      $partnership['partner'] = false;
+      $relationship['relative'] = false;
     }
     if (!empty($record['field_pr_end_value']) || !empty($record['field_pr_end_reason_value'])) {
-      $partnership['active'] = FALSE;
+      $relationship['active'] = FALSE;
     }
     else {
-      $partnership['active'] = TRUE;
+      $relationship['active'] = TRUE;
     }
-    $partnerships[] = $partnership;
+    $relationships[] = $relationship;
   }
-  return $partnerships;
+  return $relationships;
 }
 
 function partnership_types() {

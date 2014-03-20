@@ -1,5 +1,5 @@
 <h3 style="text-decoration: underline;"><?php print person_get_full_name($person); ?></h3>
-<?php if ($partnerships = find_partnerships($person,FALSE)): $partnership = $partnerships[0]; ?>
+<?php if ($partnerships = find_relationships(array_filter(array_keys(partnership_types())),$person,FALSE)): $partnership = $partnerships[0]; ?>
 <h4>Partnership</h4>
 <?php $lang = $partnership['node']->language;
 ?>
@@ -21,8 +21,11 @@ case "parent":
   $type = "Parent/child to ";
   break;
 }; ?><?php
-if ($partnership['partner']) {  
-  print $type.person_get_full_name($partnership['partner']);
+if ($partnership['relative']) {  
+  print $type.person_get_full_name($partnership['relative']);
+}
+elseif (isset($partnership['node']->field_person_2_nr['und'][0]['value'])) {
+  print $type.$partnership['node']->field_person_2_nr['und'][0]['value'];
 }
 else {
   $type = explode(" ",$type); print $type[0];

@@ -35,8 +35,8 @@ function user_generator_flush_users() {
 }
 
 function user_generator_create_account($email,$person,$rid) {
-  if (person_data_type_is_alive($person)) {
-    $name = person_data_type_get_full_name($person);
+  if (person_is_alive($person)) {
+    $name = person_get_full_name($person);
     if (user_generator_check_name($name)) {
       $name = $email;
     }
@@ -92,7 +92,7 @@ function fix_names() {
     $nodes = entity_load('node', array_keys($entities['node']));
   }
   foreach ($nodes as $node) {
-    $node->title = person_data_type_get_full_name($node);
+    $node->title = person_get_full_name($node);
     var_dump($node->title);
     node_save($node);
   }

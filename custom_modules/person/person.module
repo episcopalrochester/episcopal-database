@@ -74,7 +74,7 @@ function person_safe_form($form,&$form_state) {
     '#title' => "Upload a CSV",
     '#tree' => TRUE,
   );
-  $people = person_fetch_people();
+  $people = person_fetch_people("clergy");
   $form['requireall'] = array(
     '#type' => 'checkbox',
     '#tree' => true,
@@ -334,7 +334,7 @@ function person_people_form($form,&$form_state,$type="all",$last="",$first="",$s
   if (isset($form_state['values']['status'])) {
     $status = $form_state['values']['status'];
   }
-  $people = person_fetch_people($type,$last,$first,$status);
+  $people = person_fetch_people($type,$last,$first,$status,20);
   $people_table = array(
     'header' => array('Name','Location','E-Mail','Phone','edit'),
     'rows' => array(),
@@ -429,6 +429,10 @@ function person_people_form($form,&$form_state,$type="all",$last="",$first="",$s
     '#type' => 'item',
     '#markup' => theme_table($people_table)
   );
+  $form['pager'] = array(
+    '#type' => 'item',
+    '#markup' => theme('pager', array('tags' => array())),
+  );
   $form['#submit'] = array('person_people_form_submit');
   return $form;
 }
@@ -446,7 +450,7 @@ function person_people_form_submit($form, &$form_state) {
   $form_state['rebuild'] = TRUE;  
 }
 
-function person_fetch_people($type="all",$last="",$first="",$status="living") {
+function person_fetch_people($type="all",$last="",$first="",$status="living",$limit=FALSE) {
   $query = db_select("node","n");
   $query->leftJoin("field_data_field_person_last_name","l","l.entity_id = n.nid");
   $query->leftJoin("field_data_field_person_first_name","f","f.entity_id = n.nid");
@@ -483,6 +487,9 @@ function person_fetch_people($type="all",$last="",$first="",$status="living") {
       ->isNull('d.field_person_diaconate_value')
       ->isNull('c.field_person_consecration_value');
   }
+  if ($limit) {
+$query = $query->extend('PagerDefault')->limit($limit);
+  }
   $result = $query->execute();
   $people = array('nodes' => array(), 'pager' => '');
   while ($record = $result->fetchAssoc()) {
@@ -501,6 +508,9 @@ function person_is_alive($person) {
 function person_get_full_name($person) {
   $first = field_get_items('node',$person,'field_person_first_name');
   $middle = field_get_items('node',$person,'field_person_middle_name');
+  if (!isset($middle[0]['value'])) {
+   $middle[0]['value'] = "";
+  }
   $last = field_get_items('node',$person,'field_person_last_name');
   return trim(preg_replace('!\s+!', ' ', implode(" ",array(
     $first[0]['value'],
@@ -556,7 +566,7 @@ function person_node_load($nodes, $types) {
 function person_node_view($node, $view_mode, $langcode) {
   if ($node->type == "person") {
     $count = 1;
-    $partnerships = find_partnerships($node,TRUE);
+    $partnerships = find_relationships(array_filter(array_keys(partnership_types())),$node,TRUE);
     foreach ($partnerships as $partnership) {
       $pr_node = $partnership['node'];
       $lang = $pr_node->language;
@@ -566,8 +576,8 @@ function person_node_view($node, $view_mode, $langcode) {
       $node->content['#group_children']['field_pr_start_'.$nid] = "group_personal_relationships";
       $node->content['#group_children']['field_pr_end_'.$nid] = "group_personal_relationships";
       $node->content['#group_children']['field_pr_end_reason_'.$nid] = "group_personal_relationships";
-      if ($partnership['partner']) {
-        $partner = person_get_full_name($partnership['partner']);
+      if ($partnership['relative']) {
+        $partner = person_get_full_name($partnership['relative']);
       }
       elseif(isset($pr_node->field_person_2_nr[$lang][0]['value'])) {
         $partner = $pr_node->field_person_2_nr[$lang][0]['value'];
@@ -578,6 +588,9 @@ function person_node_view($node, $view_mode, $langcode) {
       $title = "Partnership";
       if (!$partnership['active']) {
         $title .= " (inactive)";
+      }
+      if (node_access("update",$pr_node)) {
+        $title .= " - ".l("edit","node/".$pr_node->nid."/edit");
       }
       $node->content['field_pr_head_'.$nid] = array(
         '#theme' => 'field',
@@ -602,6 +615,7 @@ function person_node_view($node, $view_mode, $langcode) {
         '#formatter' => 'text_default',
         0 => array('#markup' => $partner),
       );
+      if ($partnership['start']) {
       $node->content['field_pr_start_'.$nid] = array(
         '#theme' => 'field',
         '#label_display' => 'inline',
@@ -614,6 +628,8 @@ function person_node_view($node, $view_mode, $langcode) {
         '#formatter' => 'text_default',
         0 => array('#markup' => $partnership['start']),
       );
+      }
+      if ($partnership['end']) {
    $node->content['field_pr_end_'.$nid] = array(
         '#theme' => 'field',
         '#label_display' => 'inline',
@@ -626,6 +642,7 @@ function person_node_view($node, $view_mode, $langcode) {
         '#formatter' => 'text_default',
         0 => array('#markup' =>$partnership['end']),
       );
+      }
       if ($partnership['end_reason']) {
       $node->content['field_pr_end_reason_'.$nid] = array(
         '#theme' => 'field',
@@ -648,7 +665,7 @@ function person_node_view($node, $view_mode, $langcode) {
 }
 
 function person_form_person_node_form_alter(&$form, &$form_state, $form_id) {
-    $partnerships = find_partnerships($form['#node'],TRUE);
+    $partnerships = find_relationships(array_filter(array_keys(partnership_types())),$form['#node'],TRUE);
     $count = 1;
     foreach ($partnerships as $partnership) {
       $pr_node = $partnership['node'];
@@ -660,8 +677,8 @@ function person_form_person_node_form_alter(&$form, &$form_state, $form_id) {
       $form['#group_children']['field_pr_start_'.$nid] = "group_personal_relationships";
       $form['#group_children']['field_pr_end_'.$nid] = "group_personal_relationships";
       $form['#group_children']['field_pr_end_reason_'.$nid] = "group_personal_relationships";
-if ($partnership['partner']) {
-        $partner = person_get_full_name($partnership['partner']);
+if ($partnership['relative']) {
+        $partner = person_get_full_name($partnership['relative']);
       }
     elseif(isset($pr_node->field_person_2_nr[$lang][0]['value'])) {
         $partner = $pr_node->field_person_2_nr[$lang][0]['value'];
@@ -713,7 +730,7 @@ if ($partnership['partner']) {
 function person_node_update($node) {
   if ($node->type == "person") {
     $node->title = person_get_full_name($node);
-    $partnerships = find_partnerships($node,TRUE);
+    $partnerships = find_relationships(array_filter(array_keys(partnership_types())),$node,TRUE);
     foreach ($partnerships as $partnership) {
       $pr_node = $partnership['node'];
       $nid = $pr_node->nid;
