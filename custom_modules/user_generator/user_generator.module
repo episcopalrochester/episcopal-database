@@ -81,3 +81,19 @@ function user_generator_scan_persons() {
   }
   return array();
 }
+
+function fix_names() {
+  $query = new EntityFieldQuery();
+  $entities = $query->entityCondition('entity_type', 'node')
+    ->entityCondition('bundle', 'person')
+    ->propertyCondition('status', 1)
+    ->execute();
+  if ($entities['node']) {
+    $nodes = entity_load('node', array_keys($entities['node']));
+  }
+  foreach ($nodes as $node) {
+    $node->title = person_data_type_get_full_name($node);
+    var_dump($node->title);
+    node_save($node);
+  }
+}

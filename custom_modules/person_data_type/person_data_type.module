@@ -841,25 +841,29 @@ if ($partnership['partner']) {
 
 function person_data_type_node_update($node) {
   if ($node->type == "person") {
+    $node->title = person_data_type_get_full_name($node);
     $partnerships = person_data_type_find_partnerships($node,TRUE);
     foreach ($partnerships as $partnership) {
       $pr_node = $partnership['node'];
       $nid = $pr_node->nid;
       $lang = $pr_node->language;
-      eval("\$pr_node->field_pr_type[\$lang][0]['value']=\$node->field_pr_type_".$nid.";");
-      eval("\$pr_node->field_pr_start[\$lang][0]['value'] = _date_to_utc(\$node->field_pr_start_".$nid.");");
-      if (empty($pr_node->field_pr_start[$lang][0]['value'])) {
-        $pr_node->field_pr_start = NULL;
+      eval("\$editing = isset(\$node->field_pr_type_".$nid.");");
+      if ($editing) {
+        eval("\$pr_node->field_pr_type[\$lang][0]['value']=\$node->field_pr_type_".$nid.";");
+        eval("\$pr_node->field_pr_start[\$lang][0]['value'] = _date_to_utc(\$node->field_pr_start_".$nid.");");
+        if (empty($pr_node->field_pr_start[$lang][0]['value'])) {
+          $pr_node->field_pr_start = NULL;
+        }
+        eval("\$pr_node->field_pr_end[\$lang][0]['value'] = _date_to_utc(\$node->field_pr_end_".$nid.");");
+        if (empty($pr_node->field_pr_end[$lang][0]['value'])) {
+          $pr_node->field_pr_end = NULL;
+        } 
+        eval("\$pr_node->field_pr_end_reason[\$lang][0]['value']=\$node->field_pr_end_reason_".$nid.";");
+        if (empty($pr_node->field_pr_end_reason[$lang][0]['value'])) {
+          $pr_node->field_pr_end_reason = NULL;
+        }
+        node_save($pr_node);
       }
-      eval("\$pr_node->field_pr_end[\$lang][0]['value'] = _date_to_utc(\$node->field_pr_end_".$nid.");");
-      if (empty($pr_node->field_pr_end[$lang][0]['value'])) {
-        $pr_node->field_pr_end = NULL;
-      } 
-      eval("\$pr_node->field_pr_end_reason[\$lang][0]['value']=\$node->field_pr_end_reason_".$nid.";");
-      if (empty($pr_node->field_pr_end_reason[$lang][0]['value'])) {
-        $pr_node->field_pr_end_reason = NULL;
-      }
-      node_save($pr_node);
     }
   }
 }
