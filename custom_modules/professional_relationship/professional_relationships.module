@@ -30,7 +30,7 @@ function professional_relationships_partners_form($form,&$form_state) {
   $form['partnered_people'] = array(
     '#theme' => 'table',
     '#caption' => 'Partnered People',
-    '#header' => array('Person 1','Person 2','Type','edit'),
+    '#header' => array('Person','Organization','Type','edit'),
     '#rows'=> array(),
     '#tree' => true,
   );
@@ -70,6 +70,10 @@ function professional_relationships_partners_form($form,&$form_state) {
     unset($type_field);
   }
   return $form;
+}
+
+function professional_relationships_form_professional_relationship_node_form_alter(&$form,&$form_state,$form_id) {
+  $form['field_pf_type']['und']['#options'] = array_filter(pro_relationship_types());
 }
 
 function find_pro_relationships($types = FALSE, $person,$inactive = FALSE) {
@@ -143,9 +147,10 @@ function find_pro_relationships($types = FALSE, $person,$inactive = FALSE) {
 function pro_relationship_types() {
   return array(
     ''=>'',
-    'marriage'=>'Marriage',
-    'partnership'=>'Partnership',
-    'cohabitate'=>'Cohabitating',
+    'rector'=>'Rector',
+    'pic'=>'Priest-in-Charge',
+    'associate'=>'Associate Priest',
+    'deacon'=>'Deacon',
   );
 }
 

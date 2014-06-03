@@ -15,7 +15,7 @@ function professional_relationships_field_default_field_instances() {
     'bundle' => 'professional_relationship',
     'default_value' => NULL,
     'deleted' => 0,
-    'description' => 'Name of second person if there is no record for them in the database. This is useful if the second person will never have a database entry.',
+    'description' => 'Name of organization if there is no record.',
     'display' => array(
       'default' => array(
         'label' => 'above',
@@ -33,7 +33,7 @@ function professional_relationships_field_default_field_instances() {
     ),
     'entity_type' => 'node',
     'field_name' => 'field_org_nr',
-    'label' => 'Person 2 (if no record)',
+    'label' => 'Organization (if no record)',
     'required' => 0,
     'settings' => array(
       'text_processing' => 0,
@@ -163,20 +163,20 @@ function professional_relationships_field_default_field_instances() {
     ),
     'entity_type' => 'node',
     'field_name' => 'field_pf_first',
-    'label' => 'Person 1',
+    'label' => 'Person',
     'required' => 1,
     'settings' => array(
       'user_register_form' => FALSE,
     ),
     'widget' => array(
       'active' => 1,
-      'module' => 'options',
+      'module' => 'node_reference',
       'settings' => array(
         'autocomplete_match' => 'contains',
         'autocomplete_path' => 'node_reference/autocomplete',
         'size' => 60,
       ),
-      'type' => 'options_select',
+      'type' => 'node_reference_autocomplete',
       'weight' => 2,
     ),
   );
@@ -204,7 +204,7 @@ function professional_relationships_field_default_field_instances() {
     ),
     'entity_type' => 'node',
     'field_name' => 'field_pf_second',
-    'label' => 'Person 2',
+    'label' => 'Organization',
     'required' => 0,
     'settings' => array(
       'user_register_form' => FALSE,
@@ -315,11 +315,11 @@ function professional_relationships_field_default_field_instances() {
   // Translatables
   // Included for use with string extractors like potx.
   t('End Date');
-  t('Name of second person if there is no record for them in the database. This is useful if the second person will never have a database entry.');
+  t('Name of organization if there is no record.');
   t('Notes');
   t('Person 1');
-  t('Person 2');
-  t('Person 2 (if no record)');
+  t('Organization');
+  t('Organization (if no record)');
   t('Reason for End');
   t('Relationship Type');
   t('Start Date');

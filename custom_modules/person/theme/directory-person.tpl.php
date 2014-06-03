@@ -32,6 +32,39 @@ else {
 }
 ?></p>
 <?php endif; ?>
+<?php if ($jobs = find_pro_relationships(array_filter(array_keys(pro_relationship_types())),$person,FALSE)): ?>
+<h4>Jobs</h4>
+<?php foreach ($jobs as $job): ?>
+<?php $lang = $job['node']->language;
+?>
+  <p><?php $type = "Employed at ";
+switch($job['node']->field_pf_type[$lang][0]['value']) {
+case "rector":
+$type = "Rector at ";
+  break;
+case "pic":
+  $type = "Priest-in-Charge at ";
+  break;
+case "deacon":
+    $type = "Deacon at ";
+      break;
+case "associate":
+    $type = "Associate Priest at ";
+      break;
+
+}; ?><?php
+  if ($job['relative']) {
+      print $type.$job['relative']->title;
+  }
+  elseif (isset($job['node']->field_org_nr['und'][0]['value'])) {
+      print $type.$job['node']->field_org_nr['und'][0]['value'];
+  }
+  else {
+      $type = explode(" ",$type); print $type[0];
+  }
+?></p>
+<?php endforeach; ?>
+<?php endif; ?>
 <?php $home = person_get_address($person,'home');
 if ($home['line1'] || $home['line2'] || $home['city'] || $home['state'] || $home['other']): ?>
 <h4>Home Address</h4>

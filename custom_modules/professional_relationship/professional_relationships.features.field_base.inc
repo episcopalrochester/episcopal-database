@@ -158,7 +158,7 @@ function professional_relationships_field_default_field_bases() {
     'module' => 'node_reference',
     'settings' => array(
       'referenceable_types' => array(
-        'person' => 'person',
+        'parish' => 'parish',
         'professional_relationship' => 0,
       ),
       'view' => array(
@@ -218,12 +218,7 @@ function professional_relationships_field_default_field_bases() {
     'module' => 'list',
     'settings' => array(
       'allowed_values' => array(
-        'marriage' => 'Marriage',
-        'partnership' => 'Partnership',
-        'cohabitate' => 'Cohabitating',
-        'sibling' => 'Sibling',
-        'parent' => 'Parent/Child',
-      ),
+       ),
       'allowed_values_function' => '',
     ),
     'translatable' => 0,
