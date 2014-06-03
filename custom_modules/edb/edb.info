@@ -3,6 +3,7 @@ description = Master module for Episcopal Database system.
 core = 7.x
 version = 7.x-1.1
 package = Episcopal Database
+stylesheets[all][] = styles.css
 dependencies[] = person
 dependencies[] = personal_relationships
 
