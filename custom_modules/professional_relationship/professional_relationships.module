@@ -1,0 +1,164 @@
+<?php
+/**
+ * @file
+ * Code for the Personal Relationships feature.
+ */
+
+include_once 'professional_relationships.features.inc';
+
+function professional_relationships_menu() {
+  $items = array();
+  $items['partners'] = array(
+      'title' => 'Partner/Marriage Editor',
+      'page callback' => 'drupal_get_form',
+      'page arguments' => array('professional_relationships_partners_form'),
+      'access arguments' => array('access people listing'),
+      'type' => MENU_CALLBACK,
+      );
+  return $items;
+}
+
+function professional_relationships_partners_form($form,&$form_state) {
+  $people = person_fetch_people('clergy');
+  $form['single_people'] = array(
+    '#theme' => 'table',
+    '#caption' => 'Unpartnered People',
+    '#header' => array('Person','Add'),
+    '#rows'=> array(),
+    '#tree' => true,
+  );
+  $form['partnered_people'] = array(
+    '#theme' => 'table',
+    '#caption' => 'Partnered People',
+    '#header' => array('Person 1','Person 2','Type','edit'),
+    '#rows'=> array(),
+    '#tree' => true,
+  );
+  $expired = "";
+  foreach ($people['nodes'] as $person) {
+    $name = person_get_full_name($person);
+    $name = l(rtrim($name," ,"),"node/".$person->nid);
+    $types = pro_relationship_types();
+    $partnerships = find_pro_relationships(array_filter(array_keys($types)),$person);
+    $row = array();
+    $row['person1'] = $name;
+    $table = "single";
+    $edit = l("Add Relationship","node/add/professional-relationship",array(
+      'query'=>array('destination'=>"partners",'edit[field_pf_first][und]'=>$person->nid),
+    ));
+    foreach ($partnerships as $partnership) {
+      $table = "partnered";
+      if ($partnership['relative']) {
+        $row['org'] = person_get_full_name($partnership['relative']);
+      }
+      elseif (isset($partnership['node']->field_org_nr['und'][0]['value'])) {
+        $row['org'] = $partnership['node']->field_org_nr['und'][0]['value'];
+      }
+      else {
+        $row['org'] = "";
+      }
+      $row['type'] = $types[$partnership['type']];
+      if (node_access("update",$partnership['node'])) {
+        $edit = l("edit","node/".$partnership['node']->nid."/edit",array(
+          'query'=>array('destination'=>"partners"),
+        ));
+      }
+    }
+    $row['edit'] = $edit;
+    $form[$table.'_people']['#rows'][] = array('data'=>$row);
+    unset($partner_field);
+    unset($type_field);
+  }
+  return $form;
+}
+
+function find_pro_relationships($types = FALSE, $person,$inactive = FALSE) {
+  $query = db_select("node","n");
+  $query->leftJoin("field_data_field_pf_first","f","f.entity_id = n.nid");
+  $query->leftJoin("field_data_field_pf_second","s","s.entity_id = n.nid");
+  $query->leftJoin("field_data_field_pf_type","t","t.entity_id = n.nid");
+  $query->leftJoin("field_data_field_pf_start","p","p.entity_id = n.nid");
+  $query->leftJoin("field_data_field_pf_end","e","e.entity_id = n.nid");
+  $query->leftJoin("field_data_field_pf_end_reason","r","r.entity_id = n.nid");
+  $query->fields('n',array('nid'))
+    ->fields('t',array('field_pf_type_value'))
+    ->fields('f',array('field_pf_first_nid'))
+    ->fields('s',array('field_pf_second_nid'))
+    ->fields('p',array('field_pf_start_value'))
+    ->fields('e',array('field_pf_end_value'))
+    ->fields('r',array('field_pf_end_reason_value'));
+  if ($types) {
+    $or = db_or();
+    foreach ($types as $type) {
+      $or->condition('t.field_pf_type_value',$type);
+    }
+    $query->condition($or);
+  }
+   $query->condition(db_or()->condition('f.field_pf_first_nid',$person->nid)->condition('s.field_pf_second_nid',$person->nid))
+    ->condition('n.status', 1);
+  if (!$inactive) {
+    $query->isNull('e.field_pf_end_value');
+    $query->isNull('r.field_pf_end_reason_value');
+  }
+  $result = $query->execute();
+  if (!$result) {
+    return false;
+  }
+  $relationships = array();
+  while ($record = $result->fetchAssoc()) {
+    $relationship = array('type'=>$record['field_pf_type_value']);
+    $relationship['start'] = "";
+    if ($record['field_pf_start_value']) {
+      $relationship['start'] = _date_to_human($record['field_pf_start_value']);
+    }
+    $relationship['end'] = "";
+    if ($record['field_pf_end_value']) {
+      $relationship['end'] = _date_to_human($record['field_pf_end_value']);
+    }
+    $relationship['end_reason'] = "";
+    if ($record['field_pf_end_reason_value']) {
+      $relationship['end_reason'] = $record['field_pf_end_reason_value'];
+    }
+    $relationship['node'] = node_load($record['nid']);
+    if ($person->nid == $record["field_pf_first_nid"]) {
+      $relationship['relative'] = node_load($record['field_pf_second_nid']);
+    }
+    elseif ($person->nid == $record['field_pf_second_nid']) {
+      $relationship['relative'] = node_load($record['field_pf_first_nid']);
+    }
+    else {
+      $relationship['relative'] = false;
+    }
+    if (!empty($record['field_pf_end_value']) || !empty($record['field_pf_end_reason_value'])) {
+      $relationship['active'] = FALSE;
+    }
+    else {
+      $relationship['active'] = TRUE;
+    }
+    $relationships[] = $relationship;
+  }
+  return $relationships;
+}
+
+function pro_relationship_types() {
+  return array(
+    ''=>'',
+    'marriage'=>'Marriage',
+    'partnership'=>'Partnership',
+    'cohabitate'=>'Cohabitating',
+  );
+}
+
+function pro_relationship_splits($key = FALSE) {
+  $splits =  array(
+    '' => '',
+    "death"=>"Death",
+    "divorce"=>"Divorce",
+    "separation"=>"Separation",
+    "other"=>"Other (see notes)",
+  );
+  if ($key && !empty($key)) {
+    return $splits[$key];
+  }
+  return $splits;
+}

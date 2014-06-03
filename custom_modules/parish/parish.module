@@ -1,0 +1,7 @@
+<?php
+/**
+ * @file
+ * Code for the Parish feature.
+ */
+
+include_once 'parish.features.inc';

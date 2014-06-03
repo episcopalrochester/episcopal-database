@@ -1,0 +1,13 @@
+name = Parish
+description = Parish content type
+core = 7.x
+package = Episcopal Database
+version = 7.x-1.0
+project = parish
+dependencies[] = features
+dependencies[] = list
+dependencies[] = options
+features[features_api][] = api:2
+features[field_base][] = field_parish_district
+features[field_instance][] = node-parish-field_parish_district
+features[node][] = parish
