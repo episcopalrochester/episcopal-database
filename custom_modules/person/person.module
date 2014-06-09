@@ -278,7 +278,7 @@ function person_directory_form($form,&$form_state,$type="all",$last="",$first=""
   $people = person_fetch_people('clergy',$last,$first,$status);
   $weight = 1000;
   foreach ($people['nodes'] as $person) {
-    $form['person'.$person->uid] = array(
+    $form['person'.$person->nid] = array(
       '#type'=>'markup',
       '#markup'=>theme('directory_person',array('person'=>$person)),
       '#weight'=>$weight,

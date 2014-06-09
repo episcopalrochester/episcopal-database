@@ -215,13 +215,13 @@ function personal_relationships_field_default_field_instances() {
     ),
     'widget' => array(
       'active' => 1,
-      'module' => 'options',
+      'module' => 'node_reference',
       'settings' => array(
         'autocomplete_match' => 'contains',
         'autocomplete_path' => 'node_reference/autocomplete',
         'size' => 60,
       ),
-      'type' => 'options_select',
+      'type' => 'node_reference_autocomplete',
       'weight' => 2,
     ),
   );
