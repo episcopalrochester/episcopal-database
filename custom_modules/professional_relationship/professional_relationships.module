@@ -160,9 +160,10 @@ function pro_relationship_types() {
 function pro_relationship_splits($key = FALSE) {
   $splits =  array(
     '' => '',
-    "death"=>"Death",
-    "divorce"=>"Divorce",
-    "separation"=>"Separation",
+    "retirement"=>"Retirement",
+    "resignation"=>"Resignation",
+    "reassignment"=>"Reassignment",
+    "termination"=>"Termination",
     "other"=>"Other (see notes)",
   );
   if ($key && !empty($key)) {
