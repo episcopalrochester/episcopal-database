@@ -1,0 +1,26 @@
+#navigation,
+#person-directory-form #edit-filters {
+  display: none;
+}
+
+#person-directory-form .person {
+ page-break-inside: avoid;
+}
+
+#person-directory-form .person td {
+  padding: 3px !important;
+}
+
+#person-directory-form .person hr {
+  margin: 5px 0px;
+}
+
+#person-directory-form .person h4,
+#person-directory-form .person p {
+  margin-bottom: 1px;
+}
+
+body {
+  margin-left: 60px !important;
+  margin-right: 30px !important;
+}
