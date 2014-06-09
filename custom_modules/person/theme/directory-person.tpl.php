@@ -1,3 +1,4 @@
+<div class="person">
 <h3 style="text-decoration: underline;"><?php print person_get_full_name($person); ?></h3>
 <?php if ($partnerships = find_relationships(array_filter(array_keys(partnership_types())),$person,FALSE)): $partnership = $partnerships[0]; ?>
 <h4>Partnership</h4>
@@ -39,6 +40,9 @@ else {
 ?>
   <p><?php $type = "Employed at ";
 switch($job['node']->field_pf_type[$lang][0]['value']) {
+case "bishop": $type = "Bishop at "; break;
+case "chaplain": $type = "Chaplain at "; break;
+case "cmm": $type = "Canon for Mission & Ministry at "; break;
 case "rector":
 $type = "Rector at ";
   break;
@@ -163,3 +167,4 @@ if ($pref_email['addy'] || $other_email['addy']): ?>
 </tr>
 </table>
 <hr />
+</div>

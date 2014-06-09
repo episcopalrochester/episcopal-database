@@ -1,3 +1,8 @@
 fieldset.form-wrapper .fieldset-wrapper {
   padding-top: 20px;
 }
+
+#person-directory-form td {
+  vertical-align: top;
+  padding: 15px !important;
+}

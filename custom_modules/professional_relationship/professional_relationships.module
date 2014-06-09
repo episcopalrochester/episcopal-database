@@ -151,6 +151,9 @@ function pro_relationship_types() {
     'pic'=>'Priest-in-Charge',
     'associate'=>'Associate Priest',
     'deacon'=>'Deacon',
+    'chaplain' => 'Chaplain',
+    'bishop' => 'Bishop',
+    'cmm' => 'Canon for Mission & Ministry',
   );
 }
 
