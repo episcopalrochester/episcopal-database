@@ -564,9 +564,15 @@ function person_node_load($nodes, $types) {
 }
 
 function person_node_view($node, $view_mode, $langcode) {
+  $admin = edb_is_admin();
   if ($node->type == "person") {
     $count = 1;
+    if ($admin) {
     $partnerships = find_relationships(array_filter(array_keys(partnership_types())),$node,TRUE);
+    }
+    else {
+    $partnerships = find_relationships(array_filter(array_keys(partnership_types())),$node,FALSE);
+    }
     foreach ($partnerships as $partnership) {
       $pr_node = $partnership['node'];
       $lang = $pr_node->language;
@@ -659,7 +665,12 @@ function person_node_view($node, $view_mode, $langcode) {
       }
     }
     $count = 1;
+    if ($admin) {
     $jobs = find_pro_relationships(array_filter(array_keys(pro_relationship_types())),$node,TRUE);
+    }
+    else {
+    $jobs = find_pro_relationships(array_filter(array_keys(pro_relationship_types())),$node,FALSE);
+    }
     foreach ($jobs as $job) {
       $pf_node = $job['node'];
       $lang = $pf_node->language;
@@ -696,13 +707,14 @@ function person_node_view($node, $view_mode, $langcode) {
         '#formatter' => 'text_default',
         0 => array('#markup' => "<h2>".$title."</h2>"),
       );
+      $types = pro_relationship_types();
       $node->content['field_pf_job_'.$nid] = array(
         '#theme' => 'field',
         '#label_display' => 'inline',
         '#field_name' => 'field_pf_job',
         '#field_type' => 'textfield',
         '#view_mode' => 'full',
-        '#title' => ucwords($job['type']),
+        '#title' => $types[$job['type']],
         '#bundle' => 'person',
         '#items' => array(0 => array('value'=>$job_title)),
         '#formatter' => 'text_default',
@@ -755,8 +767,14 @@ function person_node_view($node, $view_mode, $langcode) {
 }
 
 function person_form_person_node_form_alter(&$form, &$form_state, $form_id) {
+  $admin = edb_is_admin();
   if (isset($form['#node']->nid)) {
-    $partnerships = find_relationships(array_filter(array_keys(partnership_types())),$form['#node'],TRUE);
+    if ($admin) {
+      $partnerships = find_relationships(array_filter(array_keys(partnership_types())),$form['#node'],TRUE);
+    }
+    else {
+      $partnerships = find_relationships(array_filter(array_keys(partnership_types())),$form['#node'],FALSE);
+    }
     $count = 1;
     foreach ($partnerships as $partnership) {
       $pr_node = $partnership['node'];
@@ -816,7 +834,12 @@ if ($partnership['relative']) {
       );
       $count++;
     }
+    if ($admin) {
     $jobs = find_pro_relationships(array_filter(array_keys(pro_relationship_types())),$form['#node'],TRUE);
+    }
+    else {
+    $jobs = find_pro_relationships(array_filter(array_keys(pro_relationship_types())),$form['#node'],FALSE);
+    }
     $count = 1;
     foreach ($jobs as $job) {
       $pf_node = $job['node'];

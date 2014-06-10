@@ -94,6 +94,17 @@ function edb_node_access($node, $op, $account) {
   }
 }
 
+function edb_is_admin() {
+  global $user;
+  if (
+    in_array("database editor",$user->roles) ||
+    $user->uid == 1 ||
+    in_array("administrator",$user->roles)) {
+    return true;
+  }
+  return false; 
+}
+
 function edb_check_editors($uid,$node) {
   $lang = $node->language;
   if (isset($node->field_editors[$lang])) {
