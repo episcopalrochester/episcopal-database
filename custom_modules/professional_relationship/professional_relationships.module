@@ -150,10 +150,19 @@ function pro_relationship_types() {
     'rector'=>'Rector',
     'pic'=>'Priest-in-Charge',
     'associate'=>'Associate Priest',
+    'assistant'=>'Assistant Priest',
+    'priest'=>'Priest',
+    'vicar'=>'Vicar',
+    'pastor'=>'Pastor',
+    'supply'=>'Covenanted Supply Priest',
     'deacon'=>'Deacon',
     'chaplain' => 'Chaplain',
     'bishop' => 'Bishop',
     'cmm' => 'Canon for Mission & Ministry',
+    'director' => 'Director',
+    'exec' => 'Executive Director',
+    'missioner' => 'Missioner',
+    'coordinator' => 'Coordinator',
   );
 }
 

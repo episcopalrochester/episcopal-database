@@ -39,24 +39,8 @@ else {
 <?php $lang = $job['node']->language;
 ?>
   <p><?php $type = "Employed at ";
-switch($job['node']->field_pf_type[$lang][0]['value']) {
-case "bishop": $type = "Bishop at "; break;
-case "chaplain": $type = "Chaplain at "; break;
-case "cmm": $type = "Canon for Mission & Ministry at "; break;
-case "rector":
-$type = "Rector at ";
-  break;
-case "pic":
-  $type = "Priest-in-Charge at ";
-  break;
-case "deacon":
-    $type = "Deacon at ";
-      break;
-case "associate":
-    $type = "Associate Priest at ";
-      break;
-
-}; ?><?php
+$types = pro_relationship_types();
+$type = $types[$job['node']->field_pf_type[$lang][0]['value']]." at ";
   if ($job['relative']) {
       print $type.$job['relative']->title;
   }
