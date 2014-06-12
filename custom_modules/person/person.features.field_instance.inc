@@ -293,8 +293,8 @@ function person_field_default_field_instances() {
     'label' => 'Date of Birth',
     'required' => 0,
     'settings' => array(
-      'default_value' => 'now',
-      'default_value2' => 'same',
+      'default_value' => '',
+      'default_value2' => '',
       'default_value_code' => '',
       'default_value_code2' => '',
       'user_register_form' => FALSE,
@@ -346,8 +346,8 @@ function person_field_default_field_instances() {
     'label' => 'Date of Death',
     'required' => 0,
     'settings' => array(
-      'default_value' => 'now',
-      'default_value2' => 'same',
+      'default_value' => '',
+      'default_value2' => '',
       'default_value_code' => '',
       'default_value_code2' => '',
       'user_register_form' => FALSE,
