@@ -246,13 +246,7 @@ function personal_relationships_field_default_field_bases() {
     'locked' => 0,
     'module' => 'list',
     'settings' => array(
-      'allowed_values' => array(
-        'marriage' => 'Marriage',
-        'partnership' => 'Partnership',
-        'cohabitate' => 'Cohabitating',
-        'sibling' => 'Sibling',
-        'parent' => 'Parent/Child',
-      ),
+      'allowed_values' => array(),
       'allowed_values_function' => '',
     ),
     'translatable' => 0,

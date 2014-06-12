@@ -77,7 +77,7 @@ function professional_relationships_form_professional_relationship_node_form_alt
   if (isset($form['field_pf_type']['und']['#entity']->field_pf_type['und'][0]['value'])) {
     $form['field_pf_type']['und']['#default_value'] = $form['field_pf_type']['und']['#entity']->field_pf_type['und'][0]['value'];
   }
- $form['field_pf_end_reason']['und']['#options'] = array_filter(pro_relationship_splits());
+ $form['field_pf_end_reason']['und']['#options'] = pro_relationship_splits();
   if (isset($form['field_pf_end_reason']['und']['#entity']->field_pf_end_reason['und'][0]['value'])) {
     $form['field_pf_end_reason']['und']['#default_value'] = $form['field_pf_end_reason']['und']['#entity']->field_pf_end_reason['und'][0]['value'];
   }

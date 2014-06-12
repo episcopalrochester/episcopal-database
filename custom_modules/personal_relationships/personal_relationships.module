@@ -169,3 +169,14 @@ function partnership_splits($key = FALSE) {
   }
   return $splits;
 }
+
+function personal_relationships_form_personal_relationship_node_form_alter(&$form,&$form_state,$form_id) {
+  $form['field_pr_type']['und']['#options'] = array_filter(partnership_types());
+  if (isset($form['field_pr_type']['und']['#entity']->field_pr_type['und'][0]['value'])) {
+    $form['field_pr_type']['und']['#default_value'] = $form['field_pr_type']['und']['#entity']->field_pr_type['und'][0]['value'];
+  }
+  $form['field_pr_end_reason']['und']['#options'] = partnership_splits();
+  if (isset($form['field_pr_end_reason']['und']['#entity']->field_pr_end_reason['und'][0]['value'])) {
+    $form['field_pr_end_reason']['und']['#default_value'] = $form['field_pr_end_reason']['und']['#entity']->field_pr_end_reason['und'][0]['value'];
+  }
+}
