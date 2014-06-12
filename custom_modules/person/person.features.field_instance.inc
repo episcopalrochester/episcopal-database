@@ -81,7 +81,7 @@ function person_field_default_field_instances() {
     'label' => 'Baptism',
     'required' => 0,
     'settings' => array(
-      'default_value' => 'now',
+      'default_value' => 'blank',
       'default_value2' => 'same',
       'default_value_code' => '',
       'default_value_code2' => '',
@@ -134,7 +134,7 @@ function person_field_default_field_instances() {
     'label' => 'Confirmation',
     'required' => 0,
     'settings' => array(
-      'default_value' => 'now',
+      'default_value' => 'blank',
       'default_value2' => 'same',
       'default_value_code' => '',
       'default_value_code2' => '',
@@ -187,7 +187,7 @@ function person_field_default_field_instances() {
     'label' => 'Consecration',
     'required' => 0,
     'settings' => array(
-      'default_value' => 'now',
+      'default_value' => 'blank',
       'default_value2' => 'same',
       'default_value_code' => '',
       'default_value_code2' => '',
@@ -240,7 +240,7 @@ function person_field_default_field_instances() {
     'label' => 'Diaconate Ordination',
     'required' => 0,
     'settings' => array(
-      'default_value' => 'now',
+      'default_value' => 'blank',
       'default_value2' => 'same',
       'default_value_code' => '',
       'default_value_code2' => '',
@@ -293,8 +293,8 @@ function person_field_default_field_instances() {
     'label' => 'Date of Birth',
     'required' => 0,
     'settings' => array(
-      'default_value' => '',
-      'default_value2' => '',
+      'default_value' => 'blank',
+      'default_value2' => 'same',
       'default_value_code' => '',
       'default_value_code2' => '',
       'user_register_form' => FALSE,
@@ -346,8 +346,8 @@ function person_field_default_field_instances() {
     'label' => 'Date of Death',
     'required' => 0,
     'settings' => array(
-      'default_value' => '',
-      'default_value2' => '',
+      'default_value' => 'blank',
+      'default_value2' => 'same',
       'default_value_code' => '',
       'default_value_code2' => '',
       'user_register_form' => FALSE,
@@ -1378,7 +1378,7 @@ function person_field_default_field_instances() {
     'label' => 'Priesthood Ordination',
     'required' => 0,
     'settings' => array(
-      'default_value' => 'now',
+      'default_value' => 'blank',
       'default_value2' => 'same',
       'default_value_code' => '',
       'default_value_code2' => '',
