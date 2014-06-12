@@ -10,6 +10,46 @@
 function person_field_default_field_instances() {
   $field_instances = array();
 
+  // Exported field_instance: 'node-person-field_editors'
+  $field_instances['node-person-field_editors'] = array(
+    'bundle' => 'person',
+    'default_value' => NULL,
+    'deleted' => 0,
+    'description' => '',
+    'display' => array(
+      'default' => array(
+        'label' => 'hidden',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 1,
+      ),
+      'teaser' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 0,
+      ),
+    ),
+    'entity_type' => 'node',
+    'field_name' => 'field_editors',
+    'label' => 'Editors',
+    'required' => 0,
+    'settings' => array(
+      'user_register_form' => FALSE,
+    ),
+    'widget' => array(
+      'active' => 1,
+      'module' => 'user_reference',
+      'settings' => array(
+        'autocomplete_match' => 'contains',
+        'autocomplete_path' => 'user_reference/autocomplete',
+        'size' => 60,
+      ),
+      'type' => 'user_reference_autocomplete',
+      'weight' => 55,
+    ),
+  );
+
   // Exported field_instance: 'node-person-field_person_baptism'
   $field_instances['node-person-field_person_baptism'] = array(
     'bundle' => 'person',
@@ -1548,6 +1588,7 @@ function person_field_default_field_instances() {
   t('Date of Death');
   t('Diaconate Ordination');
   t('Disable only if this person is no longer canonically required to complete Safe Church training.');
+  t('Editors');
   t('First Name');
   t('Gender');
   t('Honorific');

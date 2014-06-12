@@ -13,6 +13,33 @@ function person_field_group_info() {
   $field_group = new stdClass();
   $field_group->disabled = FALSE; /* Edit this to true to make a default field_group disabled initially */
   $field_group->api_version = 1;
+  $field_group->identifier = 'group_editors|node|person|form';
+  $field_group->group_name = 'group_editors';
+  $field_group->entity_type = 'node';
+  $field_group->bundle = 'person';
+  $field_group->mode = 'form';
+  $field_group->parent_name = 'group_person_data';
+  $field_group->data = array(
+    'label' => 'Editors',
+    'weight' => '11',
+    'children' => array(
+      0 => 'field_editors',
+    ),
+    'format_type' => 'tab',
+    'format_settings' => array(
+      'formatter' => 'closed',
+      'instance_settings' => array(
+        'description' => '',
+        'classes' => 'group-editors field-group-tab',
+        'required_fields' => 1,
+      ),
+    ),
+  );
+  $export['group_editors|node|person|form'] = $field_group;
+
+  $field_group = new stdClass();
+  $field_group->disabled = FALSE; /* Edit this to true to make a default field_group disabled initially */
+  $field_group->api_version = 1;
   $field_group->identifier = 'group_person_address|node|person|default';
   $field_group->group_name = 'group_person_address';
   $field_group->entity_type = 'node';
@@ -94,6 +121,7 @@ function person_field_group_info() {
       5 => 'group_person_phones',
       6 => 'group_person_vitals',
       7 => 'group_personal_relationships',
+      8 => 'group_professional_relationships',
     ),
     'format_type' => 'tabs',
     'format_settings' => array(
@@ -126,6 +154,8 @@ function person_field_group_info() {
       5 => 'group_person_phones',
       6 => 'group_person_vitals',
       7 => 'group_personal_relationships',
+      8 => 'group_editors',
+      9 => 'group_professional_relationships',
     ),
     'format_type' => 'tabs',
     'format_settings' => array(
