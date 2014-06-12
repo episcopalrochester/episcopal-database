@@ -6,3 +6,7 @@ fieldset.form-wrapper .fieldset-wrapper {
   vertical-align: top;
   padding: 15px !important;
 }
+
+.page-node-edit .tabs {
+  display: none;
+}

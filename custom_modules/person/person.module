@@ -528,6 +528,9 @@ function person_get_full_name($person) {
     $first[0]['value'] = "";
     $middle[0]['value'] = "";
   }
+  else {
+    $nick[0]['value'] = "";
+  }
   $last = field_get_items('node',$person,'field_person_last_name');
   return trim(preg_replace('!\s+!', ' ', implode(" ",array(
     $nick[0]['value'],
@@ -583,6 +586,9 @@ function person_node_load($nodes, $types) {
 
 function person_node_view($node, $view_mode, $langcode) {
   $admin = edb_is_admin();
+if (node_access("update",$node)) {
+    drupal_goto("node/".$node->nid."/edit");
+}
   if ($node->type == "person") {
     $count = 1;
     if ($admin) {

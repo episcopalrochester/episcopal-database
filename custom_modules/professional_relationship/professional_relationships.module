@@ -74,6 +74,13 @@ function professional_relationships_partners_form($form,&$form_state) {
 
 function professional_relationships_form_professional_relationship_node_form_alter(&$form,&$form_state,$form_id) {
   $form['field_pf_type']['und']['#options'] = array_filter(pro_relationship_types());
+  if (isset($form['field_pf_type']['und']['#entity']->field_pf_type['und'][0]['value'])) {
+    $form['field_pf_type']['und']['#default_value'] = $form['field_pf_type']['und']['#entity']->field_pf_type['und'][0]['value'];
+  }
+ $form['field_pf_end_reason']['und']['#options'] = array_filter(pro_relationship_splits());
+  if (isset($form['field_pf_end_reason']['und']['#entity']->field_pf_end_reason['und'][0]['value'])) {
+    $form['field_pf_end_reason']['und']['#default_value'] = $form['field_pf_end_reason']['und']['#entity']->field_pf_end_reason['und'][0]['value'];
+  }
 }
 
 function find_pro_relationships($types = FALSE, $person,$inactive = FALSE) {
@@ -101,8 +108,15 @@ function find_pro_relationships($types = FALSE, $person,$inactive = FALSE) {
    $query->condition(db_or()->condition('f.field_pf_first_nid',$person->nid)->condition('s.field_pf_second_nid',$person->nid))
     ->condition('n.status', 1);
   if (!$inactive) {
-    $query->isNull('e.field_pf_end_value');
-    $query->isNull('r.field_pf_end_reason_value');
+    $inactive_or = db_or();
+    $and_1 = db_and();
+    $and_1->isNull('e.field_pf_end_value');
+    $and_1->isNull('r.field_pf_end_reason_value');
+    $and_2 = db_and();
+    $and_2->condition('e.field_pf_end_value',date("Y-m-d")."T00:00:00",">");
+    $inactive_or->condition($and_1);
+    $inactive_or->condition($and_2);
+    $query->condition($inactive_or);
   }
   $result = $query->execute();
   if (!$result) {
@@ -133,7 +147,7 @@ function find_pro_relationships($types = FALSE, $person,$inactive = FALSE) {
     else {
       $relationship['relative'] = false;
     }
-    if (!empty($record['field_pf_end_value']) || !empty($record['field_pf_end_reason_value'])) {
+    if ((empty($record['field_pf_end_value']) && !empty($record['field_pf_end_reason_value'])) || (!empty($record['field_pf_end_value']) && $record['field_pf_end_value'] < date("Y-m-d")."T00:00:00")) {
       $relationship['active'] = FALSE;
     }
     else {

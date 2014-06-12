@@ -40,7 +40,12 @@ else {
 ?>
   <p><?php $type = "Employed at ";
 $types = pro_relationship_types();
-$type = $types[$job['node']->field_pf_type[$lang][0]['value']]." at ";
+if (isset($job['node']->field_pf_job[$lang][0]['value'])) {
+  $type = $job['node']->field_pf_job[$lang][0]['value'].", ";
+}
+else {
+$type = $types[$job['node']->field_pf_type[$lang][0]['value']].", ";
+}
   if ($job['relative']) {
       print $type.$job['relative']->title;
   }
