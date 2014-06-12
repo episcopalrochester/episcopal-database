@@ -523,8 +523,14 @@ function person_get_full_name($person) {
   if (!isset($middle[0]['value'])) {
    $middle[0]['value'] = "";
   }
+  $nick = field_get_items('node',$person,'field_person_nickname');
+  if (isset($nick[0]['value'])) {
+    $first[0]['value'] = "";
+    $middle[0]['value'] = "";
+  }
   $last = field_get_items('node',$person,'field_person_last_name');
   return trim(preg_replace('!\s+!', ' ', implode(" ",array(
+    $nick[0]['value'],
     $first[0]['value'],
     $middle[0]['value'],
     $last[0]['value'],
@@ -808,6 +814,9 @@ if ($partnership['relative']) {
         $partner = "No record entered for partner/spouse";
       }
       $title = "Partnership";
+      if (node_access("update",$pr_node)) {
+        $title .= " - ".l("edit","node/".$pr_node->nid."/edit");
+      }
       if (!$partnership['active']) {
         $title .= " (inactive)";
       }
@@ -873,6 +882,9 @@ if ($job['relative']) {
         $job_title = "No record entered for job";
       }
       $title = "Job";
+      if (node_access("update",$pf_node)) {
+        $title .= " - ".l("edit","node/".$pf_node->nid."/edit");
+      }
       if (!$job['active']) {
         $title .= " (inactive)";
       }
