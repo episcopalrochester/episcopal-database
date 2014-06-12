@@ -97,8 +97,15 @@ function find_relationships($types = FALSE, $person,$inactive = FALSE) {
    $query->condition(db_or()->condition('f.field_pr_first_nid',$person->nid)->condition('s.field_pr_second_nid',$person->nid))
     ->condition('n.status', 1);
   if (!$inactive) {
-    $query->isNull('e.field_pr_end_value');
-    $query->isNull('r.field_pr_end_reason_value');
+    $inactive_or = db_or();
+    $and_1 = db_and();
+    $and_1->isNull('e.field_pr_end_value');
+    $and_1->isNull('r.field_pr_end_reason_value');
+    $and_2 = db_and();
+    $and_2->condition('e.field_pr_end_value',date("Y-m-d")."T00:00:00",">");
+    $inactive_or->condition($and_1);
+    $inactive_or->condition($and_2);
+    $query->condition($inactive_or);
   }
   $result = $query->execute();
   if (!$result) {
