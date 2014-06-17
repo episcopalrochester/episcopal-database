@@ -275,15 +275,38 @@ function person_directory_form($form,&$form_state,$type="all",$last="",$first=""
   if (isset($form_state['values']['first'])) {
     $first = $form_state['values']['first'];
   }
-  $people = person_fetch_people('clergy',$last,$first,$status);
-  $weight = 1000;
-  foreach ($people['nodes'] as $person) {
-    $form['person'.$person->nid] = array(
-      '#type'=>'markup',
-      '#markup'=>theme('directory_person',array('person'=>$person)),
-      '#weight'=>$weight,
-    );
-    $weight++;
+  if (empty($first) && empty($last)) {
+    $cache_people = cache_get("people_directory");
+    if ($cache_people) {
+      $form = array_merge($form,unserialize($cache_people->data));
+    }
+    else {
+      $people = person_fetch_people('clergy',$last,$first,$status);
+      $people_form = array();
+      $weight = 1000;
+      foreach ($people['nodes'] as $person) {
+        $people_form['person'.$person->nid] = array(
+          '#type'=>'markup',
+          '#markup'=>theme('directory_person',array('person'=>$person)),
+          '#weight'=>$weight,
+        );
+        $weight++;
+      }
+      cache_set("people_directory",serialize($people_form));
+      $form = array_merge($form,$people_form);
+    }
+  }
+  else {
+    $people = person_fetch_people('clergy',$last,$first,$status);
+    $weight = 1000;
+    foreach ($people['nodes'] as $person) {
+      $form['person'.$person->nid] = array(
+        '#type'=>'markup',
+        '#markup'=>theme('directory_person',array('person'=>$person)),
+        '#weight'=>$weight,
+      );
+      $weight++;
+    }
   }
   $form['filters'] = array(
     '#type' => 'fieldset',
@@ -934,6 +957,7 @@ if ($job['relative']) {
 }
 
 function person_node_update($node) {
+  cache_clear_all("people_directory","cache");
   if ($node->type == "person" && isset($node->nid)) {
     $node->title = person_get_full_name($node);
     $partnerships = find_relationships(array_filter(array_keys(partnership_types())),$node,TRUE);
