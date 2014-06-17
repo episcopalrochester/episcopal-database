@@ -1,5 +1,26 @@
+<?php
+$privacy_types = array(
+  'partnerships',
+  'directory',
+  'home',
+  'phone',
+  'email',
+  );
+$privacy = array();
+foreach ($privacy_types as $privacy_type) {
+  $privacy[$privacy_type] = TRUE;
+  $field = field_get_items("node",$person,"field_person_no_".$privacy_type);
+  if ($field) {
+    if ($field[0]['value'] == 1) {
+        $privacy[$privacy_type] = FALSE;
+    } 
+  }
+}
+?>
+<?php if ($privacy['directory']): ?>
 <div class="person">
 <h3 style="text-decoration: underline;"><?php print person_get_full_name($person); ?></h3>
+<?php if ($privacy['partnerships']): ?>
 <?php if ($partnerships = find_relationships(array_filter(array_keys(partnership_types())),$person,FALSE)): $partnership = $partnerships[0]; ?>
 <h4>Partnership</h4>
 <?php $lang = $partnership['node']->language;
@@ -33,6 +54,7 @@ else {
 }
 ?></p>
 <?php endif; ?>
+<?php endif; ?>
 <?php if ($jobs = find_pro_relationships(array_filter(array_keys(pro_relationship_types())),$person,FALSE)): ?>
 <h4>Jobs</h4>
 <?php foreach ($jobs as $job): ?>
@@ -58,6 +80,7 @@ $type = $types[$job['node']->field_pf_type[$lang][0]['value']].", ";
 ?></p>
 <?php endforeach; ?>
 <?php endif; ?>
+<?php if ($privacy['home']): ?>
 <?php $home = person_get_address($person,'home');
 if ($home['line1'] || $home['line2'] || $home['city'] || $home['state'] || $home['other']): ?>
 <h4>Home Address</h4>
@@ -107,8 +130,10 @@ if ($mail['line1'] || $mail['line2'] || $mail['city'] || $mail['state'] || $mail
 <?php endif; ?>
 </p>
 <?php endif; ?>
+<?php endif; ?>
 <table width="100%" border="0" style="border: 0px;">
 <tr>
+<?php if ($privacy['phone']): ?>
 <td style="padding: 0px;">
 <?php $pref_phone = person_get_phone($person,"pref");
 $other_phone = person_get_phone($person,"other");
@@ -131,6 +156,8 @@ if ($pref_phone['number'] || $other_phone['number']): ?>
 
 <?php endif; ?>
 </td>
+<?php endif; ?>
+<?php if ($privacy['email']): ?>
 <td style="padding: 0px;">
 <?php $pref_email = person_get_email($person,"pref");
 $other_email = person_get_email($person,"other");
@@ -153,7 +180,9 @@ if ($pref_email['addy'] || $other_email['addy']): ?>
 
 <?php endif; ?>
 </td>
+<?php endif; ?>
 </tr>
 </table>
 <hr />
 </div>
+<?php endif; ?>
