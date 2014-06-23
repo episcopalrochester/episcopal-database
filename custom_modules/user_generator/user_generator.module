@@ -20,6 +20,25 @@ function user_generator_run() {
   }
 }
 
+function user_generator_scan_clergy() {
+  $persons = user_generator_scan_persons();
+  $rid = user_role_load_by_name('clergy')->rid;
+  foreach ($persons as $person) {
+    $is_clergy = person_is_clergy($person);
+    $email_field = field_get_items('node',$person,'field_person_email_pref');
+    if ($email_field) {
+      $email = trim(strtolower($email_field[0]['value']));
+      if($uid = user_generator_check_mail($email)) {
+        $account = user_load($uid);
+        if ($is_clergy) {
+          $account->roles[$rid] = true;
+          user_save($account);
+        }
+      }
+    }
+  }
+}
+
 function user_generator_flush_users() {
   $result = db_select('users','u')
     ->fields("u",array('uid'))

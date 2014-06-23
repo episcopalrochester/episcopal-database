@@ -22,6 +22,13 @@ function person_menu() {
     'access arguments' => array('access people listing'),
     'type' => MENU_CALLBACK,
   );
+  $items['newsletter'] = array(
+    'title' => 'Newsletter Signups',
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('person_newsletter_form'),
+    'access arguments' => array('access people listing'),
+    'type' => MENU_CALLBACK,
+  );
   $items['directory'] = array(
     'title' => 'Clergy Directory',
     'page callback' => 'drupal_get_form',
@@ -82,7 +89,7 @@ function person_safe_form($form,&$form_state) {
   );
   $form['people'] = array(
     '#theme' => 'table',
-    '#header' => array('Title','Required','Date','edit'),
+    '#header' => array('Title','Required','Date'),
     '#rows'=> array(),
     '#tree' => true,
   );
@@ -123,10 +130,6 @@ function person_safe_form($form,&$form_state) {
       $expired .="\n";
     }
     $name = l(rtrim($name," ,"),"node/".$person->nid);
-    $edit = "";
-    if (node_access("update",$person)) {
-      $edit = l("edit","node/".$person->nid."/edit");
-    }
     $req_field = array(
       '#name' => 'required-'.$person->nid,
       '#type' => 'checkbox',
@@ -145,7 +148,6 @@ function person_safe_form($form,&$form_state) {
       'Title' => $name,
       array('data'=>&$req_field),
       array('data'=>&$date_field),
-      'edit' => $edit,
     );
     $form['people']['#rows'][] = array('data'=>$row,'style'=>$style);
     unset($req_field);
@@ -166,6 +168,33 @@ function person_safe_form($form,&$form_state) {
    $form['#submit'] = array('person_safe_form_submit');
   return $form;
 }
+
+function person_newsletter_form($form, &$form_state) {
+  $form['signup'] = array(
+    '#type' => 'textarea',
+    '#title' => 'Subscribe These Addresses',
+    '#description' => 'Add email addresses, one per line.',
+    '#tree' => true,
+    );
+  $form['submit'] = array(
+    '#type' => 'submit',
+    '#value' => 'Subscribe',
+    '#submit' => array('person_newsletter_form_submit'),
+    );
+  return $form;
+}
+
+function person_newsletter_form_submit($form, &$form_state) {
+ $signups = explode("\n",$form['signup']['#value']); 
+ foreach ($signups as $signup) {
+   $person = person_find_person(false,trim($signup));
+   if ($person) {
+     $person->field_person_enews['und'][0]['value'] = 1;
+     node_save($person);
+   }
+ }
+}
+
 
 function person_safe_form_submit($form, &$form_state) {
   $people = person_fetch_people();
@@ -234,20 +263,22 @@ function person_safe_form_submit($form, &$form_state) {
   $form_state['rebuild'] = TRUE;  
 }
 
-function person_find_person($name,$email=FALSE) {
-  $name_query = new EntityFieldQuery();
-  $name_result = $name_query
-    ->entityCondition('entity_type', 'node')
-    ->entityCondition('bundle', 'person')
-    ->propertyCondition('title', "%".$name."%","LIKE")
-    ->propertyCondition('status', 1)
-    ->range(0,1)
-    ->execute();
-  if (isset($name_result['node'])) {
-    $name_nid = array_shift(array_values($name_result['node']))->nid;
-  }
-  if (isset($name_nid)) {
-    return node_load($name_nid);
+function person_find_person($name=FALSE,$email=FALSE) {
+  if ($name) {
+    $name_query = new EntityFieldQuery();
+    $name_result = $name_query
+      ->entityCondition('entity_type', 'node')
+      ->entityCondition('bundle', 'person')
+      ->propertyCondition('title', "%".$name."%","LIKE")
+      ->propertyCondition('status', 1)
+      ->range(0,1)
+      ->execute();
+    if (isset($name_result['node'])) {
+      $name_nid = array_shift(array_values($name_result['node']))->nid;
+    }
+    if (isset($name_nid)) {
+      return node_load($name_nid);
+    }
   }
   if ($email) {
     $email_query = new EntityFieldQuery();
@@ -371,7 +402,7 @@ function person_people_form($form,&$form_state,$type="all",$last="",$first="",$s
   }
   $people = person_fetch_people($type,$last,$first,$status,20);
   $people_table = array(
-    'header' => array('Name','Location','E-Mail','Phone','edit'),
+    'header' => array('Name','Location','E-Mail','Phone'),
     'rows' => array(),
     'attributes' => array(),
     'caption' => '',
@@ -413,16 +444,11 @@ function person_people_form($form,&$form_state,$type="all",$last="",$first="",$s
     if (isset($person->field_person_phone_pref['und']['0']['value'])) {
       $phone .= $person->field_person_phone_pref['und']['0']['value'];
     }
-    $edit = "";
-    if (node_access("update",$person)) {
-      $edit = l("edit","node/".$person->nid."/edit");
-    }
-    $row = array(
+      $row = array(
       'title' => $name,
       'Location' => $location,
       'E-Mail' => $email,
       'Phone' => $phone,
-      'edit' => $edit,
     );
     $people_table['rows'][] = $row;
   }
@@ -538,6 +564,17 @@ function person_is_alive($person) {
     return false;
   }
   return true; 
+}
+
+function person_is_clergy($person) {
+  $is_clergy = false;
+  $fields = array('field_person_diaconate','field_person_priesthood','field_person_consecration');
+  foreach ($fields as $field) {
+     if (field_get_items('node',$person,$field)) {
+       $is_clergy = true;
+     }
+  }
+  return $is_clergy;
 }
 
 function person_get_full_name($person) {
@@ -815,9 +852,54 @@ if (node_access("update",$node)) {
 
 function person_form_person_node_form_alter(&$form, &$form_state, $form_id) {
   $admin = edb_is_admin();
+  if (isset($form['#node']->field_person_email_pref['und'][0]['value'])) {
+    $uid = user_generator_check_mail($form['#node']->field_person_email_pref['und'][0]['value']);
+    if ($uid) {
+      $form['field_db_user'] = array(
+        '#type' => 'hidden',
+        '#value' => $uid,
+      );
+    }
+  }
   if (isset($form['#node']->nid)) {
     if ($admin) {
       $partnerships = find_relationships(array_filter(array_keys(partnership_types())),$form['#node'],TRUE);
+      $form['#group_children']['field_pr_add'] = "group_personal_relationships";
+      $form['#group_children']['field_pf_add'] = "group_professional_relationships";
+      $form['#group_children']['field_db_uid'] = "group_person_access";
+      $form['#group_children']['field_db_roles'] = "group_person_access";
+      $form['field_pr_add'] = array(
+        '#type' => 'item',
+        '#markup' => "<a href='/node/add/personal-relationship?edit[field_pr_first][und][0][nid]=[nid:".$form['#node']->nid."]'>+Add</a>",
+
+      );
+      $form['field_pf_add'] = array(
+        '#type' => 'item',        '#markup' => "<a href='/node/add/professional-relationship?edit[field_pf_first][und][0][nid]=[nid:".$form['#node']->nid."]'>+Add</a>",
+
+      );
+      if (isset($form['#node']->field_person_email_pref['und'][0]['value'])) {
+        $uid = user_generator_check_mail($form['#node']->field_person_email_pref['und'][0]['value']);
+        if ($uid) {
+          $account = user_load($uid);
+          $form['field_db_uid'] = array(
+            '#type' => 'textfield',
+            '#title' => 'Database User ID:',
+            '#value' => $account->uid,
+            '#disabled' => true,
+          );
+          $form['field_db_roles'] = array(
+            '#type' => 'checkboxes',
+            '#title' => 'Roles',
+            '#options' => array(
+              user_role_load_by_name('administrator')->rid => 'Administrator',
+              user_role_load_by_name('database user')->rid => 'Database User',
+              user_role_load_by_name('database editor')->rid => 'Database Editor',
+              user_role_load_by_name('clergy')->rid => 'Clergy'
+              ),
+              '#default_value' => array_keys($account->roles),
+            );
+        }
+      }
     }
     else {
       $partnerships = find_relationships(array_filter(array_keys(partnership_types())),$form['#node'],FALSE);
@@ -959,6 +1041,23 @@ if ($job['relative']) {
 function person_node_update($node) {
   cache_clear_all("people_directory","cache");
   if ($node->type == "person" && isset($node->nid)) {
+    if (isset($node->field_db_user)) {
+      $account = user_load($node->field_db_user);
+      if (isset($node->field_db_roles)) {
+        foreach($node->field_db_roles as $rid => $value) {
+          if ($value) {
+            $account->roles[$rid] = TRUE;
+          }
+          else {
+            unset($account->roles[$rid]);
+          }
+        }
+      }
+      if (isset($node->field_person_email_pref['und'][0]['value'])) {
+        $account->mail = $node->field_person_email_pref['und'][0]['value'];
+      }
+      user_save($account);
+    }
     $node->title = person_get_full_name($node);
     $partnerships = find_relationships(array_filter(array_keys(partnership_types())),$node,TRUE);
     foreach ($partnerships as $partnership) {

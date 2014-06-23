@@ -34,7 +34,7 @@ function edb_mydata_page_form($form,&$form_state) {
   $result = $query->execute();
   $tables = array();
   $variables = array(
-    'header' => array('Record','Last Edited','edit'),
+    'header' => array('Record','Last Edited'),
     'rows' => array(),
     'attributes' => array(),
     'caption' => '',
@@ -52,7 +52,6 @@ function edb_mydata_page_form($form,&$form_state) {
       'data' => array(
         l($record['title'],"node/".$record['nid'],array('html'=>TRUE)),
         date('r',$record['changed']),
-        l("edit","node/".$record['nid']."/edit"),
         ),
       );
     $tables[$type]['rows'][] = $row;
