@@ -17,6 +17,10 @@ function edb_menu() {
 
 function edb_init() {
   variable_set("site_frontpage","my-data");
+  global $user;
+  if (arg(1) <> "logout" && arg(0) == "user" && arg(2) <> "password" && $user->uid > 1) {
+    drupal_goto("user/".$user->uid."/password");
+  }
 }
 
 function edb_mydata_page_form($form,&$form_state) {
