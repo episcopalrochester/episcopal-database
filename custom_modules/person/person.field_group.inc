@@ -156,6 +156,9 @@ function person_field_group_info() {
       7 => 'group_personal_relationships',
       8 => 'group_editors',
       9 => 'group_professional_relationships',
+      10 => 'group_person_privacy',
+      11 => 'group_person_subscriptions',
+      12 => 'group_person_access',
     ),
     'format_type' => 'tabs',
     'format_settings' => array(
@@ -413,6 +416,65 @@ function person_field_group_info() {
   $field_group = new stdClass();
   $field_group->disabled = FALSE; /* Edit this to true to make a default field_group disabled initially */
   $field_group->api_version = 1;
+  $field_group->identifier = 'group_person_privacy|node|person|form';
+  $field_group->group_name = 'group_person_privacy';
+  $field_group->entity_type = 'node';
+  $field_group->bundle = 'person';
+  $field_group->mode = 'form';
+  $field_group->parent_name = 'group_person_data';
+  $field_group->data = array(
+    'label' => 'Privacy',
+    'weight' => '12',
+    'children' => array(
+      0 => 'field_person_no_directory',
+      1 => 'field_person_no_partnerships',
+      2 => 'field_person_no_home',
+      3 => 'field_person_no_phone',
+      4 => 'field_person_no_email',
+    ),
+    'format_type' => 'tab',
+    'format_settings' => array(
+      'formatter' => 'closed',
+      'instance_settings' => array(
+        'description' => '',
+        'classes' => 'group-person-privacy field-group-tab',
+        'required_fields' => 1,
+      ),
+    ),
+  );
+  $export['group_person_privacy|node|person|form'] = $field_group;
+
+  $field_group = new stdClass();
+  $field_group->disabled = FALSE; /* Edit this to true to make a default field_group disabled initially */
+  $field_group->api_version = 1;
+  $field_group->identifier = 'group_person_subscriptions|node|person|form';
+  $field_group->group_name = 'group_person_subscriptions';
+  $field_group->entity_type = 'node';
+  $field_group->bundle = 'person';
+  $field_group->mode = 'form';
+  $field_group->parent_name = 'group_person_data';
+  $field_group->data = array(
+    'label' => 'Subscriptions',
+    'weight' => '13',
+    'children' => array(
+      0 => 'field_person_enews',
+      1 => 'field_person_printed_news',
+    ),
+    'format_type' => 'tab',
+    'format_settings' => array(
+      'formatter' => 'closed',
+      'instance_settings' => array(
+        'description' => '',
+        'classes' => 'group-person-subscriptions field-group-tab',
+        'required_fields' => 1,
+      ),
+    ),
+  );
+  $export['group_person_subscriptions|node|person|form'] = $field_group;
+
+  $field_group = new stdClass();
+  $field_group->disabled = FALSE; /* Edit this to true to make a default field_group disabled initially */
+  $field_group->api_version = 1;
   $field_group->identifier = 'group_person_training|node|person|default';
   $field_group->group_name = 'group_person_training';
   $field_group->entity_type = 'node';
@@ -521,6 +583,7 @@ function person_field_group_info() {
       6 => 'field_person_nickname',
       7 => 'field_person_suffix',
       8 => 'field_person_title',
+      9 => 'field_person_employment',
     ),
     'format_type' => 'tab',
     'format_settings' => array(

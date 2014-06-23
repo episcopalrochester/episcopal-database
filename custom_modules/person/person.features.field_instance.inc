@@ -311,7 +311,7 @@ function person_field_default_field_instances() {
         'year_range' => '1901:2014',
       ),
       'type' => 'date_select',
-      'weight' => 15,
+      'weight' => 16,
     ),
   );
 
@@ -364,7 +364,7 @@ function person_field_default_field_instances() {
         'year_range' => '-3:+3',
       ),
       'type' => 'date_select',
-      'weight' => 16,
+      'weight' => 17,
     ),
   );
 
@@ -519,6 +519,86 @@ function person_field_default_field_instances() {
       'settings' => array(),
       'type' => 'options_select',
       'weight' => 29,
+    ),
+  );
+
+  // Exported field_instance: 'node-person-field_person_employment'
+  $field_instances['node-person-field_person_employment'] = array(
+    'bundle' => 'person',
+    'default_value' => NULL,
+    'deleted' => 0,
+    'description' => '',
+    'display' => array(
+      'default' => array(
+        'label' => 'above',
+        'module' => 'list',
+        'settings' => array(),
+        'type' => 'list_default',
+        'weight' => 57,
+      ),
+      'teaser' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 0,
+      ),
+    ),
+    'entity_type' => 'node',
+    'field_name' => 'field_person_employment',
+    'label' => 'Employment Status',
+    'required' => 0,
+    'settings' => array(
+      'user_register_form' => FALSE,
+    ),
+    'widget' => array(
+      'active' => 1,
+      'module' => 'options',
+      'settings' => array(),
+      'type' => 'options_select',
+      'weight' => 15,
+    ),
+  );
+
+  // Exported field_instance: 'node-person-field_person_enews'
+  $field_instances['node-person-field_person_enews'] = array(
+    'bundle' => 'person',
+    'default_value' => array(
+      0 => array(
+        'value' => 0,
+      ),
+    ),
+    'deleted' => 0,
+    'description' => 'Delivered by email',
+    'display' => array(
+      'default' => array(
+        'label' => 'above',
+        'module' => 'list',
+        'settings' => array(),
+        'type' => 'list_default',
+        'weight' => 55,
+      ),
+      'teaser' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 0,
+      ),
+    ),
+    'entity_type' => 'node',
+    'field_name' => 'field_person_enews',
+    'label' => 'E-Newlsetter',
+    'required' => 0,
+    'settings' => array(
+      'user_register_form' => FALSE,
+    ),
+    'widget' => array(
+      'active' => 1,
+      'module' => 'options',
+      'settings' => array(
+        'display_label' => 1,
+      ),
+      'type' => 'options_onoff',
+      'weight' => 61,
     ),
   );
 
@@ -1193,6 +1273,221 @@ function person_field_default_field_instances() {
     ),
   );
 
+  // Exported field_instance: 'node-person-field_person_no_directory'
+  $field_instances['node-person-field_person_no_directory'] = array(
+    'bundle' => 'person',
+    'default_value' => array(
+      0 => array(
+        'value' => 0,
+      ),
+    ),
+    'deleted' => 0,
+    'description' => '',
+    'display' => array(
+      'default' => array(
+        'label' => 'above',
+        'module' => 'list',
+        'settings' => array(),
+        'type' => 'list_default',
+        'weight' => 50,
+      ),
+      'teaser' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 0,
+      ),
+    ),
+    'entity_type' => 'node',
+    'field_name' => 'field_person_no_directory',
+    'label' => 'Do not include me in directories',
+    'required' => 0,
+    'settings' => array(
+      'user_register_form' => FALSE,
+    ),
+    'widget' => array(
+      'active' => 1,
+      'module' => 'options',
+      'settings' => array(
+        'display_label' => 1,
+      ),
+      'type' => 'options_onoff',
+      'weight' => 56,
+    ),
+  );
+
+  // Exported field_instance: 'node-person-field_person_no_email'
+  $field_instances['node-person-field_person_no_email'] = array(
+    'bundle' => 'person',
+    'default_value' => array(
+      0 => array(
+        'value' => 0,
+      ),
+    ),
+    'deleted' => 0,
+    'description' => '',
+    'display' => array(
+      'default' => array(
+        'label' => 'above',
+        'module' => 'list',
+        'settings' => array(),
+        'type' => 'list_default',
+        'weight' => 54,
+      ),
+      'teaser' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 0,
+      ),
+    ),
+    'entity_type' => 'node',
+    'field_name' => 'field_person_no_email',
+    'label' => 'Do not print my email address(es) in directories',
+    'required' => 0,
+    'settings' => array(
+      'user_register_form' => FALSE,
+    ),
+    'widget' => array(
+      'active' => 1,
+      'module' => 'options',
+      'settings' => array(
+        'display_label' => 1,
+      ),
+      'type' => 'options_onoff',
+      'weight' => 60,
+    ),
+  );
+
+  // Exported field_instance: 'node-person-field_person_no_home'
+  $field_instances['node-person-field_person_no_home'] = array(
+    'bundle' => 'person',
+    'default_value' => array(
+      0 => array(
+        'value' => 0,
+      ),
+    ),
+    'deleted' => 0,
+    'description' => '',
+    'display' => array(
+      'default' => array(
+        'label' => 'above',
+        'module' => 'list',
+        'settings' => array(),
+        'type' => 'list_default',
+        'weight' => 52,
+      ),
+      'teaser' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 0,
+      ),
+    ),
+    'entity_type' => 'node',
+    'field_name' => 'field_person_no_home',
+    'label' => 'Do not print my address in directories',
+    'required' => 0,
+    'settings' => array(
+      'user_register_form' => FALSE,
+    ),
+    'widget' => array(
+      'active' => 1,
+      'module' => 'options',
+      'settings' => array(
+        'display_label' => 1,
+      ),
+      'type' => 'options_onoff',
+      'weight' => 58,
+    ),
+  );
+
+  // Exported field_instance: 'node-person-field_person_no_partnerships'
+  $field_instances['node-person-field_person_no_partnerships'] = array(
+    'bundle' => 'person',
+    'default_value' => array(
+      0 => array(
+        'value' => 0,
+      ),
+    ),
+    'deleted' => 0,
+    'description' => '',
+    'display' => array(
+      'default' => array(
+        'label' => 'above',
+        'module' => 'list',
+        'settings' => array(),
+        'type' => 'list_default',
+        'weight' => 51,
+      ),
+      'teaser' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 0,
+      ),
+    ),
+    'entity_type' => 'node',
+    'field_name' => 'field_person_no_partnerships',
+    'label' => 'Do not print my personal relationships in directories',
+    'required' => 0,
+    'settings' => array(
+      'user_register_form' => FALSE,
+    ),
+    'widget' => array(
+      'active' => 1,
+      'module' => 'options',
+      'settings' => array(
+        'display_label' => 1,
+      ),
+      'type' => 'options_onoff',
+      'weight' => 57,
+    ),
+  );
+
+  // Exported field_instance: 'node-person-field_person_no_phone'
+  $field_instances['node-person-field_person_no_phone'] = array(
+    'bundle' => 'person',
+    'default_value' => array(
+      0 => array(
+        'value' => 0,
+      ),
+    ),
+    'deleted' => 0,
+    'description' => '',
+    'display' => array(
+      'default' => array(
+        'label' => 'above',
+        'module' => 'list',
+        'settings' => array(),
+        'type' => 'list_default',
+        'weight' => 53,
+      ),
+      'teaser' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 0,
+      ),
+    ),
+    'entity_type' => 'node',
+    'field_name' => 'field_person_no_phone',
+    'label' => 'Do not print my phone number(s) in directories',
+    'required' => 0,
+    'settings' => array(
+      'user_register_form' => FALSE,
+    ),
+    'widget' => array(
+      'active' => 1,
+      'module' => 'options',
+      'settings' => array(
+        'display_label' => 1,
+      ),
+      'type' => 'options_onoff',
+      'weight' => 59,
+    ),
+  );
+
   // Exported field_instance: 'node-person-field_person_phone_other'
   $field_instances['node-person-field_person_phone_other'] = array(
     'bundle' => 'person',
@@ -1400,6 +1695,49 @@ function person_field_default_field_instances() {
     ),
   );
 
+  // Exported field_instance: 'node-person-field_person_printed_news'
+  $field_instances['node-person-field_person_printed_news'] = array(
+    'bundle' => 'person',
+    'default_value' => array(
+      0 => array(
+        'value' => 0,
+      ),
+    ),
+    'deleted' => 0,
+    'description' => 'Sent by traditional mail',
+    'display' => array(
+      'default' => array(
+        'label' => 'above',
+        'module' => 'list',
+        'settings' => array(),
+        'type' => 'list_default',
+        'weight' => 56,
+      ),
+      'teaser' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 0,
+      ),
+    ),
+    'entity_type' => 'node',
+    'field_name' => 'field_person_printed_news',
+    'label' => 'Printed Newsletter',
+    'required' => 0,
+    'settings' => array(
+      'user_register_form' => FALSE,
+    ),
+    'widget' => array(
+      'active' => 1,
+      'module' => 'options',
+      'settings' => array(
+        'display_label' => 1,
+      ),
+      'type' => 'options_onoff',
+      'weight' => 62,
+    ),
+  );
+
   // Exported field_instance: 'node-person-field_person_safe_church'
   $field_instances['node-person-field_person_safe_church'] = array(
     'bundle' => 'person',
@@ -1586,9 +1924,17 @@ function person_field_default_field_instances() {
   t('Consecration');
   t('Date of Birth');
   t('Date of Death');
+  t('Delivered by email');
   t('Diaconate Ordination');
   t('Disable only if this person is no longer canonically required to complete Safe Church training.');
+  t('Do not include me in directories');
+  t('Do not print my address in directories');
+  t('Do not print my email address(es) in directories');
+  t('Do not print my personal relationships in directories');
+  t('Do not print my phone number(s) in directories');
+  t('E-Newlsetter');
   t('Editors');
+  t('Employment Status');
   t('First Name');
   t('Gender');
   t('Honorific');
@@ -1607,7 +1953,9 @@ function person_field_default_field_instances() {
   t('Preferred Phone');
   t('Preferred Phone Type');
   t('Priesthood Ordination');
+  t('Printed Newsletter');
   t('Safe Church Training Required');
+  t('Sent by traditional mail');
   t('State/Province');
   t('Suffix');
   t('ZIP/Postal Code');
