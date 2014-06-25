@@ -61,6 +61,7 @@ function find_pro_relationships($types = FALSE, $person,$inactive = FALSE) {
   $relationships = array();
   while ($record = $result->fetchAssoc()) {
     $relationship = array('type'=>$record['field_pf_type_value']);
+    $relationship['title'] = "";
     if ($record['field_pf_job_value']) {
       $relationship['title'] = $record['field_pf_job_value'];
     }

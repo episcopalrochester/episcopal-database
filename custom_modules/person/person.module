@@ -963,19 +963,20 @@ if ($partnership['relative']) {
       $form['field_pr_start_'.$nid] = array(
         '#type'=> 'textfield',
         '#title' => 'Partnership Start Date:',
-        '#description' => 'Format: '.date('m/d/Y'),
+        '#description' => 'Format: '.date('m/d/Y')." - not visible in directory",
         '#default_value' => $partnership['start'],
       );
       $form['field_pr_end_'.$nid] = array(
         '#type'=> 'textfield',
         '#title' => 'Partnership End Date:',
-        '#description' => 'Format: '.date('m/d/Y'),
+        '#description' => 'Format: '.date('m/d/Y')." - not visible in directory",
         '#default_value' => $partnership['end'],
       );
       $form['field_pr_end_reason_'.$nid] = array(
         '#type'=> 'select',
         '#title' => 'Partnership End Reason:',
         '#options' => partnership_splits(),
+        '#description' => 'Not visible in directory',
         '#default_value' => $partnership['end_reason'],
       );
       $count++;
@@ -1032,24 +1033,25 @@ if ($job['relative']) {
       $form['field_pf_title_'.$nid] = array(
         '#type'=> 'textfield',
         '#title' => 'Job Title:',
-        '#description' => 'Optional',
+        '#description' => 'Optional.',
         '#default_value' => $job['title'],
       );
       $form['field_pf_start_'.$nid] = array(
         '#type'=> 'textfield',
         '#title' => 'Job Start Date:',
-        '#description' => 'Format: '.date('m/d/Y'),
+        '#description' => 'Format: '.date('m/d/Y')." - not visible in directory",
         '#default_value' => $job['start'],
       );
       $form['field_pf_end_'.$nid] = array(
         '#type'=> 'textfield',
         '#title' => 'Job End Date:',
-        '#description' => 'Format: '.date('m/d/Y'),
+        '#description' => 'Format: '.date('m/d/Y')." - not visible in directory",
         '#default_value' => $job['end'],
       );
       $form['field_pf_end_reason_'.$nid] = array(
         '#type'=> 'select',
         '#title' => 'Job End Reason:',
+        '#description' => 'Not visible in directory',
         '#options' => pro_relationship_splits(),
         '#default_value' => $job['end_reason'],
       );
