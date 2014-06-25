@@ -8,19 +8,33 @@ include_once 'person.features.inc';
 
 function person_menu() {
   $items = array();
-  $items['people'] = array(
+  $items['staff'] = array(
     'title' => 'People',
     'page callback' => 'drupal_get_form',
     'page arguments' => array('person_people_form'),
     'access arguments' => array('access people listing'),
-    'type' => MENU_CALLBACK,
   );
-  $items['safe-training'] = array(
+  $items['staff/people'] = array(
+    'title' => 'People',
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('person_people_form'),
+    'access arguments' => array('access people listing'),
+    'type' => MENU_DEFAULT_LOCAL_TASK,
+  );
+  $items['staff/safe-training'] = array(
     'title' => 'Update Safe Training Data',
     'page callback' => 'drupal_get_form',
     'page arguments' => array('person_safe_form'),
     'access arguments' => array('access people listing'),
-    'type' => MENU_CALLBACK,
+    'type' => MENU_LOCAL_TASK,
+  );
+  $items['staff/new-person'] = array(
+    'title' => 'New Person',
+    'page callback' => 'drupal_goto',
+    'page arguments' => array('node/add/person'),
+    'access arguments' => array('access people listing'),
+    'weight' => 20,
+    'type' => MENU_LOCAL_TASK,
   );
   $items['newsletter'] = array(
     'title' => 'Newsletter Signups',
