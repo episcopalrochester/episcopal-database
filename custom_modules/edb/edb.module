@@ -29,6 +29,7 @@ function edb_mydata_page_form($form,&$form_state) {
   $query->leftJoin("field_data_field_editors","e","e.entity_id = n.nid");
   $query->fields('n',array('nid','type','title','changed'))
     ->condition('status','1')
+    ->condition('type','person')
     ->orderBy('type','ASC')
     ->orderBy('changed','DESC');
   $or = db_or();
