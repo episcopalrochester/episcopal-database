@@ -40,6 +40,31 @@ function person_field_group_info() {
   $field_group = new stdClass();
   $field_group->disabled = FALSE; /* Edit this to true to make a default field_group disabled initially */
   $field_group->api_version = 1;
+  $field_group->identifier = 'group_person_access|node|person|form';
+  $field_group->group_name = 'group_person_access';
+  $field_group->entity_type = 'node';
+  $field_group->bundle = 'person';
+  $field_group->mode = 'form';
+  $field_group->parent_name = 'group_person_data';
+  $field_group->data = array(
+    'label' => 'Database Access',
+    'weight' => '14',
+    'children' => array(),
+    'format_type' => 'tab',
+    'format_settings' => array(
+      'formatter' => 'closed',
+      'instance_settings' => array(
+        'description' => '',
+        'classes' => 'group-person-access field-group-tab',
+        'required_fields' => 1,
+      ),
+    ),
+  );
+  $export['group_person_access|node|person|form'] = $field_group;
+
+  $field_group = new stdClass();
+  $field_group->disabled = FALSE; /* Edit this to true to make a default field_group disabled initially */
+  $field_group->api_version = 1;
   $field_group->identifier = 'group_person_address|node|person|default';
   $field_group->group_name = 'group_person_address';
   $field_group->entity_type = 'node';
@@ -596,6 +621,107 @@ function person_field_group_info() {
     ),
   );
   $export['group_person_vitals|node|person|form'] = $field_group;
+
+  $field_group = new stdClass();
+  $field_group->disabled = FALSE; /* Edit this to true to make a default field_group disabled initially */
+  $field_group->api_version = 1;
+  $field_group->identifier = 'group_personal_relationships|node|person|default';
+  $field_group->group_name = 'group_personal_relationships';
+  $field_group->entity_type = 'node';
+  $field_group->bundle = 'person';
+  $field_group->mode = 'default';
+  $field_group->parent_name = 'group_person_data';
+  $field_group->data = array(
+    'label' => 'Personal Relationships',
+    'weight' => '15',
+    'children' => array(),
+    'format_type' => 'tab',
+    'format_settings' => array(
+      'label' => 'Personal Relationships',
+      'instance_settings' => array(
+        'classes' => 'group-personal-relationships field-group-tab',
+        'description' => '',
+      ),
+      'formatter' => 'closed',
+    ),
+  );
+  $export['group_personal_relationships|node|person|default'] = $field_group;
+
+  $field_group = new stdClass();
+  $field_group->disabled = FALSE; /* Edit this to true to make a default field_group disabled initially */
+  $field_group->api_version = 1;
+  $field_group->identifier = 'group_personal_relationships|node|person|form';
+  $field_group->group_name = 'group_personal_relationships';
+  $field_group->entity_type = 'node';
+  $field_group->bundle = 'person';
+  $field_group->mode = 'form';
+  $field_group->parent_name = 'group_person_data';
+  $field_group->data = array(
+    'label' => 'Personal Relationships',
+    'weight' => '9',
+    'children' => array(),
+    'format_type' => 'tab',
+    'format_settings' => array(
+      'label' => 'Personal Relationships',
+      'instance_settings' => array(
+        'required_fields' => 1,
+        'classes' => 'group-personal-relationships field-group-tab',
+        'description' => '',
+      ),
+      'formatter' => 'closed',
+    ),
+  );
+  $export['group_personal_relationships|node|person|form'] = $field_group;
+
+  $field_group = new stdClass();
+  $field_group->disabled = FALSE; /* Edit this to true to make a default field_group disabled initially */
+  $field_group->api_version = 1;
+  $field_group->identifier = 'group_professional_relationships|node|person|default';
+  $field_group->group_name = 'group_professional_relationships';
+  $field_group->entity_type = 'node';
+  $field_group->bundle = 'person';
+  $field_group->mode = 'default';
+  $field_group->parent_name = 'group_person_data';
+  $field_group->data = array(
+    'label' => 'Professional Relationships',
+    'weight' => '16',
+    'children' => array(),
+    'format_type' => 'tab',
+    'format_settings' => array(
+      'formatter' => 'closed',
+      'instance_settings' => array(
+        'description' => '',
+        'classes' => 'group-professional-relationships field-group-tab',
+      ),
+    ),
+  );
+  $export['group_professional_relationships|node|person|default'] = $field_group;
+
+  $field_group = new stdClass();
+  $field_group->disabled = FALSE; /* Edit this to true to make a default field_group disabled initially */
+  $field_group->api_version = 1;
+  $field_group->identifier = 'group_professional_relationships|node|person|form';
+  $field_group->group_name = 'group_professional_relationships';
+  $field_group->entity_type = 'node';
+  $field_group->bundle = 'person';
+  $field_group->mode = 'form';
+  $field_group->parent_name = 'group_person_data';
+  $field_group->data = array(
+    'label' => 'Organizational Relationships',
+    'weight' => '10',
+    'children' => array(),
+    'format_type' => 'tab',
+    'format_settings' => array(
+      'label' => 'Organizational Relationships',
+      'instance_settings' => array(
+        'required_fields' => 1,
+        'classes' => 'group-professional-relationships field-group-tab',
+        'description' => '',
+      ),
+      'formatter' => 'closed',
+    ),
+  );
+  $export['group_professional_relationships|node|person|form'] = $field_group;
 
   return $export;
 }

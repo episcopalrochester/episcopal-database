@@ -10,7 +10,7 @@
 function professional_relationships_node_info() {
   $items = array(
     'professional_relationship' => array(
-      'name' => t('Professional Relationship'),
+      'name' => t('Organizational Relationship'),
       'base' => 'node_content',
       'description' => t('Add a relationship between a person and organization.'),
       'has_title' => '1',
