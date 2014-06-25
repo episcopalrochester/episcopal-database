@@ -660,7 +660,7 @@ function person_node_load($nodes, $types) {
 
 function person_node_view($node, $view_mode, $langcode) {
   $admin = edb_is_admin();
-if (node_access("update",$node)) {
+if (node_access("update",$node) && arg(2) <> "revisions") {
     drupal_goto("node/".$node->nid."/edit");
 }
   if ($node->type == "person") {
