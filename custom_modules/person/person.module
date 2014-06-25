@@ -994,6 +994,7 @@ if ($partnership['relative']) {
       $form['#group_children']['field_pf_head_'.$nid] = "group_professional_relationships";
       $form['#group_children']['field_pf_job_'.$nid] = "group_professional_relationships";
       $form['#group_children']['field_pf_type_'.$nid] = "group_professional_relationships";
+      $form['#group_children']['field_pf_title_'.$nid] = "group_professional_relationships";
       $form['#group_children']['field_pf_start_'.$nid] = "group_professional_relationships";
       $form['#group_children']['field_pf_end_'.$nid] = "group_professional_relationships";
       $form['#group_children']['field_pf_end_reason_'.$nid] = "group_professional_relationships";
@@ -1027,6 +1028,12 @@ if ($job['relative']) {
         '#title' => 'Job Type:',
         '#options' => pro_relationship_types(),
         '#default_value' => $job['type'],
+      );
+      $form['field_pf_title_'.$nid] = array(
+        '#type'=> 'textfield',
+        '#title' => 'Job Title:',
+        '#description' => 'Optional',
+        '#default_value' => $job['title'],
       );
       $form['field_pf_start_'.$nid] = array(
         '#type'=> 'textfield',
@@ -1104,6 +1111,7 @@ function person_node_update($node) {
       eval("\$editing = isset(\$node->field_pf_type_".$nid.");");
       if ($editing) {
         eval("\$pf_node->field_pf_type[\$lang][0]['value']=\$node->field_pf_type_".$nid.";");
+        eval("\$pf_node->field_pf_job[\$lang][0]['value']=\$node->field_pf_title_".$nid.";");
         eval("\$pf_node->field_pf_start[\$lang][0]['value'] = _date_to_utc(\$node->field_pf_start_".$nid.");");
         if (empty($pf_node->field_pf_start[$lang][0]['value'])) {
           $pf_node->field_pf_start = NULL;

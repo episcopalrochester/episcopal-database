@@ -22,11 +22,13 @@ function find_pro_relationships($types = FALSE, $person,$inactive = FALSE) {
   $query->leftJoin("field_data_field_pf_first","f","f.entity_id = n.nid");
   $query->leftJoin("field_data_field_pf_second","s","s.entity_id = n.nid");
   $query->leftJoin("field_data_field_pf_type","t","t.entity_id = n.nid");
+  $query->leftJoin("field_data_field_pf_job","j","j.entity_id = n.nid");
   $query->leftJoin("field_data_field_pf_start","p","p.entity_id = n.nid");
   $query->leftJoin("field_data_field_pf_end","e","e.entity_id = n.nid");
   $query->leftJoin("field_data_field_pf_end_reason","r","r.entity_id = n.nid");
   $query->fields('n',array('nid'))
     ->fields('t',array('field_pf_type_value'))
+    ->fields('j',array('field_pf_job_value'))
     ->fields('f',array('field_pf_first_nid'))
     ->fields('s',array('field_pf_second_nid'))
     ->fields('p',array('field_pf_start_value'))
@@ -59,6 +61,9 @@ function find_pro_relationships($types = FALSE, $person,$inactive = FALSE) {
   $relationships = array();
   while ($record = $result->fetchAssoc()) {
     $relationship = array('type'=>$record['field_pf_type_value']);
+    if ($record['field_pf_job_value']) {
+      $relationship['title'] = $record['field_pf_job_value'];
+    }
     $relationship['start'] = "";
     if ($record['field_pf_start_value']) {
       $relationship['start'] = _date_to_human($record['field_pf_start_value']);
