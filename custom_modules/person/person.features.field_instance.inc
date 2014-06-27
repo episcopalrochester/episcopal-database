@@ -103,6 +103,49 @@ function person_field_default_field_instances() {
     ),
   );
 
+  // Exported field_instance: 'node-person-field_person_clergy_spouse'
+  $field_instances['node-person-field_person_clergy_spouse'] = array(
+    'bundle' => 'person',
+    'default_value' => array(
+      0 => array(
+        'value' => 0,
+      ),
+    ),
+    'deleted' => 0,
+    'description' => '',
+    'display' => array(
+      'default' => array(
+        'label' => 'above',
+        'module' => 'list',
+        'settings' => array(),
+        'type' => 'list_default',
+        'weight' => 60,
+      ),
+      'teaser' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 0,
+      ),
+    ),
+    'entity_type' => 'node',
+    'field_name' => 'field_person_clergy_spouse',
+    'label' => 'Surviving Clergy Spouse',
+    'required' => 0,
+    'settings' => array(
+      'user_register_form' => FALSE,
+    ),
+    'widget' => array(
+      'active' => 1,
+      'module' => 'options',
+      'settings' => array(
+        'display_label' => 1,
+      ),
+      'type' => 'options_onoff',
+      'weight' => 18,
+    ),
+  );
+
   // Exported field_instance: 'node-person-field_person_confirmation'
   $field_instances['node-person-field_person_confirmation'] = array(
     'bundle' => 'person',
@@ -259,6 +302,49 @@ function person_field_default_field_instances() {
       ),
       'type' => 'date_select',
       'weight' => 50,
+    ),
+  );
+
+  // Exported field_instance: 'node-person-field_person_directory'
+  $field_instances['node-person-field_person_directory'] = array(
+    'bundle' => 'person',
+    'default_value' => array(
+      0 => array(
+        'value' => 0,
+      ),
+    ),
+    'deleted' => 0,
+    'description' => 'Printed annually, for clergy only.',
+    'display' => array(
+      'default' => array(
+        'label' => 'above',
+        'module' => 'list',
+        'settings' => array(),
+        'type' => 'list_default',
+        'weight' => 58,
+      ),
+      'teaser' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 0,
+      ),
+    ),
+    'entity_type' => 'node',
+    'field_name' => 'field_person_directory',
+    'label' => 'Send me a printed clergy directory',
+    'required' => 0,
+    'settings' => array(
+      'user_register_form' => FALSE,
+    ),
+    'widget' => array(
+      'active' => 1,
+      'module' => 'options',
+      'settings' => array(
+        'display_label' => 1,
+      ),
+      'type' => 'options_onoff',
+      'weight' => 63,
     ),
   );
 
@@ -913,6 +999,49 @@ function person_field_default_field_instances() {
       'settings' => array(),
       'type' => 'options_select',
       'weight' => 36,
+    ),
+  );
+
+  // Exported field_instance: 'node-person-field_person_invitations'
+  $field_instances['node-person-field_person_invitations'] = array(
+    'bundle' => 'person',
+    'default_value' => array(
+      0 => array(
+        'value' => 0,
+      ),
+    ),
+    'deleted' => 0,
+    'description' => 'Such as parties, fundraisers, etc.',
+    'display' => array(
+      'default' => array(
+        'label' => 'above',
+        'module' => 'list',
+        'settings' => array(),
+        'type' => 'list_default',
+        'weight' => 59,
+      ),
+      'teaser' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 0,
+      ),
+    ),
+    'entity_type' => 'node',
+    'field_name' => 'field_person_invitations',
+    'label' => 'Send me printed invitations to special diocesan events',
+    'required' => 0,
+    'settings' => array(
+      'user_register_form' => FALSE,
+    ),
+    'widget' => array(
+      'active' => 1,
+      'module' => 'options',
+      'settings' => array(
+        'display_label' => 1,
+      ),
+      'type' => 'options_onoff',
+      'weight' => 64,
     ),
   );
 
@@ -1954,10 +2083,15 @@ function person_field_default_field_instances() {
   t('Preferred Phone Type');
   t('Priesthood Ordination');
   t('Printed Newsletter');
+  t('Printed annually, for clergy only.');
   t('Safe Church Training Required');
+  t('Send me a printed clergy directory');
+  t('Send me printed invitations to special diocesan events');
   t('Sent by traditional mail');
   t('State/Province');
+  t('Such as parties, fundraisers, etc.');
   t('Suffix');
+  t('Surviving Clergy Spouse');
   t('ZIP/Postal Code');
 
   return $field_instances;

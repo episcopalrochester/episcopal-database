@@ -484,6 +484,8 @@ function person_field_group_info() {
     'children' => array(
       0 => 'field_person_enews',
       1 => 'field_person_printed_news',
+      2 => 'field_person_directory',
+      3 => 'field_person_invitations',
     ),
     'format_type' => 'tab',
     'format_settings' => array(
@@ -609,6 +611,7 @@ function person_field_group_info() {
       7 => 'field_person_suffix',
       8 => 'field_person_title',
       9 => 'field_person_employment',
+      10 => 'field_person_clergy_spouse',
     ),
     'format_type' => 'tab',
     'format_settings' => array(
