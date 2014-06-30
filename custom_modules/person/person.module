@@ -105,7 +105,7 @@ function person_lists_form($form,&$form_state) {
     '#title' => 'Export Type',
     '#options' => array(
       'csv'=>"Excel format",
-      'txt'=>"Names with email addresses",
+      'txt'=>"Names with email addresses (useful for Constant Contact)",
       ),
       '#default_value' => 'csv',
     );
@@ -126,6 +126,10 @@ function person_lists_form($form,&$form_state) {
     '#options' => array(
       'Retired Clergy',
       'Surviving Spouses',
+      'Enewsletter Subscribers',
+      'Printed Newsletter Subscribers',
+      'Printed Directory Subscribers',
+      'Printed Invitation Subscribers',
       ),
     );
   $form['submit'] = array(
@@ -152,8 +156,36 @@ function person_lists_submit_form($form,&$form_state) {
       'operation' => '=',
       'value' => 1,
       'abv' => 'cs',
-      ),
-    );
+    ),
+    'Enewsletter Subscribers' => array(
+      'table' => 'field_data_field_person_enews',
+      'field' => 'field_person_enews_value',
+      'operation' => '=',
+      'value' => 1,
+      'abv' => 'enews',
+    ),
+    'Printed Newsletter Subscribers' => array(
+      'table' => 'field_data_field_person_printed_news',
+      'field' => 'field_person_printed_news_value',
+      'operation' => '=',
+      'value' => 1,
+      'abv' => 'printed',
+    ),
+    'Printed Directory Subscribers' => array(
+      'table' => 'field_data_field_person_directory',
+      'field' => 'field_person_directory_value',
+      'operation' => '=',
+      'value' => 1,
+      'abv' => 'directory',
+    ),
+    'Printed Invitation Subscribers' => array(
+      'table' => 'field_data_field_person_invitations',
+      'field' => 'field_person_invitations_value',
+      'operation' => '=',
+      'value' => 1,
+      'abv' => 'invite',
+    ),
+  );
   $address = $form['address']['#value'];
   $type = $form['type']['#value'];
   foreach ($form['who']['#options'] as $key => $title) {
@@ -234,8 +266,10 @@ function person_lists_submit_form($form,&$form_state) {
        $no_email[] = $person->title;
       }
     }
-    print "\n\nNo emails:\n";
-    print implode("\n",$no_email);
+    if (!empty($no_email)) {
+      print "\n\nNo emails:\n";
+      print implode("\n",$no_email);
+    }
     exit;
   }
 }
