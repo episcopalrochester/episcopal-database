@@ -19,13 +19,24 @@ function person_menu() {
     'page callback' => 'drupal_get_form',
     'page arguments' => array('person_people_form'),
     'access arguments' => array('access people listing'),
+    'weight' => 0,
     'type' => MENU_DEFAULT_LOCAL_TASK,
   );
+  $items['staff/export'] = array(
+    'title' => 'Export Lists',
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('person_lists_form'),
+    'access arguments' => array('access people listing'),
+    'weight' => 1,
+    'type' => MENU_LOCAL_TASK,
+  );
+
   $items['staff/safe-training'] = array(
     'title' => 'Update Safe Training Data',
     'page callback' => 'drupal_get_form',
     'page arguments' => array('person_safe_form'),
     'access arguments' => array('access people listing'),
+    'weight' => 2,
     'type' => MENU_LOCAL_TASK,
   );
   $items['staff/new-person'] = array(
@@ -88,6 +99,146 @@ function person_partners_form_submit($form, &$form_state) {
   exit;
 }
 
+function person_lists_form($form,&$form_state) {
+  $form['type'] = array(
+    '#type' => 'radios',
+    '#title' => 'Export Type',
+    '#options' => array(
+      'csv'=>"Excel format",
+      'txt'=>"Names with email addresses",
+      ),
+      '#default_value' => 'csv',
+    );
+  $form['address'] = array(
+    '#type' => 'radios',
+    '#title' => 'Address Type',
+    '#options' => array(
+      'home'=>"Where people live",
+      'mail'=>"Where people want their mail",
+      'both'=>"Both where they live and want their mail",
+      ),
+      '#default_value' => 'home',
+    );
+
+  $form['who'] = array(
+    '#type' => 'checkboxes',
+    '#title' => 'People to include',
+    '#options' => array(
+      'Retired Clergy',
+      'Surviving Spouses',
+      ),
+    );
+  $form['submit'] = array(
+    '#type' => 'submit',
+    '#value' => 'Export',
+    );
+  $form['#submit'] = array('person_lists_submit_form');
+  return $form;
+}
+
+function person_lists_submit_form($form,&$form_state) {
+  $who = array();
+  $queries = array(
+    'Retired Clergy' => array(
+      'table' => 'field_data_field_person_employment',
+      'field' => 'field_person_employment_value',
+      'operation' => '=',
+      'value' => 'retired',
+      'abv' => 'e',
+      ),
+    'Surviving Spouses' => array(
+      'table' => 'field_data_field_person_clergy_spouse',
+      'field' => 'field_person_clergy_spouse_value',
+      'operation' => '=',
+      'value' => 1,
+      'abv' => 'cs',
+      ),
+    );
+  $address = $form['address']['#value'];
+  $type = $form['type']['#value'];
+  foreach ($form['who']['#options'] as $key => $title) {
+    if ($form['who'][$key]['#checked']) {
+      $who[] = $queries[$title];
+    }
+  }
+  $people = person_fetch_people($who);
+  if ($type == "csv") {
+    header("Content-type: text/csv");
+    header("Content-Disposition: attachment; filename=file.csv");
+    header("Pragma: no-cache");
+    header("Expires: 0");
+    print '"Name"';
+    $labels = array("Line 1","Line 2","City","State","Other","ZIP");
+    if ($address == "mail") {
+      foreach ($labels as $label) {
+        print ',"Mail '.$label.'"';
+      }
+    }
+    elseif ($address == "home") {
+      foreach ($labels as $label) {
+        print ',"Home '.$label.'"';
+      }
+    }
+    else {
+      foreach ($labels as $label) {
+        print ',"Home '.$label.'"';
+      }
+      foreach ($labels as $label) {
+        print ',"Mail '.$label.'"';
+      }
+    }
+    print ',"Phone","Email"';
+    print "\n";
+
+    foreach ($people['nodes'] as $person) {
+      print "\"";
+      print $person->title;
+      print "\",\"";
+      $mailing = array_filter(person_get_address($person,"mail"));
+      if ($address == "mail") {
+        if (!empty($mailing)) {
+          print implode("\",\"",person_get_address($person,"mail"));
+        } else {
+          print implode("\",\"",person_get_address($person,"home"));
+        }
+      }
+      elseif ($address == "home") {
+        print implode("\",\"",person_get_address($person,"home"));
+      }
+      else {
+        print implode("\",\"",person_get_address($person,"home"));
+        print '","';
+        print implode("\",\"",person_get_address($person,"mail"));
+      }
+      print '"';
+      $phone = person_get_phone($person,"pref");
+      print ',"'.$phone['number'].'"';
+      $email = person_get_email($person,"pref");
+      print ',"'.$email['addy'].'"';
+      print "\n";
+    }
+    exit;
+  }
+  elseif ($type == "txt") {
+    header("Content-type: text/txt");
+    header("Content-Disposition: attachment; filename=file.txt");
+    header("Pragma: no-cache");
+    header("Expires: 0");
+    $no_email = array();
+    foreach ($people['nodes'] as $person) {
+      $email = person_get_email($person,"pref");
+      if (!empty($email['addy'])) {
+        print $person->title." "."<".$email['addy'].">\n";
+      }
+      else {
+       $no_email[] = $person->title;
+      }
+    }
+    print "\n\nNo emails:\n";
+    print implode("\n",$no_email);
+    exit;
+  }
+}
 
 function person_safe_form($form,&$form_state) {
   $form['csv'] = array(
@@ -533,6 +684,11 @@ function person_fetch_people($type="all",$last="",$first="",$status="living",$li
   $query->leftJoin("field_data_field_person_diaconate","d","d.entity_id = n.nid");
   $query->leftJoin("field_data_field_person_consecration","c","c.entity_id = n.nid");
   $query->leftJoin("field_data_field_person_dod","m","m.entity_id = n.nid");
+  if (is_array($type)) {
+    foreach ($type as $q) {
+    $query->leftJoin($q['table'],$q['abv'],$q['abv'].".entity_id = n.nid");
+    }
+  }
   $query->fields('n',array('nid'))
     ->condition("n.type","person","=")
     ->orderBy('l.field_person_last_name_value','ASC')
@@ -550,14 +706,21 @@ function person_fetch_people($type="all",$last="",$first="",$status="living",$li
   else {
     $query->isNull('m.field_person_dod_value');
   }
-  if ($type == "clergy") {
+  if (is_array($type)) {
+    $who = db_or();
+    foreach ($type as $q) {
+      $who->condition($q['abv'].".".$q['field'],$q['value'],$q['operation']);
+    }
+    $query->condition($who);
+  }
+  elseif ($type == "clergy") {
     $is_clergy = db_or()
       ->isNotNull('p.field_person_priesthood_value')
       ->isNotNull('d.field_person_diaconate_value')
       ->isNotNull('c.field_person_consecration_value');
     $query->condition($is_clergy);
   }
-  if ($type == "laity") {
+  elseif ($type == "laity") {
     $query->isNull('p.field_person_priesthood_value')
       ->isNull('d.field_person_diaconate_value')
       ->isNull('c.field_person_consecration_value');
