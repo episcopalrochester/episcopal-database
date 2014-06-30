@@ -188,15 +188,18 @@ function person_lists_submit_form($form,&$form_state) {
   );
   $address = $form['address']['#value'];
   $type = $form['type']['#value'];
+  $filename = array();
   foreach ($form['who']['#options'] as $key => $title) {
     if ($form['who'][$key]['#checked']) {
+      $filename[] = $title;
       $who[] = $queries[$title];
     }
   }
+  $filename = str_replace(" ","_",implode("-",$filename));
   $people = person_fetch_people($who);
   if ($type == "csv") {
     header("Content-type: text/csv");
-    header("Content-Disposition: attachment; filename=file.csv");
+    header("Content-Disposition: attachment; filename=".$filename.".csv");
     header("Pragma: no-cache");
     header("Expires: 0");
     print '"Name"';
@@ -253,7 +256,7 @@ function person_lists_submit_form($form,&$form_state) {
   }
   elseif ($type == "txt") {
     header("Content-type: text/txt");
-    header("Content-Disposition: attachment; filename=file.txt");
+    header("Content-Disposition: attachment; filename=".$filename.".txt");
     header("Pragma: no-cache");
     header("Expires: 0");
     $no_email = array();
