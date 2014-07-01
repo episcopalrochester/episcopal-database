@@ -195,7 +195,7 @@ function person_lists_submit_form($form,&$form_state) {
       $who[] = $queries[$title];
     }
   }
-  $filename = str_replace(" ","_",implode("-",$filename));
+  $filename = str_replace(" ","_",implode("-",$filename))."-".date('Y-m-d');
   $people = person_fetch_people($who);
   if ($type == "csv") {
     header("Content-type: text/csv");
@@ -223,6 +223,8 @@ function person_lists_submit_form($form,&$form_state) {
       }
     }
     print ',"Phone","Email"';
+    print ',"Enews","Printed News","Directory","Invites"';
+    print ',"Priv:No Dir","Pv:No Spou","Pv:No Addr","Pv:No Phone","Pv:No Email"';
     print "\n";
 
     foreach ($people['nodes'] as $person) {
@@ -250,6 +252,28 @@ function person_lists_submit_form($form,&$form_state) {
       print ',"'.$phone['number'].'"';
       $email = person_get_email($person,"pref");
       print ',"'.$email['addy'].'"';
+      $subscriptions = array('enews','printed_news','directory','invitations');
+      foreach ($subscriptions as $sub) {
+        eval("\$field = \$person->field_person_$sub;");
+        if (isset($field['und'][0]['value'])) {
+          if ($field['und'][0]['value'] == 1) {
+            print ',"X"';
+          }
+          else { print ',""'; }
+        }
+        else { print ',""'; }
+      }
+      $privacy = array('directory','partnerships','home','phone','email');
+      foreach ($privacy as $pv) {
+        eval("\$field = \$person->field_person_no_$pv;");
+        if (isset($field['und'][0]['value'])) {
+          if ($field['und'][0]['value'] == 1) {
+            print ',"X"';
+          }
+          else { print ',""'; }
+        }
+        else { print ',""'; }
+      }
       print "\n";
     }
     exit;
