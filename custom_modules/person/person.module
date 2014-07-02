@@ -548,6 +548,7 @@ function person_directory_form($form,&$form_state,$type="Clergy",$last="",$first
       $type = "Clergy";
     }
   }
+  drupal_set_title($type." Directory");
   if (empty($first) && empty($last) && $type == "Clergy") {
     $cache_people = cache_get("people_directory");
     if ($cache_people) {
