@@ -95,10 +95,6 @@ function person_nodereference_options($element, $edit = FALSE) {
   return array($field_key => NULL);
 }
 
-function person_partners_form_submit($form, &$form_state) {
-  exit;
-}
-
 function person_lists_form($form,&$form_state) {
   $form['type'] = array(
     '#type' => 'radios',
@@ -123,15 +119,8 @@ function person_lists_form($form,&$form_state) {
   $form['who'] = array(
     '#type' => 'checkboxes',
     '#title' => 'People to include',
-    '#options' => array(
-      'Retired Clergy',
-      'Surviving Spouses',
-      'Enewsletter Subscribers',
-      'Printed Newsletter Subscribers',
-      'Printed Directory Subscribers',
-      'Printed Invitation Subscribers',
-      ),
-    );
+    '#options' => person_type_options(),
+  );
   $form['submit'] = array(
     '#type' => 'submit',
     '#value' => 'Export',
@@ -140,15 +129,25 @@ function person_lists_form($form,&$form_state) {
   return $form;
 }
 
-function person_lists_submit_form($form,&$form_state) {
-  $who = array();
-  $queries = array(
+function person_type_options() {
+  $queries = person_type_queries();
+  foreach ($queries as $key => $value) {
+    $queries[$key] = $key;
+  }
+  return $queries;
+}
+
+function person_type_queries($type = FALSE) {
+   $queries = array(
+    'All People' => 'All People',
+    'Clergy' => 'Clergy',
+    'Laity' => 'Deceased People',
     'Retired Clergy' => array(
       'table' => 'field_data_field_person_employment',
       'field' => 'field_person_employment_value',
       'operation' => '=',
       'value' => 'retired',
-      'abv' => 'e',
+      'abv' => 'emp',
       ),
     'Surviving Spouses' => array(
       'table' => 'field_data_field_person_clergy_spouse',
@@ -186,6 +185,17 @@ function person_lists_submit_form($form,&$form_state) {
       'abv' => 'invite',
     ),
   );
+  if ($type) {
+    if (isset($queries[$type])) {
+      return $queries[$type];
+    }
+  }
+  return $queries; 
+}
+
+function person_lists_submit_form($form,&$form_state) {
+  $who = array();
+  $queries = person_type_queries();
   $address = $form['address']['#value'];
   $type = $form['type']['#value'];
   $filename = array();
@@ -307,7 +317,7 @@ function person_safe_form($form,&$form_state) {
     '#title' => "Upload a CSV",
     '#tree' => TRUE,
   );
-  $people = person_fetch_people("clergy");
+  $people = person_fetch_people("Clergy");
   $form['requireall'] = array(
     '#type' => 'checkbox',
     '#tree' => true,
@@ -525,7 +535,7 @@ function person_find_person($name=FALSE,$email=FALSE) {
   return false;
 }
 
-function person_directory_form($form,&$form_state,$type="all",$last="",$first="",$status="living") {
+function person_directory_form($form,&$form_state,$type="All People",$last="",$first="",$status="living") {
   if (isset($form_state['values']['last'])) {
     $last = $form_state['values']['last'];
   }
@@ -538,7 +548,7 @@ function person_directory_form($form,&$form_state,$type="all",$last="",$first=""
       $form = array_merge($form,unserialize($cache_people->data));
     }
     else {
-      $people = person_fetch_people('clergy',$last,$first,$status);
+      $people = person_fetch_people('Clergy',$last,$first,$status);
       $people_form = array();
       $weight = 1000;
       foreach ($people['nodes'] as $person) {
@@ -554,7 +564,7 @@ function person_directory_form($form,&$form_state,$type="all",$last="",$first=""
     }
   }
   else {
-    $people = person_fetch_people('clergy',$last,$first,$status);
+    $people = person_fetch_people('Clergy',$last,$first,$status);
     $weight = 1000;
     foreach ($people['nodes'] as $person) {
       $form['person'.$person->nid] = array(
@@ -613,7 +623,7 @@ function person_directory_form_submit($form, &$form_state) {
   $form_state['rebuild'] = TRUE;  
 }
 
-function person_people_form($form,&$form_state,$type="all",$last="",$first="",$status="living") {
+function person_people_form($form,&$form_state,$type="All People",$last="",$first="",$status="living") {
   if (isset($form_state['values']['type'])) {
     $type = $form_state['values']['type'];
   }
@@ -685,11 +695,7 @@ function person_people_form($form,&$form_state,$type="all",$last="",$first="",$s
   $form['filters']['type'] = array(
     '#type' => 'select',
     '#title' => 'Listing Type',
-    '#options' => array(
-      'all' => 'All',
-      'clergy' => 'Clergy',
-      'laity' => 'Laity',
-    ),
+    '#options' => person_type_options(),
     '#default_value' => $type,
   );
   $form['filters']['last'] = array(
@@ -706,7 +712,10 @@ function person_people_form($form,&$form_state,$type="all",$last="",$first="",$s
     '#type' => 'select',
     '#default_value' => $status,
     '#title' => "Status",
-    '#options' => array('living'=>'Living','deceased'=>'Deceased'),
+    '#options' => array(
+      'living'=>'Living People',
+      'deceased'=>'Deceased People'
+    ),
   );
   $form['filters']['submit'] = array(
     '#type' => 'submit',
@@ -737,7 +746,10 @@ function person_people_form_submit($form, &$form_state) {
   $form_state['rebuild'] = TRUE;  
 }
 
-function person_fetch_people($type="all",$last="",$first="",$status="living",$limit=FALSE) {
+function person_fetch_people($type="All People",$last="",$first="",$status="living",$limit=FALSE) {
+  if (!is_array($type)) {
+    $type = array(person_type_queries($type));
+  }
   $query = db_select("node","n");
   $query->leftJoin("field_data_field_person_last_name","l","l.entity_id = n.nid");
   $query->leftJoin("field_data_field_person_first_name","f","f.entity_id = n.nid");
@@ -747,7 +759,9 @@ function person_fetch_people($type="all",$last="",$first="",$status="living",$li
   $query->leftJoin("field_data_field_person_dod","m","m.entity_id = n.nid");
   if (is_array($type)) {
     foreach ($type as $q) {
-    $query->leftJoin($q['table'],$q['abv'],$q['abv'].".entity_id = n.nid");
+      if (is_array($q)) {
+        $query->leftJoin($q['table'],$q['abv'],$q['abv'].".entity_id = n.nid");
+      }
     }
   }
   $query->fields('n',array('nid'))
@@ -767,27 +781,35 @@ function person_fetch_people($type="all",$last="",$first="",$status="living",$li
   else {
     $query->isNull('m.field_person_dod_value');
   }
+
   if (is_array($type)) {
     $who = db_or();
     foreach ($type as $q) {
-      $who->condition($q['abv'].".".$q['field'],$q['value'],$q['operation']);
+      if ($q == "All People") { 
+        $who->isNotNull('n.title');
+      }
+      elseif ($q == "Clergy") {
+        $is_clergy = db_or()
+          ->isNotNull('p.field_person_priesthood_value')
+          ->isNotNull('d.field_person_diaconate_value')
+          ->isNotNull('c.field_person_consecration_value');
+        $who->condition($is_clergy);
+      }
+      elseif ($q == "Laity") {
+        $is_not_clergy = db_and();
+        $is_not_clergy->isNull('p.field_person_priesthood_value')
+          ->isNull('d.field_person_diaconate_value')
+          ->isNull('c.field_person_consecration_value');
+        $who->condition($is_not_clergy);
+      }
+      else {
+        $who->condition($q['abv'].".".$q['field'],$q['value'],$q['operation']);
+      }
     }
     $query->condition($who);
   }
-  elseif ($type == "clergy") {
-    $is_clergy = db_or()
-      ->isNotNull('p.field_person_priesthood_value')
-      ->isNotNull('d.field_person_diaconate_value')
-      ->isNotNull('c.field_person_consecration_value');
-    $query->condition($is_clergy);
-  }
-  elseif ($type == "laity") {
-    $query->isNull('p.field_person_priesthood_value')
-      ->isNull('d.field_person_diaconate_value')
-      ->isNull('c.field_person_consecration_value');
-  }
   if ($limit) {
-$query = $query->extend('PagerDefault')->limit($limit);
+    $query = $query->extend('PagerDefault')->limit($limit);
   }
   $result = $query->execute();
   $people = array('nodes' => array(), 'pager' => '');
