@@ -535,20 +535,26 @@ function person_find_person($name=FALSE,$email=FALSE) {
   return false;
 }
 
-function person_directory_form($form,&$form_state,$type="All People",$last="",$first="",$status="living") {
+function person_directory_form($form,&$form_state,$type="Clergy",$last="",$first="",$status="living") {
   if (isset($form_state['values']['last'])) {
     $last = $form_state['values']['last'];
   }
   if (isset($form_state['values']['first'])) {
     $first = $form_state['values']['first'];
   }
-  if (empty($first) && empty($last)) {
+  if (isset($form_state['values']['type'])) {
+    $type = $form_state['values']['type'];
+    if ($type <> "Clergy" && $type <> "Retired Clergy"){
+      $type = "Clergy";
+    }
+  }
+  if (empty($first) && empty($last) && $type == "Clergy") {
     $cache_people = cache_get("people_directory");
     if ($cache_people) {
       $form = array_merge($form,unserialize($cache_people->data));
     }
     else {
-      $people = person_fetch_people('Clergy',$last,$first,$status);
+      $people = person_fetch_people($type,$last,$first,$status);
       $people_form = array();
       $weight = 1000;
       foreach ($people['nodes'] as $person) {
@@ -564,7 +570,7 @@ function person_directory_form($form,&$form_state,$type="All People",$last="",$f
     }
   }
   else {
-    $people = person_fetch_people('Clergy',$last,$first,$status);
+    $people = person_fetch_people($type,$last,$first,$status);
     $weight = 1000;
     foreach ($people['nodes'] as $person) {
       $form['person'.$person->nid] = array(
@@ -588,6 +594,15 @@ function person_directory_form($form,&$form_state,$type="All People",$last="",$f
     '#type' => 'textfield',
     '#default_value' => $first,
     '#title' => "First Name",
+  );
+  $form['filters']['type'] = array(
+    '#type' => 'select',
+    '#default_value' => $type,
+    '#title' => "Show",
+    '#options' => array(
+      'Clergy' => 'All Clergy',
+      'Retired Clergy' => 'Retired Clergy',
+    ),
   );
   $form['filters']['submit'] = array(
 
