@@ -5,3 +5,121 @@
  */
 
 include_once 'prayer_requests.features.inc';
+
+
+function prayer_requests_menu() {
+  $items = array();
+  $items['prayers'] = array(
+    'title' => 'EDOR Prayer Requests',
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('prayer_requests_view_form'),
+    'access arguments' => array('access clergy directory'),
+  );
+  $items['prayers/directory'] = array(
+    'title' => 'Directory Site Prayers',
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('prayer_requests_view_form','directory'),
+    'access arguments' => array('access clergy directory'),
+    'weight' => 0,
+    'type' => MENU_DEFAULT_LOCAL_TASK,
+  );
+  $items['prayers/needs'] = array(
+    'title' => 'Prayer Needs Blast',
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('prayer_requests_view_form','prayerneeds'),
+    'access arguments' => array('access people listing'),
+    'weight' => 1,
+    'type' => MENU_LOCAL_TASK,
+  );
+  $items['prayers/add'] = array(
+    'title' => 'New Prayer Request',
+    'page callback' => 'drupal_goto',
+    'page arguments' => array('node/add/prayer'),
+    'access arguments' => array('access clergy directory'),
+    'weight' => 10,
+    'type' => MENU_LOCAL_TASK,
+  );
+
+  return $items;
+}
+
+
+function prayer_requests_view_form($form,&$form_state,$location = "directory") {
+  $prayers = prayer_requests_fetch($location);
+  if (!$prayers) {
+    $form['markup'] = array(
+      '#type' => 'item',
+      '#markup' => 'No prayers at present.',
+    );
+  }
+  else {
+    $types = prayer_requests_types();
+    foreach ($prayers as $prayer) {
+      $type = $prayer->field_prayer_type['und'][0]['value'];
+      if (!isset($form[$type])) {
+        $form[$type] = array(
+          '#type' => 'fieldset',
+          '#description' => '<h2>'.$types[$type].'</h2>',
+          '#prefix' => '<ul>',
+          '#suffix' => '</ul>',
+        );
+      }
+      $form[$type][] = array(
+        '#type' => 'item',
+        '#markup' => $prayer->body['und'][0]['value'],
+        '#prefix' => '<li>',
+        '#suffix' => '</li>',
+      );
+    }
+  }
+  return $form;
+}
+
+function prayer_requests_form_prayer_node_form_alter(&$form,&$form_state,$form_id) {
+  $form['field_prayer_type']['und']['#options'] = array_filter(prayer_requests_types());
+  if (isset($form['field_prayer_type']['und']['#entity']->field_prayer_type['und'][0]['value'])) {
+    $form['field_prayer_type']['und']['#default_value'] = $form['field_prayer_type']['und']['#entity']->field_prayer_type['und'][0]['value'];
+  }
+
+}
+
+function prayer_requests_types() {
+  return array(
+    'general'=>'Prayers and Petitions',
+    'thanksgiving'=>'Thanksgivings',
+    'peace'=>'Prayers for peace in the world',
+    'parish'=>'Parishes in transition',
+  );
+}
+
+function prayer_requests_fetch($location = "directory") {
+  $now = date("Y-m-d")."T00:00:00";
+  $query = db_select("node","n");
+  $query->leftJoin("field_data_field_prayer_location","l","l.entity_id = n.nid");
+  $query->leftJoin("field_data_field_prayer_start","s","s.entity_id = n.nid");
+  $query->leftJoin("field_data_field_prayer_end","e","e.entity_id = n.nid");
+  $query->fields('n',array('nid'))
+    ->condition('n.type','prayer')
+    ->condition('l.field_prayer_location_value',$location)
+    ->condition('status',1);
+  $start = db_or()
+    ->condition('s.field_prayer_start_value',$now,'<=')
+    ->isNull('s.field_prayer_start_value');
+  $query->condition($start);
+
+  $end = db_or()
+    ->condition('e.field_prayer_end_value',$now,'>=')
+    ->isNull('e.field_prayer_end_value');
+  $query->condition($end);
+  $result = $query->execute();
+  if (!$result) {
+    return false;
+  }
+  else {
+    $prayers = array();
+    while ($record = $result->fetchAssoc()) {
+      $prayers[] = node_load($record['nid']);
+    }
+    return $prayers;
+  }
+}
