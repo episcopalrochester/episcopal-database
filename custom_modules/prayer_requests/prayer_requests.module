@@ -96,8 +96,10 @@ function prayer_requests_fetch($location = "directory") {
   $now = date("Y-m-d")."T00:00:00";
   $query = db_select("node","n");
   $query->leftJoin("field_data_field_prayer_location","l","l.entity_id = n.nid");
+  $query->leftJoin("field_data_field_prayer_type","t","t.entity_id = n.nid");
   $query->leftJoin("field_data_field_prayer_start","s","s.entity_id = n.nid");
   $query->leftJoin("field_data_field_prayer_end","e","e.entity_id = n.nid");
+  $query->leftJoin("field_data_body","b","b.entity_id = n.nid");
   $query->fields('n',array('nid'))
     ->condition('n.type','prayer')
     ->condition('l.field_prayer_location_value',$location)
@@ -111,6 +113,8 @@ function prayer_requests_fetch($location = "directory") {
     ->condition('e.field_prayer_end_value',$now,'>=')
     ->isNull('e.field_prayer_end_value');
   $query->condition($end);
+  $query->orderBy("t.field_prayer_type_value","ASC")
+    ->orderBy("b.body_value","ASC");
   $result = $query->execute();
   if (!$result) {
     return false;
