@@ -57,9 +57,10 @@ function prayer_requests_field_default_field_bases() {
     'module' => 'list',
     'settings' => array(
       'allowed_values' => array(
-        'prayerneeds' => 'Prayer Needs Email',
-        'newsletter' => 'Newsletter',
-        'web' => 'Website',
+        'directory' => 'Clergy directory site (not public)',
+        'prayerneeds' => 'Prayer Needs Email (somewhat public)',
+        'newsletter' => 'Newsletter (public)',
+        'web' => 'Website (very public)',
       ),
       'allowed_values_function' => '',
     ),
