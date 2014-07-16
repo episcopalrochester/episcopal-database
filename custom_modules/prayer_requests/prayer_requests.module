@@ -1,0 +1,7 @@
+<?php
+/**
+ * @file
+ * Code for the Prayer Requests feature.
+ */
+
+include_once 'prayer_requests.features.inc';
