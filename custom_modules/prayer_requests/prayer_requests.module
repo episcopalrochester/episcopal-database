@@ -12,7 +12,7 @@ function prayer_requests_menu() {
   $items['prayers'] = array(
     'title' => 'EDOR Prayer Requests',
     'page callback' => 'drupal_get_form',
-    'page arguments' => array('prayer_requests_view_form'),
+    'page arguments' => array('prayer_requests_view_form',"all"),
     'access arguments' => array('access clergy directory'),
   );
   $items['prayers/directory'] = array(
@@ -21,15 +21,46 @@ function prayer_requests_menu() {
     'page arguments' => array('prayer_requests_view_form','directory'),
     'access arguments' => array('access clergy directory'),
     'weight' => 0,
-    'type' => MENU_DEFAULT_LOCAL_TASK,
+    'type' => MENU_LOCAL_TASK,
   );
   $items['prayers/needs'] = array(
     'title' => 'Prayer Needs Blast',
     'page callback' => 'drupal_get_form',
     'page arguments' => array('prayer_requests_view_form','prayerneeds'),
-    'access arguments' => array('access people listing'),
+    'access arguments' => array('access clergy directory'),
     'weight' => 1,
     'type' => MENU_LOCAL_TASK,
+  );
+  $items['prayers/newsletter'] = array(
+    'title' => 'Newsletter',
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('prayer_requests_view_form','newsletter'),
+    'access arguments' => array('access clergy directory'),
+    'weight' => 2,
+    'type' => MENU_LOCAL_TASK,
+  );
+  $items['prayers/web'] = array(
+    'title' => 'Web',
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('prayer_requests_view_form','web'),
+    'access arguments' => array('access clergy directory'),
+    'weight' => 3,
+    'type' => MENU_LOCAL_TASK,
+  );
+  $items['web-prayers'] = array(
+    'title' => 'Public Prayer List',
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('prayer_requests_view_form','web'),
+    'access callback' => TRUE,
+    'type' => MENU_CALLBACK,
+  );
+  $items['prayers/all'] = array(
+    'title' => 'All Active Prayers',
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('prayer_requests_view_form','all'),
+    'access arguments' => array('access clergy directory'),
+    'weight' => -1,
+    'type' => MENU_DEFAULT_LOCAL_TASK,
   );
   $items['prayers/add'] = array(
     'title' => 'New Prayer Request',
@@ -44,7 +75,7 @@ function prayer_requests_menu() {
 }
 
 
-function prayer_requests_view_form($form,&$form_state,$location = "directory") {
+function prayer_requests_view_form($form,&$form_state,$location = "all") {
   $prayers = prayer_requests_fetch($location);
   if (!$prayers) {
     $form['markup'] = array(
@@ -58,15 +89,21 @@ function prayer_requests_view_form($form,&$form_state,$location = "directory") {
       $type = $prayer->field_prayer_type['und'][0]['value'];
       if (!isset($form[$type])) {
         $form[$type] = array(
-          '#type' => 'fieldset',
-          '#description' => '<h2>'.$types[$type].'</h2>',
-          '#prefix' => '<ul>',
+          '#type' => 'container',
+          '#prefix' => '<br /><h2>'.$types[$type].'</h2><ul>',
           '#suffix' => '</ul>',
         );
       }
+      $body = $prayer->body['und'][0]['value'];
+      if (node_access("update",$prayer) && $location == "all") {
+        $body .= " ".l("edit","node/".$prayer->nid."/edit");
+      }
+      if (node_access("delete",$prayer) && $location == "all") {
+        $body .= " ".l("delete","node/".$prayer->nid."/delete");
+      }
       $form[$type][] = array(
         '#type' => 'item',
-        '#markup' => $prayer->body['und'][0]['value'],
+        '#markup' => $body,
         '#prefix' => '<li>',
         '#suffix' => '</li>',
       );
@@ -92,18 +129,20 @@ function prayer_requests_types() {
   );
 }
 
-function prayer_requests_fetch($location = "directory") {
+function prayer_requests_fetch($location = "all") {
   $now = date("Y-m-d")."T00:00:00";
   $query = db_select("node","n");
-  $query->leftJoin("field_data_field_prayer_location","l","l.entity_id = n.nid");
   $query->leftJoin("field_data_field_prayer_type","t","t.entity_id = n.nid");
   $query->leftJoin("field_data_field_prayer_start","s","s.entity_id = n.nid");
   $query->leftJoin("field_data_field_prayer_end","e","e.entity_id = n.nid");
   $query->leftJoin("field_data_body","b","b.entity_id = n.nid");
   $query->fields('n',array('nid'))
     ->condition('n.type','prayer')
-    ->condition('l.field_prayer_location_value',$location)
     ->condition('status',1);
+  if ($location <> "all") {
+    $query->leftJoin("field_data_field_prayer_location","l","l.entity_id = n.nid");
+    $query->condition('l.field_prayer_location_value',$location);
+  }
   $start = db_or()
     ->condition('s.field_prayer_start_value',$now,'<=')
     ->isNull('s.field_prayer_start_value');
