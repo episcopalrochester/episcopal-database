@@ -60,7 +60,7 @@ function prayer_requests_field_default_field_bases() {
         'directory' => 'Clergy directory site (not public)',
         'prayerneeds' => 'Prayer Needs Email (somewhat public)',
         'newsletter' => 'Newsletter (public)',
-        'web' => 'Website (very public)',
+        'web' => 'Website (very public - do not include last name or private/health info without permission!)',
       ),
       'allowed_values_function' => '',
     ),
