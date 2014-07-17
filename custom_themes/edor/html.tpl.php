@@ -17,14 +17,8 @@
 
 
 
-  <meta name="description" content="  " />
-  <meta name="keywords" content="  " />
   <title>
-    
-      
-        Joy in Christ
-      
-     | 
+<?php print drupal_get_title(); ?> |  
       Episcopal Diocese of Rochester
 </title>
 
