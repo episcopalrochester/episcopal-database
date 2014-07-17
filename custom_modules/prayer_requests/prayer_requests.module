@@ -70,10 +70,36 @@ function prayer_requests_menu() {
     'weight' => 10,
     'type' => MENU_LOCAL_TASK,
   );
-
+  $items['admin/structure/prayers'] = array(
+    'title' => 'Prayer Request settings',
+    'description' => 'Manage boilerplate text for prayers and other settings.',
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('prayer_requests_admin_form'),
+    'access arguments' => array('administer site configuration'),
+  );
   return $items;
 }
 
+function prayer_requests_admin_form($form,&$form_state) {
+  $types = prayer_requests_types();
+  foreach ($types as $key => $value) {
+    $form[$key] = array(
+      '#type' => 'fieldset',
+      '#title' => $value,
+    );
+    $form[$key][$key."_prefix"] = array(
+      '#type' => 'textarea',
+      '#title' => 'Text before prayers',
+      '#default_value' => variable_get($key."_prefix",""),
+    );
+    $form[$key][$key."_suffix"] = array(
+      '#type' => 'textarea',
+      '#title' => 'Text after prayers',
+      '#default_value' => variable_get($key."_suffix",""),
+    );
+  }
+  return system_settings_form($form);
+}
 
 function prayer_requests_view_form($form,&$form_state,$location = "all") {
   $prayers = prayer_requests_fetch($location);
@@ -88,10 +114,12 @@ function prayer_requests_view_form($form,&$form_state,$location = "all") {
     foreach ($prayers as $prayer) {
       $type = $prayer->field_prayer_type['und'][0]['value'];
       if (!isset($form[$type])) {
+        $prefix = variable_get($type."_prefix","");
+        $suffix = variable_get($type."_suffix","");
         $form[$type] = array(
           '#type' => 'container',
-          '#prefix' => '<br /><h2>'.$types[$type].'</h2><ul>',
-          '#suffix' => '</ul>',
+          '#prefix' => '<br /><h2>'.$types[$type].'</h2>'.$prefix.'<ul>',
+          '#suffix' => '</ul>'.$suffix,
         );
       }
       $body = $prayer->body['und'][0]['value'];
