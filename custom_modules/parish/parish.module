@@ -5,3 +5,258 @@
  */
 
 include_once 'parish.features.inc';
+
+function parish_menu() {
+  $items = array();
+  $items['staff/parishes'] = array(
+    'title' => 'Parishes',
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('parish_parishes_form'),
+    'access arguments' => array('access people listing'),
+    'weight' => 1,
+    'type' => MENU_LOCAL_TASK,
+  );
+  return $items;
+}
+
+function parish_parishes_form($form,&$form_state) {
+  $parishes = parish_fetch_parishes();
+  $parishes_table = array(
+    'header' => array('Parish','District','Street','City','State','ZIP','Phone','Email'),
+    'rows' => array(),
+    'attributes' => array(),
+    'caption' => '',
+    'colgroups' => array(),
+    'sticky' => FALSE,
+    'empty' => '',
+  );
+  foreach ($parishes['nodes'] as $parish) {
+    $name = $parish->title;
+    $district_field = field_get_items("node",$parish,"field_parish_district");
+    $district = field_view_value("node",$parish,"field_parish_district",$district_field[0]);
+    $street_field = field_get_items("node",$parish,"field_parish_home_1");
+    $street = field_view_value("node",$parish,"field_parish_home_1",$street_field[0]);
+
+    $city_field = field_get_items("node",$parish,"field_parish_home_city");
+    $city = field_view_value("node",$parish,"field_parish_home_city",$city_field[0]);
+    $postal_field = field_get_items("node",$parish,"field_parish_home_postal");
+$state_field = field_get_items("node",$parish,"field_parish_home_state");
+    $state = field_view_value("node",$parish,"field_parish_home_state",$state_field[0]);
+    
+    $postal = field_view_value("node",$parish,"field_parish_home_postal",$postal_field[0]);
+    $mail_street_field = field_get_items("node",$parish,"field_parish_mail_1");
+    $mail_street = field_view_value("node",$parish,"field_parish_mail_1",$mail_street_field[0]);
+
+    $mail_city_field = field_get_items("node",$parish,"field_parish_mail_city");
+    $mail_city = field_view_value("node",$parish,"field_parish_mail_city",$mail_city_field[0]);
+    $mail_state_field = field_get_items("node",$parish,"field_parish_mail_state");
+    $mail_state = field_view_value("node",$parish,"field_parish_mail_state",$mail_state_field[0]);
+ 
+    $mail_postal_field = field_get_items("node",$parish,"field_parish_mail_postal");
+    $mail_postal = field_view_value("node",$parish,"field_parish_mail_postal",$mail_postal_field[0]);
+    $phone_field = field_get_items("node",$parish,"field_parish_phone");
+    $phone = field_view_value("node",$parish,"field_parish_phone",$phone_field[0]);
+    $email_field = field_get_items("node",$parish,"field_parish_email");
+    $email = field_view_value("node",$parish,"field_parish_email",$email_field[0]);
+
+    $row = array(
+      array('data'=>array(
+        '#name' => 'title-'.$parish->nid,
+        '#type'=> 'textfield',
+        '#size' => 25,
+        '#value'=>$name
+      )),
+      'District' => $district['#markup'],
+      array('data'=>array(
+        '#name' => 'street-'.$parish->nid,
+        '#type'=> 'textfield',
+        '#size' => 20,
+        '#value'=>$street['#markup']
+      )),
+      array('data'=>array(
+        '#name' => 'city-'.$parish->nid,
+        '#type'=> 'textfield',
+        '#size' => 12,
+        '#value'=>$city['#markup']
+      )),
+      array('data'=>array(
+        '#name' => 'state-'.$parish->nid,
+        '#type'=> 'textfield',
+        '#size' => 12,
+        '#value'=>$state['#markup']
+      )),
+
+      array('data'=>array(
+        '#name' => 'postal-'.$parish->nid,
+        '#type'=> 'textfield',
+        '#size' => 5,
+        '#value'=>$postal['#markup']
+      )),
+      array('data'=>array(
+        '#name' => 'phone-'.$parish->nid,
+        '#type'=> 'textfield',
+        '#size' => 15,
+        '#value'=>$phone['#markup']
+      )),
+      array('data'=>array(
+        '#name' => 'email-'.$parish->nid,
+        '#type'=> 'textfield',
+        '#size' => 30,
+        '#value'=>$email['#markup']
+      )),
+    );
+    $row2 = array(
+      '<em>Mailing Address:</em>',
+      '',
+      array('data'=>array(
+        '#name' => 'mail-street-'.$parish->nid,
+        '#type'=> 'textfield',
+        '#size' => 20,
+        '#value'=>$mail_street['#markup']
+      )),
+      array('data'=>array(
+        '#name' => 'mail-city-'.$parish->nid,
+        '#type'=> 'textfield',
+        '#size' => 12,
+        '#value'=>$mail_city['#markup']
+      )),
+     array('data'=>array(
+        '#name' => 'mail-state-'.$parish->nid,
+        '#type'=> 'textfield',
+        '#size' => 12,
+        '#value'=>$mail_state['#markup']
+      )),
+      array('data'=>array(
+        '#name' => 'mail-postal-'.$parish->nid,
+        '#type'=> 'textfield',
+        '#size' => 5,
+        '#value'=>$mail_postal['#markup']
+      )),
+      '',
+      ''
+    );
+    $parishes_table['rows'][] = $row;
+    $parishes_table['rows'][] = $row2;
+  }
+  $form['parishes'] = array(
+    '#type' => 'item',
+    '#markup' => theme_table($parishes_table)
+  );
+    $form['submit'] = array(
+          '#type' => 'submit',
+              '#value' => 'Submit',
+                  '#submit' => array('parish_parishes_form_submit'),
+                      );
+  return $form;
+}
+
+function parish_parishes_form_submit($form, &$form_state) {
+  $parishes = parish_fetch_parishes();
+  $input = $form_state['input'];
+  foreach ($parishes['nodes'] as $parish) {
+    $nid = $parish->nid;
+    if (!empty($input['title-'.$nid])) {
+      $parish->title = $input['title-'.$nid];
+    }
+    if ($input['street-'.$nid]) {
+      $parish->field_parish_home_1['und'][0]['value'] = $input['street-'.$nid]; 
+    }
+    else {
+      unset($parish->field_parish_home_1['und'][0]);
+    } 
+    if ($input['city-'.$nid]) {
+      $parish->field_parish_home_city['und'][0]['value'] = $input['city-'.$nid]; 
+    }
+    else {
+      unset($parish->field_parish_home_city['und'][0]);
+    } 
+    if ($input['state-'.$nid]) {
+      $parish->field_parish_home_state['und'][0]['value'] = $input['state-'.$nid]; 
+    }
+    else {
+      unset($parish->field_parish_home_state['und'][0]);
+    } 
+    if ($input['postal-'.$nid]) {
+      $parish->field_parish_home_postal['und'][0]['value'] = $input['postal-'.$nid];
+    }
+    else {
+      unset($parish->field_parish_home_postal['und'][0]);
+    } 
+    if ($input['mail-street-'.$nid]) {
+      $parish->field_parish_mail_1['und'][0]['value'] = $input['mail-street-'.$nid]; 
+    }
+    else {
+      unset($parish->field_parish_mail_1['und'][0]);
+    } 
+    if ($input['mail-city-'.$nid]) {
+      $parish->field_parish_mail_city['und'][0]['value'] = $input['mail-city-'.$nid]; 
+    }
+    else {
+      unset($parish->field_parish_mail_city['und'][0]);
+    } 
+    if ($input['mail-state-'.$nid]) {
+      $parish->field_parish_mail_state['und'][0]['value'] = $input['mail-state-'.$nid]; 
+    }
+    else {
+      unset($parish->field_parish_mail_state['und'][0]);
+    } 
+    if ($input['mail-postal-'.$nid]) {
+      $parish->field_parish_mail_postal['und'][0]['value'] = $input['mail-postal-'.$nid];
+    }
+    else {
+      unset($parish->field_parish_mail_postal['und'][0]);
+    } 
+    if ($input['phone-'.$nid]) {
+      $parish->field_parish_phone['und'][0]['value'] = $input['phone-'.$nid]; 
+    }
+    else {
+      unset($parish->field_parish_phone['und'][0]);
+    } 
+    if ($input['email-'.$nid]) {
+      $parish->field_parish_email['und'][0]['value'] = $input['email-'.$nid];   
+    }
+    else {
+      unset($parish->field_parish_email['und'][0]);
+    } 
+    node_save($parish);
+  }
+}
+
+function parish_get_address($parish,$type) {
+  $pfx = "field_parish_".$type."_";
+  $address = array(
+    'line1' => _parish_get_value($parish,$pfx."1"),
+    'line2' => _parish_get_value($parish,$pfx."2"),
+    'city' => _parish_get_value($parish,$pfx."city"),
+    'state' => _parish_get_value($parish,$pfx."state"),
+    'other' => _parish_get_value($parish,$pfx."other"),
+    'postal' => _parish_get_value($parish,$pfx."postal"),
+  );
+  return $address;
+}
+
+function _parish_get_value($node,$field,$type = "value") {
+  $array = field_get_items('node',$node,$field);
+  return $array[0][$type];
+}
+
+function parish_fetch_parishes($district=FALSE,$city=FALSE,$limit=FALSE) {
+  $query = db_select("node","n");
+  $query->leftJoin("field_data_field_parish_home_city","c","c.entity_id = n.nid");
+  $query->leftJoin("field_data_field_parish_district","d","d.entity_id = n.nid");
+  $query->fields('n',array('nid'))
+    ->condition("n.type","parish","=")
+    ->orderBy('d.field_parish_district_value','ASC')
+    ->orderBy('c.field_parish_home_city_value','ASC')
+    ->orderBy('n.title','ASC')
+    ->condition('n.status', 1);
+  if ($limit) {
+    $query = $query->extend('PagerDefault')->limit($limit);
+  }
+  $result = $query->execute();
+  $parishes = array('nodes' => array(), 'pager' => '');
+  while ($record = $result->fetchAssoc()) {
+    $parishes['nodes'][] = node_load($record['nid']);
+  }
+  return $parishes;
+}

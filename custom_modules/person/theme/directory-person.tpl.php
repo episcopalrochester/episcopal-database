@@ -75,6 +75,66 @@ $type = $types[$job['node']->field_pf_type[$lang][0]['value']].", ";
 }
   if ($job['relative']) {
       print $type.$job['relative']->title;
+      $email = _get_value($job['relative'],"field_parish_email");
+      $phone =  _get_value($job['relative'],"field_parish_phone");
+      if ($email || $phone) {
+        print " (";
+        if ($email) {
+print l($email,"mailto:$email");
+        }
+        if ($email && $phone) { print " - "; }
+        if ($phone) {
+          print $phone;
+        }
+       print ")";
+      }
+      $parish = parish_get_address($job['relative'],'home');
+      if ($parish['line1'] || $parish['line2'] || $parish['city'] || $parish['state'] || $parish['other']): ?>
+<br />
+<em>Parish location: </em>
+<?php if ($parish['line1']): ?>
+<?php print $parish['line1']; ?>,&nbsp;
+<?php endif; ?>
+<?php if ($parish['line2']): ?>
+<?php print $parish['line2']; ?>,&nbsp;
+<?php endif; ?>
+<?php if ($parish['city']): ?>
+<?php print $parish['city']; ?>,&nbsp;
+<?php endif; ?>
+<?php if ($parish['state']): ?>
+<?php print $parish['state']; ?>
+<?php endif; ?>
+<?php if ($parish['other']): ?>&nbsp;
+<?php print $parish['other']; ?>
+<?php endif; ?>
+<?php if ($parish['postal']): ?>,&nbsp;
+<?php print $parish['postal']; ?>
+<?php endif; ?>
+<?php endif; ?>
+<?php       $parish_mail = parish_get_address($job['relative'],'mail');
+      if ($parish_mail['line1'] || $parish_mail['line2'] || $parish_mail['city'] || $parish_mail['state'] || $parish_mail['other']): ?>
+<br />
+<em>Parish mailing address: </em>
+<?php if ($parish_mail['line1']): ?>
+<?php print $parish_mail['line1']; ?>,&nbsp;
+<?php endif; ?>
+<?php if ($parish_mail['line2']): ?>
+<?php print $parish_mail['line2']; ?>,&nbsp;
+<?php endif; ?>
+<?php if ($parish_mail['city']): ?>
+<?php print $parish_mail['city']; ?>,&nbsp;
+<?php endif; ?>
+<?php if ($parish_mail['state']): ?>
+<?php print $parish_mail['state']; ?>
+<?php endif; ?>
+<?php if ($parish_mail['other']): ?>&nbsp;
+<?php print $parish_mail['other']; ?> 
+<?php endif; ?>
+<?php if ($parish_mail['postal']): ?>,&nbsp;
+<?php print $parish_mail['postal']; ?>
+<?php endif; ?>
+<?php endif; ?>
+<?php
   }
   elseif (isset($job['node']->field_org_nr['und'][0]['value'])) {
       print $type.$job['node']->field_org_nr['und'][0]['value'];
@@ -83,6 +143,7 @@ $type = $types[$job['node']->field_pf_type[$lang][0]['value']].", ";
       $type = explode(" ",$type); print $type[0];
   }
 ?></p>
+
 <?php endforeach; ?>
 <?php endif; ?>
 <?php if ($privacy['home']): ?>
@@ -91,19 +152,19 @@ if ($home['line1'] || $home['line2'] || $home['city'] || $home['state'] || $home
 <h4>Home Address</h4>
 <p>
 <?php if ($home['line1']): ?>
-<?php print $home['line1']; ?><br />
+<?php print $home['line1']; ?>,&nbsp;
 <?php endif; ?>
 <?php if ($home['line2']): ?>
-<?php print $home['line2']; ?><br />
+<?php print $home['line2']; ?>,&nbsp;
 <?php endif; ?>
 <?php if ($home['city']): ?>
 <?php print $home['city']; ?>,&nbsp;
 <?php endif; ?>
 <?php if ($home['state']): ?>
-<?php print $home['state']; ?><br />
+<?php print $home['state']; ?>,&nbsp;
 <?php endif; ?>
 <?php if ($home['other']): ?>
-<?php print $home['other']; ?><br />
+<?php print $home['other']; ?>,&nbsp;
 <?php endif; ?>
 <?php if ($home['postal']): ?>
 <?php print $home['postal']; ?>
@@ -116,19 +177,19 @@ if ($mail['line1'] || $mail['line2'] || $mail['city'] || $mail['state'] || $mail
 <h4>Mailing Address</h4>
 <p>
 <?php if ($mail['line1']): ?>
-<?php print $mail['line1']; ?><br />
+<?php print $mail['line1']; ?>,&nbsp;
 <?php endif; ?>
 <?php if ($mail['line2']): ?>
-<?php print $mail['line2']; ?><br />
+<?php print $mail['line2']; ?>,&nbsp;
 <?php endif; ?>
 <?php if ($mail['city']): ?>
 <?php print $mail['city']; ?>,&nbsp;
 <?php endif; ?>
 <?php if ($mail['state']): ?>
-<?php print $mail['state']; ?><br />
+<?php print $mail['state']; ?>&nbsp;
 <?php endif; ?>
 <?php if ($mail['other']): ?>
-<?php print $mail['other']; ?><br />
+<?php print $mail['other']; ?>&nbsp;
 <?php endif; ?>
 <?php if ($mail['postal']): ?>
 <?php print $mail['postal']; ?>
