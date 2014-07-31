@@ -43,7 +43,47 @@ function parish_field_default_field_instances() {
       'module' => 'options',
       'settings' => array(),
       'type' => 'options_select',
-      'weight' => -4,
+      'weight' => 1,
+    ),
+  );
+
+  // Exported field_instance: 'node-parish-field_parish_email'
+  $field_instances['node-parish-field_parish_email'] = array(
+    'bundle' => 'parish',
+    'default_value' => NULL,
+    'deleted' => 0,
+    'description' => '',
+    'display' => array(
+      'default' => array(
+        'label' => 'above',
+        'module' => 'text',
+        'settings' => array(),
+        'type' => 'text_default',
+        'weight' => 25,
+      ),
+      'teaser' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 0,
+      ),
+    ),
+    'entity_type' => 'node',
+    'field_name' => 'field_parish_email',
+    'label' => 'Office Email',
+    'required' => 0,
+    'settings' => array(
+      'text_processing' => 0,
+      'user_register_form' => FALSE,
+    ),
+    'widget' => array(
+      'active' => 1,
+      'module' => 'text',
+      'settings' => array(
+        'size' => 60,
+      ),
+      'type' => 'text_textfield',
+      'weight' => 40,
     ),
   );
 
@@ -284,7 +324,7 @@ function parish_field_default_field_instances() {
     ),
   );
 
-    // Exported field_instance: 'node-parish-field_parish_mail_1'
+  // Exported field_instance: 'node-parish-field_parish_mail_1'
   $field_instances['node-parish-field_parish_mail_1'] = array(
     'bundle' => 'parish',
     'default_value' => NULL,
@@ -521,10 +561,99 @@ function parish_field_default_field_instances() {
     ),
   );
 
+  // Exported field_instance: 'node-parish-field_parish_phone'
+  $field_instances['node-parish-field_parish_phone'] = array(
+    'bundle' => 'parish',
+    'default_value' => NULL,
+    'deleted' => 0,
+    'description' => '',
+    'display' => array(
+      'default' => array(
+        'label' => 'above',
+        'module' => 'text',
+        'settings' => array(),
+        'type' => 'text_default',
+        'weight' => 24,
+      ),
+      'teaser' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 0,
+      ),
+    ),
+    'entity_type' => 'node',
+    'field_name' => 'field_parish_phone',
+    'label' => 'Office Phone',
+    'required' => 0,
+    'settings' => array(
+      'text_processing' => 0,
+      'user_register_form' => FALSE,
+    ),
+    'widget' => array(
+      'active' => 1,
+      'module' => 'text',
+      'settings' => array(
+        'size' => 60,
+      ),
+      'type' => 'text_textfield',
+      'weight' => 39,
+    ),
+  );
+
+  // Exported field_instance: 'node-parish-field_parish_site'
+  $field_instances['node-parish-field_parish_site'] = array(
+    'bundle' => 'parish',
+    'default_value' => NULL,
+    'deleted' => 0,
+    'description' => '',
+    'display' => array(
+      'default' => array(
+        'label' => 'above',
+        'module' => 'text',
+        'settings' => array(),
+        'type' => 'text_default',
+        'weight' => 26,
+      ),
+      'teaser' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 0,
+      ),
+    ),
+    'entity_type' => 'node',
+    'field_name' => 'field_parish_site',
+    'label' => 'Website',
+    'required' => 0,
+    'settings' => array(
+      'text_processing' => 0,
+      'user_register_form' => FALSE,
+    ),
+    'widget' => array(
+      'active' => 1,
+      'module' => 'text',
+      'settings' => array(
+        'size' => 60,
+      ),
+      'type' => 'text_textfield',
+      'weight' => 41,
+    ),
+  );
 
   // Translatables
   // Included for use with string extractors like potx.
+  t('Address (Line 1)');
+  t('Address (Line 2)');
+  t('City');
   t('District');
+  t('If outside of the U.S., enter State/Province and Country here.');
+  t('Office Email');
+  t('Office Phone');
+  t('Other');
+  t('State/Province');
+  t('Website');
+  t('ZIP/Postal Code');
 
   return $field_instances;
 }
