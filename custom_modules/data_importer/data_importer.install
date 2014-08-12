@@ -1,0 +1,35 @@
+<?php
+
+function data_importer_schema() {
+  $schema['access_ids'] = array(
+    'description' => t('Associates nodes with access records.'),
+    'fields' => array(
+      'asc_id' => array(
+        'description' => t('The primary identifier for the association'),
+        'type' => 'serial',
+        'unsigned' => TRUE,
+        'not null' => TRUE),
+      'nid' => array(
+        'description' => t('Node id'),
+        'type' => 'int',
+        'unsigned' => TRUE,
+        'not null' => TRUE,
+        'default' => 0),
+      'access_id' => array(
+        'description' => t('Access id'),
+        'type' => 'int',
+        'unsigned' => TRUE,
+        'not null' => TRUE,
+        'default' => 0),
+    ),
+    'indexes' => array(
+      'nid_id'        => array('nid'),
+    ),
+    'unique keys' => array(
+      'asc_id'     => array('asc_id'),
+      'nid'     => array('nid')
+    ),
+    'primary key' => array('asc_id'),
+  );
+  return $schema;
+}

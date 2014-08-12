@@ -1,0 +1,5 @@
+name = Supply Clergy
+description = Provides Supply Clergy System
+core = 7.x
+package = Episcopal Database
+version = 7.x-1.0

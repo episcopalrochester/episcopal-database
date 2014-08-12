@@ -1,0 +1,506 @@
+<?php
+
+function supply_clergy_menu() {
+  $items = array();
+  $items['supply'] = array(
+    'title' => 'Supply Clergy',
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('supply_clergy_calendar_form'),
+    'access arguments' => array('supply clergy'),
+    'weight' => 0,
+    'type' => MENU_NORMAL_ITEM,
+  );
+  $items['supply/%/%/%'] = array(
+    'title' => 'Supply Date',
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('supply_clergy_date_form',1,2,3),
+    'access arguments' => array('supply clergy'),
+    'weight' => 0,
+    'type' => MENU_NORMAL_ITEM,
+  );
+  $items['supply/%/%/%/book/%node'] = array(
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('supply_clergy_book_form',1,2,3,5),
+    'access arguments' => array('supply clergy'),
+    'weight' => 0,
+    'type' => MENU_NORMAL_ITEM,
+  );
+  $items['supply/edit/%supply'] = array(
+    'title' => 'Edit Supply Clergy Booking',
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('supply_clergy_edit_form',2),
+    'access callback' => 'supply_clergy_booking_access',
+    'access arguments' => array(2),
+    'weight' => 0,
+    'type' => MENU_NORMAL_ITEM,
+  );
+  return $items;
+}
+
+function supply_clergy_edit_form($form,&$form_state,$booking) {
+   $date = new DateTime($booking->date);
+  $notice ="<strong>NOTE:</strong><br />";
+  $notice .= "You <em>must</em> contact this person directly to confirm 
+    the booking. Do not assume you have booked this person for supply
+    simply by filling out this form. If they don't check their email or
+    this site, they may not even know!<br />";
+  $person = node_load($booking->cid);
+  $notice .= "<br /><strong>Contact Info:</strong><br />";
+  $phone =  _get_value($person,"field_person_phone_pref");
+  if ($phone) {
+    $notice .= "Phone: ".$phone."<br />";
+  }
+  $email =  _get_value($person,"field_person_email_pref");
+  if ($email) {
+    $notice .= "Email: ".l($email,"mailto:$email")."<br />";
+  }
+  $notes =  _get_value($person,"field_person_supply_notes");
+  if ($notes) {
+    $notice .="<br /><strong>Notes from this person:</strong><br />";
+    $notice .= _get_value($person,"field_person_supply_notes");
+  }
+  $form['notice'] = array(
+    '#type' => 'item',
+    '#markup' => $notice,
+    );
+  $form['date'] = array(
+    '#type' => 'item',
+    '#title' => 'Date:',
+    '#markup' => date_format($date,"l, F j, Y"),
+    );
+  $parishes = parish_fetch_parishes();
+  $parish_options = array('0'=>'No Parish - Mark as Unavailable');
+  foreach ($parishes['nodes'] as $parish) {
+    $parish_options[$parish->nid] = _get_value($parish,"field_parish_district").
+      " District - ".$parish->title;
+  }
+  $form['parish'] = array(
+    '#type' => 'select',
+    '#title' => 'REQUIRED - Parish:',
+    '#options' => $parish_options,
+    '#default_value' => $booking->pid,
+    );
+  $time_array = array();
+  $hour = 5;
+  while ($hour < 22) { 
+    $time_array[date("H:i",strtotime($hour.":00"))] = date("g:i a",strtotime($hour.":00"));
+    $time_array[date("H:i",strtotime($hour.":30"))] = date("g:i a",strtotime($hour.":30"));
+    $hour += 1;
+  }
+  $form['time'] = array(
+    '#title' => 'RFEQUIRED - Desired Arrival Time',
+    '#type' => 'select',
+    '#options' => $time_array,
+    '#default_value' => date_format($date,"H:i"),
+    );
+  $form['submit'] = array(
+    '#type' => 'submit',
+    '#submit' => array('supply_clergy_edit_form_submit'),
+    '#value' => 'Update this booking',
+    );
+  return $form;
+}
+
+function supply_clergy_edit_form_submit($form,&$form_state) {
+  $args = $form_state['build_info']['args'];
+  $booking = $args[0];
+  $date = explode("T",$booking->date);
+  $date = new DateTime($date[0]."T"
+    .$form_state['input']['time']);
+  $person = node_load($booking->cid);
+  global $user;
+  $uid = $user->uid;
+  $record = array(
+    'bid' => $booking->bid,
+    'cid' => $person->nid,
+    'pid' => $form_state['input']['parish'],
+    'date' => date_format($date,'c'),
+    'uid' => $uid,
+  );
+  $name = person_get_title($person)." ".person_get_full_name($person);
+  $parish = node_load($form_state['input']['parish']);
+  drupal_write_record("supply_clergy",$record,array('bid'));
+  if ($parish) {
+    drupal_set_message("You have successfully booked $name at ".
+      $parish->title." for ".date_format($date,"l, F j, Y, g:i a").".");
+  }
+  else {
+    drupal_set_message("You have successfully marked $name ".
+      "unavailable for ".date_format($date,"l, F j, Y, g:i a").".");
+
+  }
+  drupal_goto("supply/".date_format($date,"Y/m/d"));
+}
+
+function supply_clergy_book_form($form,&$form_state,$year,$month,$day,$person) {
+  drupal_set_title("Booking ".person_get_title($person)." ".person_get_full_name($person));
+    $date = new DateTime("$month/$day/$year");
+  $notice ="<strong>NOTE:</strong><br />";
+  $notice .= "You <em>must</em> contact this person directly to confirm 
+    the booking. Do not assume you have booked this person for supply
+    simply by filling out this form. If they don't check their email or
+    this site, they may not even know!<br />";
+  $notice .= "<br /><strong>Contact Info:</strong><br />";
+  $phone =  _get_value($person,"field_person_phone_pref");
+  if ($phone) {
+    $notice .= "Phone: ".$phone."<br />";
+  }
+  $email =  _get_value($person,"field_person_email_pref");
+  if ($email) {
+    $notice .= "Email: ".l($email,"mailto:$email")."<br />";
+  }
+  $notes =  _get_value($person,"field_person_supply_notes");
+  if ($notes) {
+    $notice .="<br /><strong>Notes from this person:</strong><br />";
+    $notice .= _get_value($person,"field_person_supply_notes");
+  }
+  $form['notice'] = array(
+    '#type' => 'item',
+    '#markup' => $notice,
+    );
+  $form['date'] = array(
+    '#type' => 'item',
+    '#title' => 'Date:',
+    '#markup' => date_format($date,"l, F j, Y"),
+    );
+  $parishes = parish_fetch_parishes();
+  $parish_options = array('0'=>'No Parish - Mark as Unavailable');
+  foreach ($parishes['nodes'] as $parish) {
+    $parish_options[$parish->nid] = _get_value($parish,"field_parish_district").
+      " District - ".$parish->title;
+  }
+  $form['parish'] = array(
+    '#type' => 'select',
+    '#title' => 'REQUIRED - Parish:',
+    '#options' => $parish_options,
+    );
+  $time_array = array();
+  $hour = 5;
+  while ($hour < 22) { 
+    $time_array[date("H:i",strtotime($hour.":00"))] = date("g:i a",strtotime($hour.":00"));
+    $time_array[date("H:i",strtotime($hour.":30"))] = date("g:i a",strtotime($hour.":30"));
+    $hour += 1;
+  }
+  $form['time'] = array(
+    '#title' => 'RFEQUIRED - Desired Arrival Time',
+    '#type' => 'select',
+    '#options' => $time_array,
+    '#default_value' => '08:00',
+    );
+  $form['submit'] = array(
+    '#type' => 'submit',
+    '#submit' => array('supply_clergy_book_form_submit'),
+    '#value' => 'Make this booking',
+    );
+  return $form;
+}
+
+function supply_clergy_book_form_submit($form,&$form_state) {
+  $args = $form_state['build_info']['args'];
+  $date = new DateTime($args[0]."-".$args[1]."-".$args[2]."T"
+    .$form_state['input']['time']);
+  $person = $args[3];
+  global $user;
+  $uid = $user->uid;
+  $record = array(
+    'cid' => $person->nid,
+    'pid' => $form_state['input']['parish'],
+    'date' => date_format($date,'c'),
+    'uid' => $uid,
+    );
+  $name = person_get_title($person)." ".person_get_full_name($person);
+  $parish = node_load($form_state['input']['parish']);
+  drupal_write_record("supply_clergy",$record);
+  if ($parish) {
+    drupal_set_message("You have successfully booked $name at ".
+  $parish->title." for ".date_format($date,"l, F j, Y, g:i a")."."); 
+  }
+  else {
+    drupal_set_message("You have successfully marked $name ".
+  "unavailable for ".date_format($date,"l, F j, Y, g:i a")."."); 
+  
+  }
+  drupal_goto("supply/".$args[0]."/".$args[1]."/".$args[2]);
+}
+
+function supply_clergy_permission() {
+  return array(
+    'supply clergy' => array(
+      'title' => t("Use Supply Clergy System"),
+      'description' => t("Allow users to access Supply Clergy system"),
+    ),
+  );
+}
+
+function supply_clergy_booking_access($booking) {
+  global $user;
+  if ($user->uid == $booking->uid ||
+    in_array("database editor",$user->roles) ||
+    in_array("administrator",$account->roles) ||
+    $user->uid == 1
+  ) {
+    return true;
+  }
+  return false;
+}
+
+function supply_clergy_date_form($form,&$form_state,$year,$month,$day) {
+  $date = new DateTime("$month/$day/$year");
+  $he_table = array(
+    'header' => array('Name','Location','E-Mail','Phone','Book'),
+    'rows' => array(),
+    'attributes' => array(),
+    'caption' => '',
+    'colgroups' => array(),
+    'sticky' => FALSE,
+    'empty' => '',
+  );
+  $mp_table = $he_table;
+  $no_table = $he_table;
+  $no_table['header'] = array('Name','Location','Time','Edit');
+  drupal_set_title("Supply Clergy on ".date_format($date,'l, F j, Y'));
+  $he = supply_clergy_find('he');
+  foreach ($he as $person) {
+    $bid = supply_clergy_is_booked($person->nid,$date);
+    if (!$bid) {
+      $home = person_get_address($person,"home");
+      $email = person_get_email($person,"pref");
+      $phone = person_get_phone($person,"pref");
+      $he_table['rows'][] = array(
+        person_get_title($person)." ".person_get_full_name($person),
+        $home['city'],
+        l($email['addy'],"mailto:".$email['addy']),
+       $phone['number'],
+        l("Book","supply/$year/$month/$day/book/".$person->nid),
+      );
+    }
+    else {
+      $booking = supply_load($bid);
+      if ($booking->pid) {
+        $location = node_load($booking->pid)->title;
+      }
+      else {
+        $location = "Unavailable";
+      }
+      $edit = "";
+      if (supply_clergy_booking_access($booking)) {
+        $edit = l("edit","supply/edit/".$booking->bid);
+      }
+      $no_table['rows'][] = array(
+        person_get_title($person)." ".person_get_full_name($person),
+        $location,
+        date("g:i a",strtotime($booking->date)),
+        $edit,
+      );
+    }
+  }
+  $mp = supply_clergy_find('mp');
+  foreach ($mp as $person) {
+    $bid = supply_clergy_is_booked($person->nid,$date);
+    if (!$bid) {
+        $home = person_get_address($person,"home");
+      $email = person_get_email($person,"pref");
+      $phone = person_get_phone($person,"pref");
+      $mp_table['rows'][] = array(
+        person_get_title($person)." ".person_get_full_name($person),
+        $home['city'],
+        l($email['addy'],"mailto:".$email['addy']),
+        $phone['number'],
+        l("Book","supply/$year/$month/$day/book/".$person->nid),
+      );
+    }
+    else {
+      $booking = supply_load($bid);
+      if ($booking->pid) {
+        $location = node_load($booking->pid)->title;
+      }
+      else {
+        $location = "Unavailable";
+      }
+      if (supply_clergy_booking_access($booking)) {
+        $edit = l("edit","supply/edit/".$booking->bid);
+      }
+      $no_table['rows'][] = array(
+        person_get_title($person)." ".person_get_full_name($person),
+        $location,
+        date("g:i a",strtotime($booking->date)),
+        $edit,
+      );
+    }
+  }
+  $form['he_yes'] = array(
+    '#type' => 'item',
+    '#title' => 'Available for Holy Eucharist (1 or 2)',
+    '#markup' => theme_table($he_table),
+  );
+  $form['mp_yes'] = array(
+    '#type' => 'item',
+    '#title' => 'Available for Morning Prayer (1 or 2)',
+    '#markup' => theme_table($mp_table),
+  );
+  $form['no'] = array(
+    '#type' => 'item',
+    '#title' => 'Not available for this date',
+    '#markup' => theme_table($no_table),
+  );
+  return $form;
+}
+
+function supply_clergy_find($type = "he") {
+  $query = new EntityFieldQuery();
+  $result = $query
+    ->entityCondition('entity_type','node')
+    ->entityCondition('bundle','person')
+    ->propertyCondition('status',1)
+    ->fieldCondition('field_person_supply_'.$type,'value',1)
+    ->execute();
+  if (isset($result['node'])) {
+    $nids = array_keys($result['node']);
+    return entity_load('node', $nids);
+  }
+  return false;
+}
+
+function supply_clergy_is_booked($cid,$date) {
+  $query = db_select("supply_clergy","s")
+    ->fields("s",array("bid"))
+    ->condition('s.cid',$cid)
+    ->condition('s.date',date_format($date,"Y-m-d")."%","LIKE");
+  $result = $query->execute();
+  while ($record = $result->fetchObject()) {
+    return $record->bid;  
+  }
+  return false;
+}
+
+function supply_clergy_calendar_form($form,&$form_state) {
+  drupal_set_title("Book Supply Clergy");
+  $date = 0;
+  while ($date < 7) {
+  $form['calendar_'.$date] = array(
+    '#type' => 'item',
+    '#markup' => supply_clergy_build_calendar(
+      date("m",strtotime("+$date month")),
+      date("Y",strtotime("+$date month"))
+    ),
+  );
+  $date++;
+  }
+ return $form;
+}
+
+function supply_load($bid) {
+    $query = db_select("supply_clergy","s")
+      ->fields("s",array("bid","cid","pid","date","uid"))
+      ->condition('s.bid',$bid);
+    $result = $query->execute();
+    while ($record = $result->fetchObject()) {
+      return $record;
+    }
+    return false;
+}
+
+function supply_clergy_build_calendar($month,$year) {
+
+  // Create array containing abbreviations of days of week.
+  $daysOfWeek = array('S','M','T','W','T','F','S');
+
+  // What is the first day of the month in question?
+  $firstDayOfMonth = mktime(0,0,0,$month,1,$year);
+
+  // How many days does this month contain?
+  $numberDays = date('t',$firstDayOfMonth);
+
+  // Retrieve some information about the first day of the
+  // month in question.
+  $dateComponents = getdate($firstDayOfMonth);
+
+  // What is the name of the month in question?
+  $monthName = $dateComponents['month'];
+
+  // What is the index value (0-6) of the first day of the
+  // month in question.
+  $dayOfWeek = $dateComponents['wday'];
+
+  // Create the table tag opener and day headers
+
+  $calendar = "<table class='calendar' style='border-left: 1px #ccc solid; width: 100%;'>";
+  $calendar .= "<caption style='font-size: 250%; font-weight: bold; line-height: 300%'>$monthName $year</caption>";
+  $calendar .= "<tr>";
+  
+  $cell_style = "font-size: 150%; line-height: 280%; text-align: center; border-right: 1px #ccc solid; border-bottom: 1px #ccc solid;";
+
+  // Create the calendar headers
+
+  foreach($daysOfWeek as $day) {
+    $calendar .= "<th class='header' style='$cell_style'>$day</th>";
+  } 
+
+  // Create the rest of the calendar
+
+  // Initiate the day counter, starting with the 1st.
+
+  $currentDay = 1;
+
+  $calendar .= "</tr><tr>";
+
+  // The variable $dayOfWeek is used to
+  // ensure that the calendar
+  // display consists of exactly 7 columns.
+
+  if ($dayOfWeek > 0) { 
+    $calendar .= "<td colspan='$dayOfWeek' style='$cell_style'>&nbsp;</td>"; 
+  }
+
+  $month = str_pad($month, 2, "0", STR_PAD_LEFT);
+
+  while ($currentDay <= $numberDays) {
+
+    // Seventh column (Saturday) reached. Start a new row.
+
+    if ($dayOfWeek == 7) {
+
+      $dayOfWeek = 0;
+      $calendar .= "</tr><tr>";
+
+    }
+
+    $currentDayRel = str_pad($currentDay, 2, "0", STR_PAD_LEFT);
+
+    $date = "$year-$month-$currentDayRel";
+
+    $calendar .= "<td style='$cell_style' class='day' rel='$date'>";
+    if ($dayOfWeek === 0) {
+      $calendar .= "<div style='background: #eeffee;'><strong><em>";
+    }
+    $calendar.= l($currentDay,"supply/".$year."/".$month."/".$currentDay);
+    if ($dayOfWeek === 0) {
+      $calendar .= "</em></strong></div>";
+    }
+    $calendar .= "</td>";
+
+    // Increment counters
+
+    $currentDay++;
+    $dayOfWeek++;
+
+  }
+
+
+
+  // Complete the row of the last week in month, if necessary
+
+  if ($dayOfWeek != 7) { 
+
+    $remainingDays = 7 - $dayOfWeek;
+    $calendar .= "<td colspan='$remainingDays'>&nbsp;</td>"; 
+
+  }
+
+  $calendar .= "</tr>";
+
+  $calendar .= "</table>";
+
+  return $calendar;
+
+}

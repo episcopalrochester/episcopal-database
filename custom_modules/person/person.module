@@ -9,7 +9,7 @@ include_once 'person.features.inc';
 function person_menu() {
   $items = array();
   $items['staff'] = array(
-    'title' => 'People',
+    'title' => 'Staff Tools',
     'page callback' => 'drupal_get_form',
     'page arguments' => array('person_people_form'),
     'access arguments' => array('access people listing'),
@@ -37,14 +37,6 @@ function person_menu() {
     'page arguments' => array('person_safe_form'),
     'access arguments' => array('access people listing'),
     'weight' => 2,
-    'type' => MENU_LOCAL_TASK,
-  );
-  $items['staff/import-data'] = array(
-    'title' => 'Import Data',
-    'page callback' => 'drupal_get_form',
-    'page arguments' => array('person_import_form'),
-    'access arguments' => array('access people listing'),
-    'weight' => 3,
     'type' => MENU_LOCAL_TASK,
   );
   $items['staff/new-person'] = array(
@@ -319,82 +311,6 @@ function person_lists_submit_form($form,&$form_state) {
   }
 }
 
-function person_import_form($form,&$form_state) {
-  $form['markup'] = array(
-    '#type' => 'markup',
-    '#markup' => 'Include a header with title, type, and field names.',
-    '#prefix' => '<p><strong>',
-    '#suffix' => '</strong></p>',
-  );
-  $form['csv'] = array(
-    '#type' => 'file',
-    '#title' => "Upload a CSV",
-    '#tree' => TRUE,
-  );
-  $form['process'] = array(
-    '#type' => 'radios',
-    '#title' => 'How to Process this CSV',
-    '#options' => array('update'=>'Update existing nodes only'),
-    '#default_value' => 'update',
-  );
-  $form['submit'] = array(
-    '#type' => 'submit',
-    '#value' => 'Process CSV',
-  );
-  $form['#submit'] = array('person_import_form_submit');
-  return $form;
-}
-
-function person_import_form_submit($form, &$form_state) {
-  $file = file_save_upload('csv',array(
-    'file_validate_extensions' => array('csv'),FILE_EXISTS_REPLACE));
-  if (!$file) {
-    return;
-  }
-  $csv = explode("\n",str_replace("\r","\n",file_get_contents(drupal_realpath($file->destination)))); 
-  $header = str_getcsv($csv[0]);
-  if (!in_array("type",$header)) {
-    drupal_set_message("No type column exists.",'error');
-    return;
-  }
-  if (!in_array("title",$header)) {
-    drupal_set_message("No title column exists.",'error');
-    return;
-  }
-  unset($csv[0]);
-  $array = array();
-  foreach ($csv as $row) {
-    $sub = array();
-    $data = str_getcsv($row);
-    foreach ($data as $key => $value) {
-      $sub[$header[$key]] = $value;
-    }
-    $array[] = $sub;
-  }
-  foreach ($array as $item) {
-    $query = db_select('node','n')
-      ->fields('n',array('nid'));
-    if ($item['type'] == "parish") {
-      $query->condition('n.title',$item['field_parish_home_city'].', '.$item['title']);
-    }
-    $result = $query->execute();
-    while ($record = $result->fetchAssoc()) {
-      $node = node_load($record['nid']);
-      foreach ($item as $key => $cell) {
-        if ($key <> "title" && $key <> "type") {
-          eval("\$node->".$key."['und'][0]['value'] = \"".$cell."\";");
-        }
-      }
-      drupal_set_message("Updated node ".$node->title." (".$node->nid.").");
-      node_save($node);
-    }
-  }
-  cache_clear_all();
-  $form_state['rebuild'] = TRUE;  
-}
-
-
-
 function person_safe_form($form,&$form_state) {
   $form['csv'] = array(
     '#type' => 'file',
@@ -638,7 +554,7 @@ function person_find_person($name=FALSE,$email=FALSE) {
       ->range(0,1)
       ->execute();
     if (isset($name_result['node'])) {
-      $name_nid = array_shift(array_values($name_result['node']))->nid;
+      $name_nid = array_shift($name_result['node'])->nid;
     }
     if (isset($name_nid)) {
       return node_load($name_nid);
@@ -654,7 +570,7 @@ function person_find_person($name=FALSE,$email=FALSE) {
       ->range(0,1)
       ->execute();
     if (isset($email_result['node'])) {
-      $email_nid = array_shift(array_values($email_result['node']))->nid;
+      $email_nid = array_shift($email_result['node'])->nid;
     }
   }
   if (isset($email_nid)) {
@@ -1017,6 +933,10 @@ function person_get_address($person,$type) {
   return $address;
 }
 
+function person_get_title($person) {
+ return  _get_value($person,"field_person_title");
+}
+
 function person_get_phone($person,$type) {
   $pfx = "field_person_phone_".$type;
   $phone = array(
@@ -1044,6 +964,7 @@ function person_node_load($nodes, $types) {
   if (in_array("person",$types)) {
     foreach ($nodes as $key => $node) {
       $nodes[$key]->title = person_get_full_name($node);
+      $nodes[$key]->is_alive = person_is_alive($node);
     }
   }
 }

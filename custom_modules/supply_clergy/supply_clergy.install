@@ -1,0 +1,47 @@
+<?php
+
+function supply_clergy_schema() {
+  $schema['supply_clergy'] = array(
+    'description' => t('Table of supply clergy bookings'),
+    'fields' => array(
+      'bid' => array(
+        'description' => t('Booking ID'),
+        'type' => 'serial',
+        'unsigned' => TRUE,
+        'not null' => TRUE),
+      'cid' => array(
+        'description' => t('Person ID'),
+        'type' => 'int',
+        'unsigned' => TRUE,
+        'not null' => TRUE,
+        'default' => 0),
+      'pid' => array(
+        'description' => t('Parish ID'),
+        'type' => 'int',
+        'unsigned' => TRUE,
+        'not null' => FALSE,
+        'default' => 0),
+      'date'=>array(
+        'description' => t('Booking date'),
+        'type' => 'varchar',
+        'length' => 32,
+        'default' => '',
+        'not null' => TRUE),
+      'uid' => array(
+        'description' => t('Author User ID'),
+        'type' => 'int',
+        'unsigned' => TRUE,
+        'not null' => TRUE,
+        'default' => 0),
+
+    ),
+    'indexes' => array(
+      'cid_pid'        => array('cid','pid'),
+    ),
+    'unique keys' => array(
+      'bid'     => array('bid'),
+    ),
+    'primary key' => array('bid'),
+  );
+  return $schema;
+}

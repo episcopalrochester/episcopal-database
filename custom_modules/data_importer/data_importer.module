@@ -1,0 +1,167 @@
+<?php
+
+function data_importer_menu() {
+  $items = array();
+  $items['staff/import-data'] = array(
+    'title' => 'Import Data',
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('data_importer_import_form'),
+    'access arguments' => array('access people listing'),
+    'weight' => 3,
+    'type' => MENU_LOCAL_TASK,
+  );
+  return $items;
+}
+
+function data_importer_import_form($form,&$form_state) {
+  $form['markup'] = array(
+    '#type' => 'markup',
+    '#markup' => 'Include a header with title, type, and field names.',
+    '#prefix' => '<p><strong>',
+    '#suffix' => '</strong></p>',
+  );
+  $form['csv'] = array(
+    '#type' => 'file',
+    '#title' => "Upload a CSV",
+    '#tree' => TRUE,
+  );
+  $form['process'] = array(
+    '#type' => 'radios',
+    '#title' => 'How to Process this CSV',
+    '#options' => array(
+      'dry' => 'Dry run only',
+      'update'=>'Update existing Drupal nodes only, overwriting with data from this CSV.',
+      'make'=>'Create nodes using CSV data, but do not update existing Drupal nodes.'
+    ),
+    '#default_value' => 'dry',
+  );
+  $form['source'] = array(
+    '#type' => 'radios',
+    '#title' => 'Source of this CSV',
+    '#options' => array(
+      'excel' => 'Custom spreadsheet',
+      'access' => 'Access database with PersonID column',
+    ),
+    '#default_value' => 'excel',
+  );
+  $form['submit'] = array(
+    '#type' => 'submit',
+    '#value' => 'Process CSV',
+  );
+  $form['#submit'] = array('data_importer_import_form_submit');
+  return $form;
+}
+
+function data_importer_import_form_submit($form, &$form_state) {
+  $process = $form_state['input']['process'];
+  $source =  $form_state['input']['source'];
+  $file = file_save_upload('csv',array(
+    'file_validate_extensions' => array('csv'),FILE_EXISTS_REPLACE));
+  if (!$file) {
+    return;
+  }
+  $csv = explode("\n",str_replace("\r","\n",file_get_contents(drupal_realpath($file->destination)))); 
+  $header = str_getcsv($csv[0]);
+  if (!in_array("type",$header)) {
+    drupal_set_message("No type column exists.",'error');
+    return;
+  }
+  unset($csv[0]);
+  $array = array();
+  foreach ($csv as $row) {
+    $sub = array();
+    $data = str_getcsv($row);
+    foreach ($data as $key => $value) {
+      $sub[$header[$key]] = $value;
+    }
+    $array[] = $sub;
+  }
+  foreach ($array as $item) {
+    $node = false;
+    // Try to find an existing nid via access_ids table
+    if ($source == "access") {
+      if ($item['type'] == "person") {
+        $access_id = data_importer_fetch_asc($item['PersonID']);
+      }
+      $node = ($access_id ? node_load($access_id->nid) : false);
+    }
+    // If no node is found via imported data, try to find one with matching data
+    if (!$node) {
+      if ($item['type'] == "person") {
+        $node = person_find_person($item['field_person_first_name']." ".
+          $item['field_person_middle_name']." ".
+          $item['field_person_last_name'],$item['field_person_email_pref']);
+      }
+      else {
+        $query = db_select('node','n')
+          ->fields('n',array('nid'));
+        if ($item['type'] == "parish") {
+          $query->condition('n.title',$item['field_parish_home_city'].', '.$item['title']);
+        }
+        $result = $query->execute();
+        while ($record = $result->fetchAssoc()) {
+          $node = node_load($record['nid']);
+        }
+      }
+    }
+    if ($process = "make" && !$node) {
+      $node = new StdClass();
+      $node->bundle = $item['type'];
+    }
+    if ($node) {
+      foreach ($item as $key => $cell) {
+        if ($key <> "title" && $key <> "type") {
+          $key = strtolower(preg_replace("/[^A-Za-z0-9_]/", '', $key));
+          eval("\$key_exists = isset(\$node->".$key.");");
+          if ($key_exists) {
+            eval("\$node->".$key."['und'][0]['value'] = \"".$cell."\";");
+          }
+        }
+      }
+      if (!isset($node->title)) {
+        $node->title = $item['field_person_first_name']." ".
+          $item['field_person_middle_name']." ".
+          $item['field_person_last_name'];
+      }
+      if ($process == "dry") {
+        drupal_set_message("DRY RUN - Updated node ".$node->title." (".$node->nid.").");
+      }
+      else {
+        drupal_set_message("Updated node ".$node->title." (".$node->nid.").");
+        node_save($node);
+      }
+    }
+    else {
+      drupal_set_message("No node found for ".
+        $item['field_person_first_name']." ".
+        $item['field_person_middle_name']." ".
+        $item['field_person_last_name']
+      );
+    }
+  }
+  cache_clear_all();
+  $form_state['rebuild'] = TRUE;  
+}
+
+function data_importer_fetch_asc($id=FALSE,$nid=FALSE) {
+  $query = db_select('access_ids','a')
+    ->fields('a',array('asc_id','nid','access_id'));
+  $or = db_or()
+    ->condition('a.access_id',$id)
+    ->condition('a.nid',$nid);
+  $query->condition($or);
+  $result = $query->execute();
+  while ($record = $result->fetchObject()) {
+    return $record;
+  }
+  return false;
+}
+
+function data_importer_node_load($nodes, $types) {
+  foreach ($nodes as $node) {
+    $asc = data_importer_fetch_asc(FALSE,$node->nid);
+    if (isset($asc->access_id)) {
+      $node->access_id = $asc->access_id;
+    }
+  }
+}

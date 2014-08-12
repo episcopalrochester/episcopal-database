@@ -1,0 +1,5 @@
+name = Data Importer
+description = Imports CSV data from various sources
+core = 7.x
+package = Episcopal Database
+version = 7.x-1.0

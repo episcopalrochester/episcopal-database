@@ -1,0 +1,136 @@
+<?php
+/**
+ * @file
+ * Code for the Personal Relationships feature.
+ */
+
+include_once 'committee_relationships.features.inc';
+
+function committee_relationships_form_committee_relationship_node_form_alter(&$form,&$form_state,$form_id) {
+  $form['field_cmt_type']['und']['#options'] = array_filter(pro_relationship_types());
+  if (isset($form['field_cmt_type']['und']['#entity']->field_cmt_type['und'][0]['value'])) {
+    $form['field_cmt_type']['und']['#default_value'] = $form['field_cmt_type']['und']['#entity']->field_cmt_type['und'][0]['value'];
+  }
+ $form['field_cmt_end_reason']['und']['#options'] = pro_relationship_splits();
+  if (isset($form['field_cmt_end_reason']['und']['#entity']->field_cmt_end_reason['und'][0]['value'])) {
+    $form['field_cmt_end_reason']['und']['#default_value'] = $form['field_cmt_end_reason']['und']['#entity']->field_cmt_end_reason['und'][0]['value'];
+  }
+}
+
+function find_cmt_relationships($types = FALSE, $person,$inactive = FALSE) {
+  $query = db_select("node","n");
+  $query->leftJoin("field_data_field_cmt_first","f","f.entity_id = n.nid");
+  $query->leftJoin("field_data_field_cmt_second","s","s.entity_id = n.nid");
+  $query->leftJoin("field_data_field_cmt_type","t","t.entity_id = n.nid");
+  $query->leftJoin("field_data_field_cmt_job","j","j.entity_id = n.nid");
+  $query->leftJoin("field_data_field_cmt_start","p","p.entity_id = n.nid");
+  $query->leftJoin("field_data_field_cmt_end","e","e.entity_id = n.nid");
+  $query->leftJoin("field_data_field_cmt_end_reason","r","r.entity_id = n.nid");
+  $query->fields('n',array('nid'))
+    ->fields('t',array('field_cmt_type_value'))
+    ->fields('j',array('field_cmt_job_value'))
+    ->fields('f',array('field_cmt_first_nid'))
+    ->fields('s',array('field_cmt_second_nid'))
+    ->fields('p',array('field_cmt_start_value'))
+    ->fields('e',array('field_cmt_end_value'))
+    ->fields('r',array('field_cmt_end_reason_value'));
+  if ($types) {
+    $or = db_or();
+    foreach ($types as $type) {
+      $or->condition('t.field_cmt_type_value',$type);
+    }
+    $query->condition($or);
+  }
+   $query->condition(db_or()->condition('f.field_cmt_first_nid',$person->nid)->condition('s.field_cmt_second_nid',$person->nid))
+    ->condition('n.status', 1);
+  if (!$inactive) {
+    $inactive_or = db_or();
+    $and_1 = db_and();
+    $and_1->isNull('e.field_cmt_end_value');
+    $and_1->isNull('r.field_cmt_end_reason_value');
+    $and_2 = db_and();
+    $and_2->condition('e.field_cmt_end_value',date("Y-m-d")."T00:00:00",">");
+    $inactive_or->condition($and_1);
+    $inactive_or->condition($and_2);
+    $query->condition($inactive_or);
+  }
+  $result = $query->execute();
+  if (!$result) {
+    return false;
+  }
+  $relationships = array();
+  while ($record = $result->fetchAssoc()) {
+    $relationship = array('type'=>$record['field_cmt_type_value']);
+    $relationship['title'] = "";
+    if ($record['field_cmt_job_value']) {
+      $relationship['title'] = $record['field_cmt_job_value'];
+    }
+    $relationship['start'] = "";
+    if ($record['field_cmt_start_value']) {
+      $relationship['start'] = _date_to_human($record['field_cmt_start_value']);
+    }
+    $relationship['end'] = "";
+    if ($record['field_cmt_end_value']) {
+      $relationship['end'] = _date_to_human($record['field_cmt_end_value']);
+    }
+    $relationship['end_reason'] = "";
+    if ($record['field_cmt_end_reason_value']) {
+      $relationship['end_reason'] = $record['field_cmt_end_reason_value'];
+    }
+    $relationship['node'] = node_load($record['nid']);
+    if ($person->nid == $record["field_cmt_first_nid"]) {
+      $relationship['relative'] = node_load($record['field_cmt_second_nid']);
+    }
+    elseif ($person->nid == $record['field_cmt_second_nid']) {
+      $relationship['relative'] = node_load($record['field_cmt_first_nid']);
+    }
+    else {
+      $relationship['relative'] = false;
+    }
+    if ((empty($record['field_cmt_end_value']) && !empty($record['field_cmt_end_reason_value'])) || (!empty($record['field_cmt_end_value']) && $record['field_cmt_end_value'] < date("Y-m-d")."T00:00:00")) {
+      $relationship['active'] = FALSE;
+    }
+    else {
+      $relationship['active'] = TRUE;
+    }
+    $relationships[] = $relationship;
+  }
+  return $relationships;
+}
+
+function cmt_relationship_types() {
+  return array(
+    ''=>'',
+    'rector'=>'Rector',
+    'pic'=>'Priest-in-Charge',
+    'associate'=>'Associate Priest',
+    'assistant'=>'Assistant Priest',
+    'priest'=>'Priest',
+    'vicar'=>'Vicar',
+    'pastor'=>'Pastor',
+    'supply'=>'Covenanted Supply Priest',
+    'deacon'=>'Deacon',
+    'chaplain' => 'Chaplain',
+    'bishop' => 'Bishop',
+    'cmm' => 'Canon for Mission & Ministry',
+    'director' => 'Director',
+    'exec' => 'Executive Director',
+    'missioner' => 'Missioner',
+    'coordinator' => 'Coordinator',
+  );
+}
+
+function cmt_relationship_splits($key = FALSE) {
+  $splits =  array(
+    '' => '',
+    "retirement"=>"Retirement",
+    "resignation"=>"Resignation",
+    "reassignment"=>"Reassignment",
+    "termination"=>"Termination",
+    "other"=>"Other (see notes)",
+  );
+  if ($key && !empty($key)) {
+    return $splits[$key];
+  }
+  return $splits;
+}
