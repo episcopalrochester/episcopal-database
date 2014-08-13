@@ -8,8 +8,31 @@ function supply_clergy_menu() {
     'page arguments' => array('supply_clergy_calendar_form'),
     'access arguments' => array('supply clergy'),
     'weight' => 0,
-    'type' => MENU_NORMAL_ITEM,
   );
+  $items['supply/calendar'] = array(
+    'title' => 'Calendar',
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('supply_clergy_calendar_form'),
+    'access arguments' => array('supply clergy'),
+    'weight' => 1,
+    'type' => MENU_DEFAULT_LOCAL_TASK,
+  );
+  $items['supply/roster'] = array(
+    'title' => 'Duty Roster',
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('supply_clergy_roster_form'),
+    'access arguments' => array('supply clergy'),
+    'weight' => 2,
+    'type' => MENU_LOCAL_TASK,
+  ); 
+ $items['supply/list'] = array(
+    'title' => 'List',
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('supply_clergy_list_form'),
+    'access arguments' => array('supply clergy'),
+    'weight' => 2,
+    'type' => MENU_LOCAL_TASK,
+  ); 
   $items['supply/%/%/%'] = array(
     'title' => 'Supply Date',
     'page callback' => 'drupal_get_form',
@@ -32,10 +55,96 @@ function supply_clergy_menu() {
     'access callback' => 'supply_clergy_booking_access',
     'access arguments' => array(2),
     'weight' => 0,
-    'type' => MENU_NORMAL_ITEM,
+    'type' => MENU_CALLBACK,
   );
+  $items['supply/cancel/%supply'] = array(
+    'title' => 'Cancel Supply Clergy Booking',
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('supply_clergy_cancel_form',2),
+    'access callback' => 'supply_clergy_booking_access',
+    'access arguments' => array(2),
+    'weight' => 0,
+    'type' => MENU_CALLBACK,
+  );
+
   return $items;
 }
+
+function supply_clergy_cancel_form($form,&$form_state,$booking) {
+   $date = new DateTime($booking->date);
+  $notice ="<strong>NOTE:</strong><br />";
+  $notice .= "You <em>must</em> contact this person directly to confirm 
+    cancellation.<br />";
+  $person = node_load($booking->cid);
+  $notice .= "<br /><strong>Contact Info:</strong><br />";
+  $phone =  _get_value($person,"field_person_phone_pref");
+  if ($phone) {
+    $notice .= "Phone: ".$phone."<br />";
+  }
+  $email =  _get_value($person,"field_person_email_pref");
+  if ($email) {
+    $notice .= "Email: ".l($email,"mailto:$email")."<br />";
+  }
+  $notes =  _get_value($person,"field_person_supply_notes");
+  if ($notes) {
+    $notice .="<br /><strong>Notes from this person:</strong><br />";
+    $notice .= _get_value($person,"field_person_supply_notes");
+  }
+  $form['notice'] = array(
+    '#type' => 'item',
+    '#markup' => $notice,
+    );
+  $form['date'] = array(
+    '#type' => 'item',
+    '#title' => 'Date:',
+    '#markup' => date_format($date,"l, F j, Y"),
+    );
+  $parishes = parish_fetch_parishes();
+  $parish_options = array('0'=>'No Parish - Mark as Unavailable');
+  foreach ($parishes['nodes'] as $parish) {
+    $parish_options[$parish->nid] = _get_value($parish,"field_parish_district").
+      " District - ".$parish->title;
+  }
+  $form['parish'] = array(
+    '#type' => 'select',
+    '#title' => 'REQUIRED - Parish:',
+    '#options' => $parish_options,
+    '#default_value' => $booking->pid,
+    '#disabled' => true,
+    );
+  $time_array = array();
+  $hour = 5;
+  while ($hour < 22) { 
+    $time_array[date("H:i",strtotime($hour.":00"))] = date("g:i a",strtotime($hour.":00"));
+    $time_array[date("H:i",strtotime($hour.":30"))] = date("g:i a",strtotime($hour.":30"));
+    $hour += 1;
+  }
+  $form['time'] = array(
+    '#title' => 'RFEQUIRED - Desired Arrival Time',
+    '#type' => 'select',
+    '#options' => $time_array,
+    '#default_value' => date_format($date,"H:i"),
+    '#disabled' => true,
+    );
+  $form['submit'] = array(
+    '#type' => 'submit',
+    '#submit' => array('supply_clergy_cancel_form_submit'),
+    '#value' => 'Cancel this booking',
+    );
+  return $form;
+}
+
+function supply_clergy_cancel_form_submit($form,&$form_state) {
+  $args = $form_state['build_info']['args'];
+  $booking = $args[0];
+  $date = new DateTime($booking->date);
+  db_delete("supply_clergy")
+    ->condition("bid",$booking->bid)
+    ->execute();
+  drupal_set_message("Booking canceled.");
+  drupal_goto("supply/".date_format($date,"Y/m/d"));
+}
+ 
 
 function supply_clergy_edit_form($form,&$form_state,$booking) {
    $date = new DateTime($booking->date);
@@ -234,9 +343,13 @@ function supply_clergy_permission() {
 
 function supply_clergy_booking_access($booking) {
   global $user;
+  $person = node_load($booking->cid);
+  $uid = user_generator_check_mail($person->field_person_email_pref['und'][0]['value']);
   if ($user->uid == $booking->uid ||
     in_array("database editor",$user->roles) ||
-    in_array("administrator",$account->roles) ||
+    in_array("administrator",$user->roles) ||
+    $person->uid == $user->uid ||
+    $uid == $user->uid ||
     $user->uid == 1
   ) {
     return true;
@@ -257,7 +370,7 @@ function supply_clergy_date_form($form,&$form_state,$year,$month,$day) {
   );
   $mp_table = $he_table;
   $no_table = $he_table;
-  $no_table['header'] = array('Name','Location','Time','Edit');
+  $no_table['header'] = array('Name','Location','Time','Edit','Cancel');
   drupal_set_title("Supply Clergy on ".date_format($date,'l, F j, Y'));
   $he = supply_clergy_find('he');
   foreach ($he as $person) {
@@ -286,11 +399,16 @@ function supply_clergy_date_form($form,&$form_state,$year,$month,$day) {
       if (supply_clergy_booking_access($booking)) {
         $edit = l("edit","supply/edit/".$booking->bid);
       }
+      $cancel = "";
+      if (supply_clergy_booking_access($booking)) {
+        $cancel = l("cancel","supply/cancel/".$booking->bid);
+      }
       $no_table['rows'][] = array(
         person_get_title($person)." ".person_get_full_name($person),
         $location,
         date("g:i a",strtotime($booking->date)),
         $edit,
+        $cancel,
       );
     }
   }
@@ -317,14 +435,21 @@ function supply_clergy_date_form($form,&$form_state,$year,$month,$day) {
       else {
         $location = "Unavailable";
       }
+      $edit = "";
       if (supply_clergy_booking_access($booking)) {
         $edit = l("edit","supply/edit/".$booking->bid);
+      }
+
+      $cancel = "";
+      if (supply_clergy_booking_access($booking)) {
+        $cancel = l("cancel","supply/cancel/".$booking->bid);
       }
       $no_table['rows'][] = array(
         person_get_title($person)." ".person_get_full_name($person),
         $location,
         date("g:i a",strtotime($booking->date)),
         $edit,
+        $cancel,
       );
     }
   }
@@ -374,7 +499,7 @@ function supply_clergy_is_booked($cid,$date) {
 }
 
 function supply_clergy_calendar_form($form,&$form_state) {
-  drupal_set_title("Book Supply Clergy");
+  drupal_set_title("Supply Clergy: Booking Calendar");
   $date = 0;
   while ($date < 7) {
   $form['calendar_'.$date] = array(
@@ -387,6 +512,109 @@ function supply_clergy_calendar_form($form,&$form_state) {
   $date++;
   }
  return $form;
+}
+
+function supply_clergy_roster_form($form,&$form_state) {
+  drupal_set_title("Supply Clergy: Duty Roster");
+  $now = date("Y-m-d");
+  $bookings = db_select("supply_clergy","s")
+    ->fields("s",array("bid","cid","pid","date","uid"))
+    ->condition("s.date",$now,">")
+    ->orderBy("s.date","ASC")
+    ->execute();
+  while ($booking = $bookings->fetchObject()) {
+    $date = explode("T",$booking->date);
+    if (!isset($form[$date[0]])) {
+      $form[$date[0]] = array(
+        '#type' => 'fieldset',
+        '#title' => $date[0]
+      );
+      $form[$date[0]]['list'] = array(
+        '#type' => 'item',
+        '#prefix' => '<ul>',
+        '#suffix' => '</ul>',
+        );
+    }
+    $person = node_load($booking->cid);
+    if ($booking->pid) {
+      $parish = node_load($booking->pid)->title;
+    }
+    else {
+      $parish = "Marked as unavailable";
+    }
+    $markup = date("h:i a",strtotime($booking->date)).", ".
+      person_get_title($person)." ".
+      person_get_full_name($person).", ".
+      $parish;
+    if (supply_clergy_booking_access($booking)) {
+      $markup .= ", ".l("edit","supply/edit/".$booking->bid);
+      $markup .= ", ".l("cancel","supply/cancel/".$booking->bid);
+    }
+    $form[$date[0]]['list'][$booking->date.$booking->bid] = array(
+      '#type' => 'item',
+      '#prefix' => '<li>',
+      '#suffix' => '</li>',
+      '#markup' => $markup);
+  }
+  return $form;
+}
+
+function supply_clergy_list_form($form,&$form_state) {
+  drupal_set_title("Supply Clergy: Personnel List");
+  $he = supply_clergy_find('he');
+  $form['he'] = array(
+    '#type' => 'fieldset',
+    '#title' => "List of People Offering Holy Eucharist",
+  );
+  $form['he']['list'] = array(
+    '#type' => 'item',
+    '#prefix' => '<ul>',
+    '#suffix' => '</ul>',
+  );
+  $count = 0;
+  foreach ($he as $person) {
+    $markup = person_get_title($person)." ".
+      person_get_full_name($person);
+    $notes = _get_value($person,"field_person_supply_notes");
+    if ($notes) {
+      $markup .= "<ul><li>Notes: $notes</li></ul>";
+    }
+    $form['he']['list'][$count] = array(
+      '#type' => 'item',
+      '#prefix' => '<li>',
+      '#suffix' => '</li>',
+      '#markup' => $markup,
+        );
+    $count++;
+  }
+  $mp = supply_clergy_find('mp');
+  $form['mp'] = array(
+    '#type' => 'fieldset',
+    '#title' => "List of People Offering Morning Prayer",
+  );
+  $form['mp']['list'] = array(
+    '#type' => 'item',
+    '#prefix' => '<ul>',
+    '#suffix' => '</ul>',
+  );
+  $count = 0;
+  foreach ($mp as $person) {
+    $markup = person_get_title($person)." ".
+            person_get_full_name($person);
+    $notes = _get_value($person,"field_person_supply_notes");
+    if ($notes) {
+      $markup .= "<ul><li>Notes: $notes</li></ul>";
+    }
+    $form['mp']['list'][$count] = array(
+      '#type' => 'item',
+      '#prefix' => '<li>',
+      '#suffix' => '</li>',
+      '#markup' => $markup,
+        );
+    $count++;
+  }
+  return $form;
+
 }
 
 function supply_load($bid) {
@@ -403,7 +631,7 @@ function supply_load($bid) {
 function supply_clergy_build_calendar($month,$year) {
 
   // Create array containing abbreviations of days of week.
-  $daysOfWeek = array('S','M','T','W','T','F','S');
+  $daysOfWeek = array('Su','Mo','Tu','Wd','Th','Fr','Sa');
 
   // What is the first day of the month in question?
   $firstDayOfMonth = mktime(0,0,0,$month,1,$year);
@@ -453,7 +681,6 @@ function supply_clergy_build_calendar($month,$year) {
   }
 
   $month = str_pad($month, 2, "0", STR_PAD_LEFT);
-
   while ($currentDay <= $numberDays) {
 
     // Seventh column (Saturday) reached. Start a new row.
@@ -473,7 +700,12 @@ function supply_clergy_build_calendar($month,$year) {
     if ($dayOfWeek === 0) {
       $calendar .= "<div style='background: #eeffee;'><strong><em>";
     }
-    $calendar.= l($currentDay,"supply/".$year."/".$month."/".$currentDay);
+    if (strtotime($year."/".$month."/".$currentDay) > time()) {   
+      $calendar.= l($currentDay,"supply/".$year."/".$month."/".$currentDay);
+    }
+    else {
+      $calendar .= $currentDay;
+    }
     if ($dayOfWeek === 0) {
       $calendar .= "</em></strong></div>";
     }
