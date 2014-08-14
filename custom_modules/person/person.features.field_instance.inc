@@ -142,7 +142,7 @@ function person_field_default_field_instances() {
         'display_label' => 1,
       ),
       'type' => 'options_onoff',
-      'weight' => 18,
+      'weight' => 16,
     ),
   );
 
@@ -397,7 +397,7 @@ function person_field_default_field_instances() {
         'year_range' => '1901:2014',
       ),
       'type' => 'date_select',
-      'weight' => 16,
+      'weight' => 17,
     ),
   );
 
@@ -450,7 +450,7 @@ function person_field_default_field_instances() {
         'year_range' => '-3:+3',
       ),
       'type' => 'date_select',
-      'weight' => 17,
+      'weight' => 18,
     ),
   );
 
@@ -1950,6 +1950,132 @@ function person_field_default_field_instances() {
     ),
   );
 
+  // Exported field_instance: 'node-person-field_person_supply_he'
+  $field_instances['node-person-field_person_supply_he'] = array(
+    'bundle' => 'person',
+    'default_value' => array(
+      0 => array(
+        'value' => 0,
+      ),
+    ),
+    'deleted' => 0,
+    'description' => '',
+    'display' => array(
+      'default' => array(
+        'label' => 'above',
+        'module' => 'list',
+        'settings' => array(),
+        'type' => 'list_default',
+        'weight' => 61,
+      ),
+      'teaser' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 0,
+      ),
+    ),
+    'entity_type' => 'node',
+    'field_name' => 'field_person_supply_he',
+    'label' => 'Available for Sunday Eucharist (HE1/2)',
+    'required' => 0,
+    'settings' => array(
+      'user_register_form' => FALSE,
+    ),
+    'widget' => array(
+      'active' => 1,
+      'module' => 'options',
+      'settings' => array(
+        'display_label' => 1,
+      ),
+      'type' => 'options_onoff',
+      'weight' => 65,
+    ),
+  );
+
+  // Exported field_instance: 'node-person-field_person_supply_mp'
+  $field_instances['node-person-field_person_supply_mp'] = array(
+    'bundle' => 'person',
+    'default_value' => array(
+      0 => array(
+        'value' => 0,
+      ),
+    ),
+    'deleted' => 0,
+    'description' => '',
+    'display' => array(
+      'default' => array(
+        'label' => 'above',
+        'module' => 'list',
+        'settings' => array(),
+        'type' => 'list_default',
+        'weight' => 62,
+      ),
+      'teaser' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 0,
+      ),
+    ),
+    'entity_type' => 'node',
+    'field_name' => 'field_person_supply_mp',
+    'label' => 'Available for Sunday Morning Prayer (MP1/2)',
+    'required' => 0,
+    'settings' => array(
+      'user_register_form' => FALSE,
+    ),
+    'widget' => array(
+      'active' => 1,
+      'module' => 'options',
+      'settings' => array(
+        'display_label' => 1,
+      ),
+      'type' => 'options_onoff',
+      'weight' => 66,
+    ),
+  );
+
+  // Exported field_instance: 'node-person-field_person_supply_notes'
+  $field_instances['node-person-field_person_supply_notes'] = array(
+    'bundle' => 'person',
+    'default_value' => NULL,
+    'deleted' => 0,
+    'description' => 'Notes about seasonality, how far you will travel, etc.',
+    'display' => array(
+      'default' => array(
+        'label' => 'above',
+        'module' => 'text',
+        'settings' => array(),
+        'type' => 'text_default',
+        'weight' => 63,
+      ),
+      'teaser' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 0,
+      ),
+    ),
+    'entity_type' => 'node',
+    'field_name' => 'field_person_supply_notes',
+    'label' => 'Notes',
+    'required' => 0,
+    'settings' => array(
+      'text_processing' => 0,
+      'user_register_form' => FALSE,
+    ),
+    'widget' => array(
+      'active' => 1,
+      'module' => 'text',
+      'settings' => array(
+        'rows' => 5,
+      ),
+      'type' => 'text_textarea',
+      'weight' => 67,
+    ),
+  );
+
   // Exported field_instance: 'node-person-field_person_title'
   $field_instances['node-person-field_person_title'] = array(
     'bundle' => 'person',
@@ -2047,6 +2173,8 @@ function person_field_default_field_instances() {
   // Included for use with string extractors like potx.
   t('Address (Line 1)');
   t('Address (Line 2)');
+  t('Available for Sunday Eucharist (HE1/2)');
+  t('Available for Sunday Morning Prayer (MP1/2)');
   t('Baptism');
   t('City');
   t('Confirmation');
@@ -2072,6 +2200,8 @@ function person_field_default_field_instances() {
   t('Last Safe Church Training Date');
   t('Middle Name');
   t('Nickname');
+  t('Notes');
+  t('Notes about seasonality, how far you will travel, etc.');
   t('Other');
   t('Other E-Mail');
   t('Other E-Mail Type');
