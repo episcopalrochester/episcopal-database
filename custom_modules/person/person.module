@@ -905,8 +905,13 @@ function person_get_full_name($person) {
   }
   $nick = field_get_items('node',$person,'field_person_nickname');
   if (isset($nick[0]['value'])) {
-    $first[0]['value'] = "";
-    $middle[0]['value'] = "";
+    if (!empty($nick[0]['value'])) {
+      $first[0]['value'] = "";
+      $middle[0]['value'] = "";
+    }
+    else {
+      $nick[0]['value'] = "";
+    }
   }
   else {
     $nick[0]['value'] = "";

@@ -16,6 +16,12 @@ function edb_menu() {
 }
 
 function edb_init() {
+  global $base_url;
+  if ($base_url == "http://datadev.edordev.org") {
+    if (module_exists("rules")) {
+      module_disable(array("rules","rules_admin"));
+    }
+  }
   variable_set("site_frontpage","my-data");
   global $user;
   if (arg(1) <> "logout" && arg(0) == "user" && arg(2) <> "password" && $user->uid > 1) {

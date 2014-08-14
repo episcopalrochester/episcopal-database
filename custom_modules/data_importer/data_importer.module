@@ -25,13 +25,21 @@ function data_importer_import_form($form,&$form_state) {
     '#title' => "Upload a CSV",
     '#tree' => TRUE,
   );
+  $last = variable_get("data_importer_last",false);
+  if ($last) {
+    $form['last'] = array(
+      '#type' => 'item',
+      '#markup' => 'Last file uploaded: '.$last,
+    );
+  }
   $form['process'] = array(
     '#type' => 'radios',
     '#title' => 'How to Process this CSV',
     '#options' => array(
       'dry' => 'Dry run only',
       'update'=>'Update existing Drupal nodes only, overwriting with data from this CSV.',
-      'make'=>'Create nodes using CSV data, but do not update existing Drupal nodes.'
+      'make'=>'Create nodes using CSV data, but do not update existing Drupal nodes.',
+      'accessid' => 'Assign Access ID only',
     ),
     '#default_value' => 'dry',
   );
@@ -47,23 +55,70 @@ function data_importer_import_form($form,&$form_state) {
   $form['submit'] = array(
     '#type' => 'submit',
     '#value' => 'Process CSV',
+    '#submit' =>  array('data_importer_import_form_submit')
   );
-  $form['#submit'] = array('data_importer_import_form_submit');
+  $form['expunge'] = array(
+    '#type' => 'submit',
+    '#prefix' => '&nbsp;&nbsp;',
+    '#value' => 'Expunge previously uploaded files',
+    '#submit' =>  array('data_importer_expunge')
+  );
   return $form;
 }
 
+function data_importer_expunge() {
+  if (file_exists(drupal_realpath("public://data_importer"))) {
+    file_unmanaged_delete_recursive("public://data_importer");
+    drupal_mkdir("public://data_importer");
+  }
+  variable_del("data_importer_last");
+  drupal_set_message("Previous uploads expunged.");
+}
+
 function data_importer_import_form_submit($form, &$form_state) {
+  if (module_exists("rules")) {
+    module_disable(array("rules","rules_admin"));
+    drupal_set_message("Suspending the rules.");
+  }
   $process = $form_state['input']['process'];
   $source =  $form_state['input']['source'];
-  $file = file_save_upload('csv',array(
-    'file_validate_extensions' => array('csv'),FILE_EXISTS_REPLACE));
-  if (!$file) {
-    return;
+  if (!file_exists(drupal_realpath("public://data_importer"))) {
+    drupal_mkdir("public://data_importer");
   }
-  $csv = explode("\n",str_replace("\r","\n",file_get_contents(drupal_realpath($file->destination)))); 
+  $file = file_save_upload(
+    'csv',
+    array(
+      'file_validate_extensions' => array('csv'),
+    ),
+    'public://data_importer',
+    FILE_EXISTS_REPLACE
+  );
+  if (!$file) {
+    $last = variable_get("data_importer_last",false);
+    if ($last) {
+      if (file_exists($last)) {
+        $path = $last;
+        drupal_set_message("Using last file uploaded.");
+      }
+      else {
+        variable_del("data_importer_last");
+        drupal_set_message("Couldn't access last file uploaded and no file present in this attempt.","error");
+        return;
+      }
+    }
+    else {
+      drupal_set_message("File could not be parsed.","error");
+      return;
+    }
+  }
+  else {
+    $path = drupal_realpath($file->destination);
+  }
+  variable_set("data_importer_last",$path);
+  $csv = explode("\n",str_replace("\r","\n",file_get_contents($path))); 
   $header = str_getcsv($csv[0]);
   if (!in_array("type",$header)) {
-    drupal_set_message("No type column exists.",'error');
+    drupal_set_message("No type column exists and cannot determine from file.",'error');
     return;
   }
   unset($csv[0]);
@@ -88,9 +143,11 @@ function data_importer_import_form_submit($form, &$form_state) {
     // If no node is found via imported data, try to find one with matching data
     if (!$node) {
       if ($item['type'] == "person") {
-        $node = person_find_person($item['field_person_first_name']." ".
+        $node = person_find_person(
+          $item['field_person_first_name']." ".
           $item['field_person_middle_name']." ".
-          $item['field_person_last_name'],$item['field_person_email_pref']);
+          $item['field_person_last_name'],
+          $item['field_person_email_pref']);
       }
       else {
         $query = db_select('node','n')
@@ -104,17 +161,24 @@ function data_importer_import_form_submit($form, &$form_state) {
         }
       }
     }
-    if ($process = "make" && !$node) {
-      $node = new StdClass();
-      $node->bundle = $item['type'];
-    }
     if ($node) {
       foreach ($item as $key => $cell) {
-        if ($key <> "title" && $key <> "type") {
-          $key = strtolower(preg_replace("/[^A-Za-z0-9_]/", '', $key));
+        $key = strtolower(preg_replace("/[^A-Za-z0-9_]/", '', $key));
+        if ($key <> "title" && $key <> "type" && $key <> "status") {
           eval("\$key_exists = isset(\$node->".$key.");");
           if ($key_exists) {
-            eval("\$node->".$key."['und'][0]['value'] = \"".$cell."\";");
+            if ($cell == "FALSE") {
+              $cell = 0;
+            }
+            elseif ($cell == "TRUE") {
+              $cell = 1;
+            }
+            if ($cell === 0) {
+              eval("\$node->".$key." = 'und';");
+            }
+            else {
+              eval("\$node->".$key." = array('und'=>array(0=>array('value'=>\"".$cell."\")));");
+            }
           }
         }
       }
@@ -124,23 +188,73 @@ function data_importer_import_form_submit($form, &$form_state) {
           $item['field_person_last_name'];
       }
       if ($process == "dry") {
-        drupal_set_message("DRY RUN - Updated node ".$node->title." (".$node->nid.").");
+        if (isset($node->nid)) {
+          drupal_set_message("DRY RUN - Updated node ".$node->title." (".$node->nid.").");
+        }
+        else {
+          drupal_set_message("DRY RUN - Created ".$node->title);
+        }
       }
-      else {
-        drupal_set_message("Updated node ".$node->title." (".$node->nid.").");
+      elseif ($process == "update") {
+        $node->title = person_get_full_name($node);
         node_save($node);
+        drupal_set_message("Updated node ".$node->title." (".$node->nid.").");
       }
     }
+    // No node found
     else {
-      drupal_set_message("No node found for ".
-        $item['field_person_first_name']." ".
-        $item['field_person_middle_name']." ".
-        $item['field_person_last_name']
-      );
+      if ($process == "dry" || $process == "update") {
+        drupal_set_message("No node found for ".
+          $item['field_person_first_name']." ".
+          $item['field_person_middle_name']." ".
+          $item['field_person_last_name'],
+          "error"
+        );
+      }
+      elseif ($process == "make") {
+        $node = new StdClass();
+        $node->bundle = $item['type'];
+        $node->type = $item['type'];
+        $node->language = 'und';
+        node_object_prepare($node);
+        foreach ($item as $key => $cell) {
+          $key = strtolower(preg_replace("/[^A-Za-z0-9_]/", '', $key));
+          if (field_info_instance("node",$key,$item['type'])) {
+            eval("\$node->".$key."['und'][0]['value'] = \"".$cell."\";");
+          }
+        }
+        $node->title = person_get_full_name($node);
+        node_save($node);
+        drupal_set_message("Created node ".$node->title." (".$node->nid.").");
+      }
+    }
+    // Associate with an Access ID, if a node exists
+    if (isset($node->nid) && ($process == "accessid" || $process == "make")) {
+      data_importer_write_asc($item['PersonID'],$node->nid);
     }
   }
-  cache_clear_all();
   $form_state['rebuild'] = TRUE;  
+  if (module_exists("rules")) {
+    module_enable(array("rules","rules_admin"));
+    drupal_set_message("Engaging the rules.");
+  }
+  cache_clear_all();
+}
+
+function data_importer_write_asc($id,$nid) {
+  $data = array(
+    'access_id' => $id,
+    'nid' => $nid,
+  );
+  $existing = data_importer_fetch_asc(FALSE,$nid);
+  if ($existing) {
+    $data['asc_id'] = $existing->asc_id;
+    drupal_write_record("access_ids",$data,array('asc_id'));
+  }
+  else {
+    drupal_write_record("access_ids",$data);
+  }
+  drupal_set_message("Connecting node ".$nid." to ID ".$id);
 }
 
 function data_importer_fetch_asc($id=FALSE,$nid=FALSE) {

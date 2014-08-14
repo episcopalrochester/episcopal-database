@@ -480,8 +480,14 @@ function supply_clergy_find($type = "he") {
     ->fieldCondition('field_person_supply_'.$type,'value',1)
     ->execute();
   if (isset($result['node'])) {
-    $nids = array_keys($result['node']);
-    return entity_load('node', $nids);
+    $nodes = array();
+    foreach (array_keys($result['node']) as $nid) {
+      $person = node_load($nid);
+      if ($person->is_alive) {
+        $nodes[] = $person;
+      }
+    }
+    return $nodes;
   }
   return false;
 }
