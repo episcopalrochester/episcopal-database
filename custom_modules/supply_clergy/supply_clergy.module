@@ -373,101 +373,107 @@ function supply_clergy_date_form($form,&$form_state,$year,$month,$day) {
   $no_table['header'] = array('Name','Location','Time','Edit','Cancel');
   drupal_set_title("Supply Clergy on ".date_format($date,'l, F j, Y'));
   $he = supply_clergy_find('he');
-  foreach ($he as $person) {
-    $bid = supply_clergy_is_booked($person->nid,$date);
-    if (!$bid) {
-      $home = person_get_address($person,"home");
-      $email = person_get_email($person,"pref");
-      $phone = person_get_phone($person,"pref");
-      $he_table['rows'][] = array(
-        person_get_title($person)." ".person_get_full_name($person),
-        $home['city'],
-        l($email['addy'],"mailto:".$email['addy']),
-       $phone['number'],
-        l("Book","supply/$year/$month/$day/book/".$person->nid),
-      );
-    }
-    else {
-      $booking = supply_load($bid);
-      if ($booking->pid) {
-        $location = node_load($booking->pid)->title;
+  if ($he) {
+    foreach ($he as $person) {
+      $bid = supply_clergy_is_booked($person->nid,$date);
+      if (!$bid) {
+        $home = person_get_address($person,"home");
+        $email = person_get_email($person,"pref");
+        $phone = person_get_phone($person,"pref");
+        $he_table['rows'][] = array(
+          person_get_title($person)." ".person_get_full_name($person),
+          $home['city'],
+          l($email['addy'],"mailto:".$email['addy']),
+          $phone['number'],
+          l("Book","supply/$year/$month/$day/book/".$person->nid),
+        );
       }
       else {
-        $location = "Unavailable";
+        $booking = supply_load($bid);
+        if ($booking->pid) {
+          $location = node_load($booking->pid)->title;
+        }
+        else {
+          $location = "Unavailable";
+        }
+        $edit = "";
+        if (supply_clergy_booking_access($booking)) {
+          $edit = l("edit","supply/edit/".$booking->bid);
+        }
+        $cancel = "";
+        if (supply_clergy_booking_access($booking)) {
+          $cancel = l("cancel","supply/cancel/".$booking->bid);
+        }
+        $no_table['rows'][] = array(
+          person_get_title($person)." ".person_get_full_name($person),
+          $location,
+          date("g:i a",strtotime($booking->date)),
+          $edit,
+          $cancel,
+        );
       }
-      $edit = "";
-      if (supply_clergy_booking_access($booking)) {
-        $edit = l("edit","supply/edit/".$booking->bid);
-      }
-      $cancel = "";
-      if (supply_clergy_booking_access($booking)) {
-        $cancel = l("cancel","supply/cancel/".$booking->bid);
-      }
-      $no_table['rows'][] = array(
-        person_get_title($person)." ".person_get_full_name($person),
-        $location,
-        date("g:i a",strtotime($booking->date)),
-        $edit,
-        $cancel,
-      );
     }
+    $form['he_yes'] = array(
+      '#type' => 'item',
+      '#title' => 'Available for Holy Eucharist (1 or 2)',
+      '#markup' => theme_table($he_table),
+    );
   }
   $mp = supply_clergy_find('mp');
-  foreach ($mp as $person) {
-    $bid = supply_clergy_is_booked($person->nid,$date);
-    if (!$bid) {
+  if ($mp) {
+    foreach ($mp as $person) {
+      $bid = supply_clergy_is_booked($person->nid,$date);
+      if (!$bid) {
         $home = person_get_address($person,"home");
-      $email = person_get_email($person,"pref");
-      $phone = person_get_phone($person,"pref");
-      $mp_table['rows'][] = array(
-        person_get_title($person)." ".person_get_full_name($person),
-        $home['city'],
-        l($email['addy'],"mailto:".$email['addy']),
-        $phone['number'],
-        l("Book","supply/$year/$month/$day/book/".$person->nid),
-      );
-    }
-    else {
-      $booking = supply_load($bid);
-      if ($booking->pid) {
-        $location = node_load($booking->pid)->title;
+        $email = person_get_email($person,"pref");
+        $phone = person_get_phone($person,"pref");
+        $mp_table['rows'][] = array(
+          person_get_title($person)." ".person_get_full_name($person),
+          $home['city'],
+          l($email['addy'],"mailto:".$email['addy']),
+          $phone['number'],
+          l("Book","supply/$year/$month/$day/book/".$person->nid),
+        );
       }
       else {
-        $location = "Unavailable";
-      }
-      $edit = "";
-      if (supply_clergy_booking_access($booking)) {
-        $edit = l("edit","supply/edit/".$booking->bid);
-      }
+        $booking = supply_load($bid);
+        if ($booking->pid) {
+          $location = node_load($booking->pid)->title;
+        }
+        else {
+          $location = "Unavailable";
+        }
+        $edit = "";
+        if (supply_clergy_booking_access($booking)) {
+          $edit = l("edit","supply/edit/".$booking->bid);
+        }
 
-      $cancel = "";
-      if (supply_clergy_booking_access($booking)) {
-        $cancel = l("cancel","supply/cancel/".$booking->bid);
+        $cancel = "";
+        if (supply_clergy_booking_access($booking)) {
+          $cancel = l("cancel","supply/cancel/".$booking->bid);
+        }
+        $no_table['rows'][] = array(
+          person_get_title($person)." ".person_get_full_name($person),
+          $location,
+          date("g:i a",strtotime($booking->date)),
+          $edit,
+          $cancel,
+        );
       }
-      $no_table['rows'][] = array(
-        person_get_title($person)." ".person_get_full_name($person),
-        $location,
-        date("g:i a",strtotime($booking->date)),
-        $edit,
-        $cancel,
-      );
     }
+    $form['mp_yes'] = array(
+      '#type' => 'item',
+      '#title' => 'Available for Morning Prayer (1 or 2)',
+      '#markup' => theme_table($mp_table),
+    );
   }
-  $form['he_yes'] = array(
-    '#type' => 'item',
-    '#title' => 'Available for Holy Eucharist (1 or 2)',
-    '#markup' => theme_table($he_table),
-  );
-  $form['mp_yes'] = array(
-    '#type' => 'item',
-    '#title' => 'Available for Morning Prayer (1 or 2)',
-    '#markup' => theme_table($mp_table),
-  );
-  $form['no'] = array(
-    '#type' => 'item',
-    '#title' => 'Not available for this date',
-    '#markup' => theme_table($no_table),
-  );
+  if (count($no_table['rows'])) {
+    $form['no'] = array(
+      '#type' => 'item',
+      '#title' => 'Not available for this date',
+      '#markup' => theme_table($no_table),
+    );
+  }
   return $form;
 }
 
@@ -568,56 +574,60 @@ function supply_clergy_roster_form($form,&$form_state) {
 function supply_clergy_list_form($form,&$form_state) {
   drupal_set_title("Supply Clergy: Personnel List");
   $he = supply_clergy_find('he');
-  $form['he'] = array(
-    '#type' => 'fieldset',
-    '#title' => "List of People Offering Holy Eucharist",
-  );
-  $form['he']['list'] = array(
-    '#type' => 'item',
-    '#prefix' => '<ul>',
-    '#suffix' => '</ul>',
-  );
-  $count = 0;
-  foreach ($he as $person) {
-    $markup = person_get_title($person)." ".
-      person_get_full_name($person);
-    $notes = _get_value($person,"field_person_supply_notes");
-    if ($notes) {
-      $markup .= "<ul><li>Notes: $notes</li></ul>";
-    }
-    $form['he']['list'][$count] = array(
+  if ($he) {
+    $form['he'] = array(
+      '#type' => 'fieldset',
+      '#title' => "List of People Offering Holy Eucharist",
+    );
+    $form['he']['list'] = array(
       '#type' => 'item',
-      '#prefix' => '<li>',
-      '#suffix' => '</li>',
-      '#markup' => $markup,
-        );
-    $count++;
+      '#prefix' => '<ul>',
+      '#suffix' => '</ul>',
+    );
+    $count = 0;
+    foreach ($he as $person) {
+      $markup = person_get_title($person)." ".
+        person_get_full_name($person);
+      $notes = _get_value($person,"field_person_supply_notes");
+      if ($notes) {
+        $markup .= "<ul><li>Notes: $notes</li></ul>";
+      }
+      $form['he']['list'][$count] = array(
+        '#type' => 'item',
+        '#prefix' => '<li>',
+        '#suffix' => '</li>',
+        '#markup' => $markup,
+      );
+      $count++;
+    }
   }
   $mp = supply_clergy_find('mp');
-  $form['mp'] = array(
-    '#type' => 'fieldset',
-    '#title' => "List of People Offering Morning Prayer",
-  );
-  $form['mp']['list'] = array(
-    '#type' => 'item',
-    '#prefix' => '<ul>',
-    '#suffix' => '</ul>',
-  );
-  $count = 0;
-  foreach ($mp as $person) {
-    $markup = person_get_title($person)." ".
-            person_get_full_name($person);
-    $notes = _get_value($person,"field_person_supply_notes");
-    if ($notes) {
-      $markup .= "<ul><li>Notes: $notes</li></ul>";
-    }
-    $form['mp']['list'][$count] = array(
+  if ($mp) {
+    $form['mp'] = array(
+      '#type' => 'fieldset',
+      '#title' => "List of People Offering Morning Prayer",
+    );
+    $form['mp']['list'] = array(
       '#type' => 'item',
-      '#prefix' => '<li>',
-      '#suffix' => '</li>',
-      '#markup' => $markup,
-        );
-    $count++;
+      '#prefix' => '<ul>',
+      '#suffix' => '</ul>',
+    );
+    $count = 0;
+    foreach ($mp as $person) {
+      $markup = person_get_title($person)." ".
+        person_get_full_name($person);
+      $notes = _get_value($person,"field_person_supply_notes");
+      if ($notes) {
+        $markup .= "<ul><li>Notes: $notes</li></ul>";
+      }
+      $form['mp']['list'][$count] = array(
+        '#type' => 'item',
+        '#prefix' => '<li>',
+        '#suffix' => '</li>',
+        '#markup' => $markup,
+      );
+      $count++;
+    }
   }
   return $form;
 
