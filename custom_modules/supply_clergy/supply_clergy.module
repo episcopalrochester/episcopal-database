@@ -377,11 +377,16 @@ function supply_clergy_date_form($form,&$form_state,$year,$month,$day) {
     foreach ($he as $person) {
       $bid = supply_clergy_is_booked($person->nid,$date);
       if (!$bid) {
+        $name = person_get_title($person)." ".person_get_full_name($person);
+        $notes = _get_value($person,"field_person_supply_notes");
+        if ($notes) {
+          $name .= "<br /><em>($notes)</em>";
+        }
         $home = person_get_address($person,"home");
         $email = person_get_email($person,"pref");
         $phone = person_get_phone($person,"pref");
         $he_table['rows'][] = array(
-          person_get_title($person)." ".person_get_full_name($person),
+          $name,
           $home['city'],
           l($email['addy'],"mailto:".$email['addy']),
           $phone['number'],
@@ -424,11 +429,16 @@ function supply_clergy_date_form($form,&$form_state,$year,$month,$day) {
     foreach ($mp as $person) {
       $bid = supply_clergy_is_booked($person->nid,$date);
       if (!$bid) {
+        $name = person_get_title($person)." ".person_get_full_name($person);
+        $notes = _get_value($person,"field_person_supply_notes");
+        if ($notes) {
+          $name .= "<br /><em>($notes)</em>";
+        } 
         $home = person_get_address($person,"home");
         $email = person_get_email($person,"pref");
         $phone = person_get_phone($person,"pref");
         $mp_table['rows'][] = array(
-          person_get_title($person)." ".person_get_full_name($person),
+          $name,
           $home['city'],
           l($email['addy'],"mailto:".$email['addy']),
           $phone['number'],
@@ -484,6 +494,8 @@ function supply_clergy_find($type = "he") {
     ->entityCondition('bundle','person')
     ->propertyCondition('status',1)
     ->fieldCondition('field_person_supply_'.$type,'value',1)
+    ->fieldOrderBy('field_person_last_name','value','ASC')
+    ->fieldOrderBy('field_person_first_name','value','ASC')
     ->execute();
   if (isset($result['node'])) {
     $nodes = array();
@@ -588,6 +600,9 @@ function supply_clergy_list_form($form,&$form_state) {
     foreach ($he as $person) {
       $markup = person_get_title($person)." ".
         person_get_full_name($person);
+      if (edb_is_admin() || node_access("update",$person)) {
+        $markup .= " ".l("edit","node/".$person->nid."/edit");
+      }
       $notes = _get_value($person,"field_person_supply_notes");
       if ($notes) {
         $markup .= "<ul><li>Notes: $notes</li></ul>";
