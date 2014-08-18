@@ -3,7 +3,7 @@
 function supply_clergy_menu() {
   $items = array();
   $items['supply'] = array(
-    'title' => 'Supply Clergy',
+    'title' => 'Clergy Supply',
     'page callback' => 'drupal_get_form',
     'page arguments' => array('supply_clergy_calendar_form'),
     'access arguments' => array('supply clergy'),
@@ -49,7 +49,7 @@ function supply_clergy_menu() {
     'type' => MENU_NORMAL_ITEM,
   );
   $items['supply/edit/%supply'] = array(
-    'title' => 'Edit Supply Clergy Booking',
+    'title' => 'Edit Clergy Supply Booking',
     'page callback' => 'drupal_get_form',
     'page arguments' => array('supply_clergy_edit_form',2),
     'access callback' => 'supply_clergy_booking_access',
@@ -58,7 +58,7 @@ function supply_clergy_menu() {
     'type' => MENU_CALLBACK,
   );
   $items['supply/cancel/%supply'] = array(
-    'title' => 'Cancel Supply Clergy Booking',
+    'title' => 'Cancel Clergy Supply Booking',
     'page callback' => 'drupal_get_form',
     'page arguments' => array('supply_clergy_cancel_form',2),
     'access callback' => 'supply_clergy_booking_access',
@@ -335,8 +335,8 @@ function supply_clergy_book_form_submit($form,&$form_state) {
 function supply_clergy_permission() {
   return array(
     'supply clergy' => array(
-      'title' => t("Use Supply Clergy System"),
-      'description' => t("Allow users to access Supply Clergy system"),
+      'title' => t("Use Clergy Supply System"),
+      'description' => t("Allow users to access Clergy Supply system"),
     ),
   );
 }
@@ -371,7 +371,7 @@ function supply_clergy_date_form($form,&$form_state,$year,$month,$day) {
   $mp_table = $he_table;
   $no_table = $he_table;
   $no_table['header'] = array('Name','Location','Time','Edit','Cancel');
-  drupal_set_title("Supply Clergy on ".date_format($date,'l, F j, Y'));
+  drupal_set_title("Clergy Supply on ".date_format($date,'l, F j, Y'));
   $he = supply_clergy_find('he');
   if ($he) {
     foreach ($he as $person) {
@@ -523,7 +523,7 @@ function supply_clergy_is_booked($cid,$date) {
 }
 
 function supply_clergy_calendar_form($form,&$form_state) {
-  drupal_set_title("Supply Clergy: Booking Calendar");
+  drupal_set_title("Clergy Supply: Booking Calendar");
   $date = 0;
   while ($date < 7) {
   $form['calendar_'.$date] = array(
@@ -539,7 +539,7 @@ function supply_clergy_calendar_form($form,&$form_state) {
 }
 
 function supply_clergy_roster_form($form,&$form_state) {
-  drupal_set_title("Supply Clergy: Duty Roster");
+  drupal_set_title("Clergy Supply: Duty Roster");
   $now = date("Y-m-d");
   $bookings = db_select("supply_clergy","s")
     ->fields("s",array("bid","cid","pid","date","uid"))
@@ -584,7 +584,7 @@ function supply_clergy_roster_form($form,&$form_state) {
 }
 
 function supply_clergy_list_form($form,&$form_state) {
-  drupal_set_title("Supply Clergy: Personnel List");
+  drupal_set_title("Clergy Supply: Personnel List");
   $he = supply_clergy_find('he');
   if ($he) {
     $form['he'] = array(
