@@ -141,6 +141,9 @@ function data_importer_import_form_submit($form, &$form_state) {
       elseif ($item['type'] == "parish") {
         $access_id = data_importer_fetch_asc("parish_".$item['ParishID']);
       }
+      elseif ($item['type'] == "professional_relationship") {
+        $access_id = data_importer_fetch_asc("pf_".$item['pd_id']);
+      }
       $node = ($access_id ? node_load($access_id->nid) : false);
     }
     // If no node is found via imported data, try to find one with matching data
@@ -223,6 +226,9 @@ function data_importer_import_form_submit($form, &$form_state) {
             "error"
           );
         }
+        elseif ($item['type'] == "professional_relationship") {
+          drupal_set_message("Could not find matching relationship",'error');
+        }
       }
       elseif ($process == "make") {
         $node = new StdClass();
@@ -236,9 +242,27 @@ function data_importer_import_form_submit($form, &$form_state) {
             eval("\$node->".$key."['und'][0]['value'] = \"".$cell."\";");
           }
         }
-        $node->title = person_get_full_name($node);
-        node_save($node);
-        drupal_set_message("Created node ".$node->title." (".$node->nid.").");
+        if ($item['type'] == "person") {
+          $node->title = person_get_full_name($node);
+        }
+        if ($item['type'] == "professional_relationship") {
+          if (isset($item['PersonID'])) {
+            $person = data_importer_fetch_asc("person_".$item['PersonID']);
+            if (isset($person->nid)) {
+              $node->field_pf_first['und'][0]['nid'] = $person->nid;
+            }
+          }
+          if (isset($item['ParishID'])) {
+            $parish = data_importer_fetch_asc("parish_".$item['ParishID']);
+            if (isset($parish->nid)) {
+              $node->field_pf_second['und'][0]['nid'] = $parish->nid;
+            }
+          }
+        }
+        if (isset($node->field_pf_first) && isset($node->field_pf_second)) {
+          node_save($node);
+          drupal_set_message("Created relationship between ".node_load($person->nid)->title." ".node_load($parish->nid)->title);
+        }
       }
     }
     // Associate with an Access ID, if a node exists
@@ -248,6 +272,9 @@ function data_importer_import_form_submit($form, &$form_state) {
       }
       elseif ($item['type'] == "parish")  {
         data_importer_write_asc("parish_".$item['ParishID'],$node->nid);
+      }
+      elseif ($item['type'] == "professional_relationship")  {
+        data_importer_write_asc("pf_".$item['pf_id'],$node->nid);
       }
     }
   }
