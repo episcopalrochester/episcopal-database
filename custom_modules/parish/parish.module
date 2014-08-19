@@ -8,6 +8,13 @@ include_once 'parish.features.inc';
 
 function parish_menu() {
   $items = array();
+  $items['parishes'] = array(
+    'title' => 'Parish Directory',
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('parish_parish_dir_form'),
+    'access arguments' => array('access content'),
+    'type' => MENU_NORMAL_ITEM,
+    );
   $items['staff/parishes'] = array(
     'title' => 'Parishes',
     'page callback' => 'drupal_get_form',
@@ -17,6 +24,69 @@ function parish_menu() {
     'type' => MENU_LOCAL_TASK,
   );
   return $items;
+}
+
+function parish_parish_dir_form($form,&$form_state) {
+  $parishes = parish_fetch_parishes();
+  $types = pro_relationship_types();
+  $count = 0;
+  foreach ($parishes['nodes'] as $parish) {
+    $parish_table = array(
+      'header' => array('Role/Title','Name','City','Phone','Email','Edit'),
+      'rows' => array(),
+      'attributes' => array(),
+      'caption' => '',
+      'colgroups' => array(),
+      'sticky' => FALSE,
+      'empty' => '',
+    );
+    $form[$count] = array(
+      '#type' => 'fieldset',
+      '#title' => $parish->title,
+    );
+    $rel = find_pro_relationships(FALSE,$parish);
+    foreach ($rel as $r) {
+      if ($r['relative']) {
+        $type = $r['type'];
+        $name = _get_value($r['relative'],"field_person_title")." ".person_get_full_name($r['relative']); 
+        $addy = person_get_address($r['relative'],"home");
+        $phone = person_get_phone($r['relative'],"pref");
+        $email = person_get_email($r['relative'],"pref");
+        if (isset($email['addy'])) {
+          $email = l($email['addy'],"mailto:".$email['addy']);
+        }
+        $edit = "";
+        if (node_access("update",$r['relative'])) {
+          $edit .= l(
+            'edit person',
+            'node/'.$r['relative']->nid.'/edit'
+          );
+        }
+        if (node_access("update",$r['node'])) {
+          $edit .= "<br />";
+          $edit .= l(
+            'edit relationship',
+            'node/'.$r['node']->nid.'/edit'
+          );
+        }
+        $row = array(
+          $types[$type],
+          $name,
+          $addy['city'],
+          $phone['number'],
+          $email,
+          $edit
+        );
+        $parish_table['rows'][] = $row;
+      }
+    }
+    $form[$count]['people'] = array(
+      '#type' => 'item',
+      '#markup' => theme_table($parish_table),
+    );    
+    $count++;
+  }
+  return $form;
 }
 
 function parish_parishes_form($form,&$form_state) {
