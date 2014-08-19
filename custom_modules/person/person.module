@@ -102,6 +102,7 @@ function person_lists_form($form,&$form_state) {
     '#options' => array(
       'csv'=>"Excel format",
       'txt'=>"Names with email addresses (useful for Constant Contact)",
+      'report' => "Report Format (useful for Word)",
     ),
     '#default_value' => 'csv',
   );
@@ -184,6 +185,10 @@ function person_type_queries($type = FALSE) {
       'value' => 1,
       'abv' => 'invite',
     ),
+    'Clergy Birthdays This Month' => 'Clergy Birthdays This Month',
+    'Clergy Birthdays Next Month' => 'Clergy Birthdays Next Month',
+    'Clergy Ordination Anniversaries This Month' => 'Clergy Ordination Anniversaries This Month',
+    'Clergy Ordination Anniversaries Next Month' => 'Clergy Ordination Anniversaries Next Month',
   );
   if ($type) {
     if (isset($queries[$type])) {
@@ -212,7 +217,7 @@ function person_lists_submit_form($form,&$form_state) {
     header("Content-Disposition: attachment; filename=".$filename.".csv");
     header("Pragma: no-cache");
     header("Expires: 0");
-    print '"Name"';
+    print '"Prefix","First Name","Middle Name","Last Name","Suffix","Nickname","Full Name"';
     $labels = array("Line 1","Line 2","City","State","Other","ZIP");
     if ($address == "mail") {
       foreach ($labels as $label) {
@@ -233,13 +238,44 @@ function person_lists_submit_form($form,&$form_state) {
       }
     }
     print ',"Phone","Email"';
-    print ',"Enews","Printed News","Directory","Invites"';
-    print ',"Priv:No Dir","Pv:No Spou","Pv:No Addr","Pv:No Phone","Pv:No Email"';
+    if (in_array('Enewsletter Subscribers',$form['who']['#value']) ||
+      in_array('Printed Newsletter Subscribers',$form['who']['#value']) ||
+      in_array('Printed Directory Subscribers',$form['who']['#value']) ||
+      in_array('Printed Invitation Subscribers',$form['who']['#value'])
+    ) {
+      print ',"Enews","Printed News","Directory","Invites"';
+      print ',"Priv:No Dir","Pv:No Spou","Pv:No Addr","Pv:No Phone","Pv:No Email"';
+    }
+    if (in_array('Clergy Birthdays This Month',$form['who']['#value']) ||
+      in_array('Clergy Birthdays Next Month',$form['who']['#value'])) {
+        print ',"Date of Birth"';
+      }
+    if (in_array('Clergy Ordination Anniversaries This Month',$form['who']['#value']) ||
+      in_array('Clergy Ordination Anniversaries Next Month',$form['who']['#value'])) {
+        print ',"Diaconate Ord.","Priesthood Ord."';
+      }
     print "\n";
 
     foreach ($people['nodes'] as $person) {
       print "\"";
-      print $person->title;
+      print _get_value($person,"field_person_title");
+      print "\",\"";
+      print _get_value($person,"field_person_first_name");
+      print "\",\"";
+      print _get_value($person,"field_person_middle_name");
+      print "\",\"";
+      print _get_value($person,"field_person_last_name");
+      print "\",\"";
+      print _get_value($person,"field_person_suffix");
+      print "\",\"";
+      if ($nickname = _get_value($person,"field_person_nickname"))
+        print $nickname;
+      else
+        print _get_value($person,"field_person_first_name");
+      print "\",\"";
+      print _get_value($person,"field_person_title") . " ";
+      print person_get_full_name($person);
+      print " "._get_value($person,"field_person_suffix");
       print "\",\"";
       $mailing = array_filter(person_get_address($person,"mail"));
       if ($address == "mail") {
@@ -262,32 +298,135 @@ function person_lists_submit_form($form,&$form_state) {
       print ',"'.$phone['number'].'"';
       $email = person_get_email($person,"pref");
       print ',"'.$email['addy'].'"';
-      $subscriptions = array('enews','printed_news','directory','invitations');
-      foreach ($subscriptions as $sub) {
-        eval("\$field = \$person->field_person_$sub;");
-        if (isset($field['und'][0]['value'])) {
-          if ($field['und'][0]['value'] == 1) {
-            print ',"X"';
+      if (in_array('Enewsletter Subscribers',$form['who']['#value']) ||
+        in_array('Printed Newsletter Subscribers',$form['who']['#value']) ||
+        in_array('Printed Directory Subscribers',$form['who']['#value']) ||
+        in_array('Printed Invitation Subscribers',$form['who']['#value'])
+      ) {
+        $subscriptions = array('enews','printed_news','directory','invitations');
+        foreach ($subscriptions as $sub) {
+          eval("\$field = \$person->field_person_$sub;");
+          if (isset($field['und'][0]['value'])) {
+            if ($field['und'][0]['value'] == 1) {
+              print ',"X"';
+            }
+            else { print ',""'; }
           }
           else { print ',""'; }
         }
-        else { print ',""'; }
+        $privacy = array('directory','partnerships','home','phone','email');
+        foreach ($privacy as $pv) {
+          eval("\$field = \$person->field_person_no_$pv;");
+          if (isset($field['und'][0]['value'])) {
+            if ($field['und'][0]['value'] == 1) {
+              print ',"X"';
+            }
+            else { print ',""'; }
+          }
+          else { print ',""'; }
+        }
       }
-      $privacy = array('directory','partnerships','home','phone','email');
-      foreach ($privacy as $pv) {
-        eval("\$field = \$person->field_person_no_$pv;");
-        if (isset($field['und'][0]['value'])) {
-          if ($field['und'][0]['value'] == 1) {
-            print ',"X"';
-          }
-          else { print ',""'; }
+      if (in_array('Clergy Birthdays This Month',$form['who']['#value']) ||
+        in_array('Clergy Birthdays Next Month',$form['who']['#value'])) {
+          $dob = new DateTime(_get_value($person,"field_person_dob"));
+          print ",".date_format($dob,'m/d/Y');
         }
-        else { print ',""'; }
+      if (in_array('Clergy Ordination Anniversaries This Month',$form['who']['#value']) ||
+        in_array('Clergy Ordination Anniversaries Next Month',$form['who']['#value'])) {
+          $priesthood = _get_value($person,"field_person_priesthood");
+          $diaconate = _get_value($person,"field_person_diaconate");
+          if ($diaconate && !$priesthood) {
+            $diaconate = new DateTime(_get_value($person,"field_person_diaconate"));
+            print ",".date_format($diaconate,'m/d/Y');
+          }
+          else { 
+            print ",";
+          }
+          if ($priesthood) {
+            $priesthood = new DateTime(_get_value($person,"field_person_priesthood"));
+            print ",".date_format($priesthood,'m/d/Y');
+          }
+          else { 
+            print ","; 
+          }
+        }
+      print "\n";
+    }
+    exit;
+  }
+  if ($type == "report") {
+    header("Content-type: text/txt");
+    header("Content-Disposition: attachment; filename=".$filename.".txt");
+    header("Pragma: no-cache");
+    header("Expires: 0");
+    foreach ($people['nodes'] as $person) {
+      print _get_value($person,"field_person_title") . " ";
+      print person_get_full_name($person);
+      print " "._get_value($person,"field_person_suffix");
+      if ($nickname = _get_value($person,"field_person_nickname"))
+        print " (".$nickname.")";
+      print "\n";
+      $mail = array_filter(person_get_address($person,"mail"));
+      $home = array_filter(person_get_address($person,"home"));
+      if ($address == "mail") {
+        if (!empty($mailing)) {
+          print implode(", ",$mail);
+        } else {
+          print implode(", ",$home);
+        }
+      }
+      elseif ($address == "home") {
+        print implode(", ",$home);
+      }
+      else {
+        print implode(", ",$home);
+        print "\n";
+        print implode(", ",$mail);
+      }
+      print "\n";
+      $phone = person_get_phone($person,"pref");
+      print $phone['number']."\n";
+      $email = person_get_email($person,"pref");
+      print $email['addy']."\n";
+      $this_month = str_pad(date('m'),2,'0',STR_PAD_LEFT);
+      if (date('m') == "12")
+        $next_month = "01";
+      else
+        $next_month = str_pad(date('m') + 1,2,'0',STR_PAD_LEFT);
+      $dob = new DateTime(_get_value($person,"field_person_dob"));
+      if ((in_array('Clergy Birthdays This Month',$form['who']['#value']) && $this_month == date_format($dob,'m')) ||
+        (in_array('Clergy Birthdays Next Month',$form['who']['#value']) && $next_month == date_format($dob,'m'))) 
+      {
+        print "Birthday: ".date_format($dob,'m/d/Y')."\n";
+
+      }
+      $priesthood = _get_value($person,"field_person_priesthood");
+      $priesthood = new DateTime(_get_value($person,"field_person_priesthood"));
+      $diaconate = _get_value($person,"field_person_diaconate");
+      $diaconate = new DateTime(_get_value($person,"field_person_diaconate"));
+      if (in_array('Clergy Ordination Anniversaries This Month',$form['who']['#value']))
+      {
+        if (($diaconate && !$priesthood) && $this_month == date_format($diaconate,'m')) {
+          print "Diaconate Ordination: ".date_format($diaconate,'m/d/Y')."\n";
+        }
+        if ($priesthood && ($this_month == date_format($priesthood,'m'))) {
+          print "Priesthood Ordination: ".date_format($priesthood,'m/d/Y')."\n";
+        }
+      }
+      if (in_array('Clergy Ordination Anniversaries Next Month',$form['who']['#value']))
+      {
+        if (($diaconate && !$priesthood) && $next_month == date_format($diaconate,'m')) {
+          print "Diaconate Ordination: ".date_format($diaconate,'m/d/Y')."\n";
+        }
+        if ($priesthood && ($next_month == date_format($priesthood,'m'))) {
+          print "Priesthood Ordination: ".date_format($priesthood,'m/d/Y')."\n";
+        }
       }
       print "\n";
     }
     exit;
   }
+
   elseif ($type == "txt") {
     header("Content-type: text/txt");
     header("Content-Disposition: attachment; filename=".$filename.".txt");
@@ -816,6 +955,7 @@ function person_fetch_people($type="All People",$last="",$first="",$status="livi
   $query->leftJoin("field_data_field_person_priesthood","p","p.entity_id = n.nid");
   $query->leftJoin("field_data_field_person_diaconate","d","d.entity_id = n.nid");
   $query->leftJoin("field_data_field_person_consecration","c","c.entity_id = n.nid");
+  $query->leftJoin("field_data_field_person_dob","b","b.entity_id = n.nid");
   $query->leftJoin("field_data_field_person_dod","m","m.entity_id = n.nid");
   if (is_array($type)) {
     foreach ($type as $q) {
@@ -861,6 +1001,58 @@ function person_fetch_people($type="All People",$last="",$first="",$status="livi
           ->isNull('d.field_person_diaconate_value')
           ->isNull('c.field_person_consecration_value');
         $who->condition($is_not_clergy);
+      }
+      elseif ($q == "Clergy Birthdays This Month") {
+        $is_clergy = db_or()
+          ->isNotNull('p.field_person_priesthood_value')
+          ->isNotNull('d.field_person_diaconate_value')
+          ->isNotNull('c.field_person_consecration_value');
+        $is_birthday = db_and()
+          ->condition("b.field_person_dob_value","____-".date('m')."-%","LIKE")
+          ->condition($is_clergy);
+        $who->condition($is_birthday);
+      }
+      elseif ($q == "Clergy Birthdays Next Month") {
+        if (date('m') == "12")
+          $date = "01";
+        else
+          $date = str_pad(date('m') + 1,2,'0',STR_PAD_LEFT);
+        $is_clergy = db_or()
+          ->isNotNull('p.field_person_priesthood_value')
+          ->isNotNull('d.field_person_diaconate_value')
+          ->isNotNull('c.field_person_consecration_value');
+        $is_birthday = db_and()
+          ->condition("b.field_person_dob_value","____-".$date."-%","LIKE")
+          ->condition($is_clergy);
+        $who->condition($is_birthday);
+      }
+      elseif ($q == "Clergy Ordination Anniversaries This Month") {
+        $Panniversary = db_and()
+          ->condition('p.field_person_priesthood_value',"____-".date('m')."-%","LIKE")
+          ->isNull('c.field_person_consecration_value');
+        $Danniversary = db_and()
+          ->condition('d.field_person_diaconate_value',"____-".date('m')."-%","LIKE")
+          ->isNull('p.field_person_priesthood_value');
+        $anniversary = db_or()
+          ->condition($Panniversary)
+          ->condition($Danniversary);
+        $who->condition($anniversary);
+      }
+      elseif ($q == "Clergy Ordination Anniversaries Next Month") {
+        if (date('m') == "12") 
+          $date = "01";
+        else
+          $date = str_pad(date('m') + 1,2,'0',STR_PAD_LEFT);
+        $Panniversary = db_and()
+          ->condition('p.field_person_priesthood_value',"____-".$date."-%","LIKE")
+          ->isNull('c.field_person_consecration_value');
+        $Danniversary = db_and()
+          ->condition('d.field_person_diaconate_value',"____-".$date."-%","LIKE")
+          ->isNull('p.field_person_priesthood_value');
+        $anniversary = db_or()
+          ->condition($Panniversary)
+          ->condition($Danniversary);
+        $who->condition($anniversary);
       }
       else {
         $who->condition($q['abv'].".".$q['field'],$q['value'],$q['operation']);
@@ -939,7 +1131,7 @@ function person_get_address($person,$type) {
 }
 
 function person_get_title($person) {
- return  _get_value($person,"field_person_title");
+  return  _get_value($person,"field_person_title");
 }
 
 function person_get_phone($person,$type) {
