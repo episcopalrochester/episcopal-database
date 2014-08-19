@@ -142,7 +142,7 @@ function data_importer_import_form_submit($form, &$form_state) {
         $access_id = data_importer_fetch_asc("parish_".$item['ParishID']);
       }
       elseif ($item['type'] == "professional_relationship") {
-        $access_id = data_importer_fetch_asc("pf_".$item['pd_id']);
+        $access_id = data_importer_fetch_asc("pf_".$item['pf_id']);
       }
       $node = ($access_id ? node_load($access_id->nid) : false);
     }
