@@ -17,11 +17,11 @@ function data_importer_schema() {
         'default' => 0),
       'access_id' => array(
         'description' => t('Access id'),
-        'type' => 'int',
-        'unsigned' => TRUE,
-        'not null' => TRUE,
-        'default' => 0),
-    ),
+        'type' => 'varchar',
+        'length' => 32,
+        'default' => '',
+        'not null' => TRUE),
+      ),
     'indexes' => array(
       'nid_id'        => array('nid'),
     ),
@@ -33,3 +33,4 @@ function data_importer_schema() {
   );
   return $schema;
 }
+

@@ -136,7 +136,10 @@ function data_importer_import_form_submit($form, &$form_state) {
     // Try to find an existing nid via access_ids table
     if ($source == "access") {
       if ($item['type'] == "person") {
-        $access_id = data_importer_fetch_asc($item['PersonID']);
+        $access_id = data_importer_fetch_asc("person_".$item['PersonID']);
+      }
+      elseif ($item['type'] == "parish") {
+        $access_id = data_importer_fetch_asc("parish_".$item['ParishID']);
       }
       $node = ($access_id ? node_load($access_id->nid) : false);
     }
@@ -149,7 +152,7 @@ function data_importer_import_form_submit($form, &$form_state) {
           $item['field_person_last_name'],
           $item['field_person_email_pref']);
       }
-      else {
+      elseif ($item['type'] == "parish" && isset($item['field_parish_home_city']) && isset($item['title'])) {
         $query = db_select('node','n')
           ->fields('n',array('nid'));
         if ($item['type'] == "parish") {
@@ -182,7 +185,7 @@ function data_importer_import_form_submit($form, &$form_state) {
           }
         }
       }
-      if (!isset($node->title)) {
+      if (!isset($node->title) && $item['type'] == "person") {
         $node->title = $item['field_person_first_name']." ".
           $item['field_person_middle_name']." ".
           $item['field_person_last_name'];
@@ -196,7 +199,9 @@ function data_importer_import_form_submit($form, &$form_state) {
         }
       }
       elseif ($process == "update") {
-        $node->title = person_get_full_name($node);
+        if ($item['type'] == "person") {
+          $node->title = person_get_full_name($node);
+        }
         node_save($node);
         drupal_set_message("Updated node ".$node->title." (".$node->nid.").");
       }
@@ -204,12 +209,20 @@ function data_importer_import_form_submit($form, &$form_state) {
     // No node found
     else {
       if ($process == "dry" || $process == "update") {
-        drupal_set_message("No node found for ".
-          $item['field_person_first_name']." ".
-          $item['field_person_middle_name']." ".
-          $item['field_person_last_name'],
-          "error"
-        );
+        if ($item['type'] == "person") {
+          drupal_set_message("No node found for ".
+            $item['field_person_first_name']." ".
+            $item['field_person_middle_name']." ".
+            $item['field_person_last_name'],
+            "error"
+          );
+        }
+        elseif ($item['type'] == "parish") {
+          drupal_set_message("No node found for ".
+            $item['ParishID'],
+            "error"
+          );
+        }
       }
       elseif ($process == "make") {
         $node = new StdClass();
@@ -230,7 +243,12 @@ function data_importer_import_form_submit($form, &$form_state) {
     }
     // Associate with an Access ID, if a node exists
     if (isset($node->nid) && ($process == "accessid" || $process == "make")) {
-      data_importer_write_asc($item['PersonID'],$node->nid);
+      if ($item['type'] == "person") {
+        data_importer_write_asc("person_".$item['PersonID'],$node->nid);
+      }
+      elseif ($item['type'] == "parish")  {
+        data_importer_write_asc("parish_".$item['ParishID'],$node->nid);
+      }
     }
   }
   $form_state['rebuild'] = TRUE;  
