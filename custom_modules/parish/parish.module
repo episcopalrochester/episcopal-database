@@ -53,7 +53,8 @@ function parish_parish_dir_form($form,&$form_state) {
       print '"Phone","Email"';
       print "\n";
       foreach ($parishes['nodes'] as $parish) {
-        $title = array_pop(explode(",",$parish->title));
+        $parish_title = explode(",",$parish->title);
+        $title = array_pop($parish_title);
         print $title;
         print ',"';
         $home = parish_get_address($parish,"home");
