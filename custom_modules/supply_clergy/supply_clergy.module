@@ -409,10 +409,16 @@ function supply_clergy_date_form($form,&$form_state,$year,$month,$day) {
         if (supply_clergy_booking_access($booking)) {
           $cancel = l("cancel","supply/cancel/".$booking->bid);
         }
+        if (date("Hi",strtotime($booking->date)) == "0000") {
+          $time = "-";
+        }
+        else {
+          $time = date("g:i a",strtotime($booking->date));
+        }
         $no_table['rows'][] = array(
           person_get_title($person)." ".person_get_full_name($person),
           $location,
-          date("g:i a",strtotime($booking->date)),
+          $time,
           $edit,
           $cancel,
         );
@@ -566,7 +572,13 @@ function supply_clergy_roster_form($form,&$form_state) {
     else {
       $parish = "Marked as unavailable";
     }
-    $markup = date("h:i a",strtotime($booking->date)).", ".
+    if (date("Hi",strtotime($booking->date)) == "0000") {
+      $markup ="";
+    }
+    else {
+      $markup = date("h:i a",strtotime($booking->date)).", ";
+    }
+    $markup .=
       person_get_title($person)." ".
       person_get_full_name($person).", ".
       $parish;
