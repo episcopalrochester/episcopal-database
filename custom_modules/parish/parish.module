@@ -162,6 +162,15 @@ function parish_parish_dir_form($form,&$form_state) {
         '#markup' => "<strong>Email: </strong>".l($email,"mailto:".$email),
       );
     }
+    if ($site = _get_value($parish,"field_parish_site")) {
+      if (strpos($site,'http://') === false){
+            $site = 'http://'.$site;
+      }
+      $form[$count]['site'] = array(
+        '#type' => 'item',
+        '#markup' => "<strong>Website: </strong>".l($site,$site,array('attributes'=>array('target'=>'_blank'))),
+      );
+    }
     if (node_access("update",$parish)) {
       $form[$count]['edit'] = array(
         '#type' => 'item',
