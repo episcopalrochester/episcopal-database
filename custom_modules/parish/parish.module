@@ -27,9 +27,58 @@ function parish_menu() {
 }
 
 function parish_parish_dir_form($form,&$form_state) {
-  $parishes = parish_fetch_parishes();
+  $nid = FALSE;
+  $district = FALSE;
+  if (isset($form_state['values']['nid'])) {
+    if (is_numeric($form_state['values']['nid'])) {
+      $nid = $form_state['values']['nid'];
+    }
+  }
+  if (isset($form_state['values']['district'])) {
+    if ($form_state['values']['district'] <> "_none") {
+      $district = $form_state['values']['district'];
+    }
+  }
+  
+  $parishes = parish_fetch_parishes($district,FALSE,FALSE,$nid);
+  if (isset($form_state['values']['output'])) {
+    if ($form_state['values']['output'] == "csv") {
+      header("Content-type: text/csv");
+      header("Content-Disposition: attachment; filename=parishes.csv");
+      header("Pragma: no-cache");
+      header("Expires: 0");
+      print '"Name",';
+      print '"Street 1","Street 2","City","State","Other","ZIP",';
+      print '"Mail Street 1","Mail Street 2","Mail City","Mail State","Mail Other","Mail ZIP",';
+      print '"Phone","Email"';
+      print "\n";
+      foreach ($parishes['nodes'] as $parish) {
+        $title = array_pop(explode(",",$parish->title));
+        print $title;
+        print ',"';
+        $home = parish_get_address($parish,"home");
+        print implode('","',$home);
+        print '","';
+        $mail = parish_get_address($parish,"mail");
+        if (isset($mail['city'])) {
+          print implode('","',$mail);
+        }
+        else {
+          print implode('","',$home);
+        }
+        print '","';
+        print _get_value($parish,"field_parish_phone");
+        print '","';
+        print _get_value($parish,"field_parish_email");
+        print '"';
+        print "\n";
+      }
+      exit;
+    }
+  }
   $types = pro_relationship_types();
   $count = 0;
+  $search = array('_none' => '');
   foreach ($parishes['nodes'] as $parish) {
     $parish_table = array(
       'header' => array('Role/Title','Name','City','Phone','Email','Edit'),
@@ -80,13 +129,98 @@ function parish_parish_dir_form($form,&$form_state) {
         $parish_table['rows'][] = $row;
       }
     }
+    if ($district_id = _get_value($parish,"field_parish_district")) {
+      $form[$count]['district'] = array(
+        '#type' => 'item',
+        '#markup' => "<strong>District: </strong>".$district_id,
+      );
+    }
+    if ($address = parish_get_address($parish,"home")) {
+      $form[$count]['address'] = array(
+        '#type' => 'item',
+        '#markup' => "<strong>Address: </strong>".implode(", ",array_filter($address)),
+      );
+    }
+    if ($address = parish_get_address($parish,"mail")) {
+      if (!empty($address['city'])) {
+        $form[$count]['mail'] = array(
+          '#type' => 'item',
+          '#markup' => "<strong>Mailing Address: </strong>".implode(", ",array_filter($address)),
+        );
+      }
+    }
+    if ($phone = _get_value($parish,"field_parish_phone")) {
+    $form[$count]['phone'] = array(
+      '#type' => 'item',
+      '#markup' => "<strong>Phone: </strong>".$phone,
+      );
+    }
+    if ($email = _get_value($parish,"field_parish_email")) {
+      $form[$count]['email'] = array(
+        '#type' => 'item',
+        '#markup' => "<strong>Email: </strong>".l($email,"mailto:".$email),
+      );
+    }
+    if (node_access("update",$parish)) {
+      $form[$count]['edit'] = array(
+        '#type' => 'item',
+        '#markup' => l("edit this parish","node/".$parish->nid."/edit"),
+      );
+    }
     $form[$count]['people'] = array(
       '#type' => 'item',
       '#markup' => theme_table($parish_table),
     );    
     $count++;
   }
+  $form['search'] = array(
+    '#type' => 'fieldset',
+    '#title' => 'Search',
+    '#weight' => -1,
+  );
+  $form['search']['district'] = array(
+    '#type' => 'select',
+    '#title' => 'District',
+    '#options' => array(
+      '_none' => '- All Districts -',
+      'Monroe' => 'Monroe',
+      'Northeast' => 'Northeast',
+      'Rochester' => 'Rochester',
+      'Southeast' => 'Southeast',
+      'Southwest' => 'Southwest',
+      ),
+      '#default_value' => $district,
+    );
+  $all_parishes = parish_fetch_parishes();
+  $search = array('_none'=>'- All Parishes -');
+  foreach ($all_parishes['nodes'] as $parish) {
+    $search[$parish->nid] = $parish->title;
+  }
+  $form['search']['nid'] = array(
+    '#type' => 'select',
+    '#title' => "Parish",
+    '#options' => $search,
+    '#default_value' => $nid,
+    );
+  $form['search']['output'] = array(
+    '#type' => 'radios',
+    '#title' => 'Output Format',
+    '#options' => array(
+      'report' => 'Report in webpage format (below)',
+      'csv' => 'Excel spreadsheet format',
+      ),
+      '#default_value' => 'report',
+    );
+  $form['search']['submit'] = array(
+    '#type' => 'submit',
+    '#value' => 'Search',
+    );
+  $form['#submit'] = array("parish_parish_dir_form_submit");
   return $form;
+}
+
+function parish_parish_dir_form_submit($form, &$form_state) {
+    $form_state['rebuild'] = TRUE;
 }
 
 function parish_parishes_form($form,&$form_state) {
@@ -310,18 +444,24 @@ function _parish_get_value($node,$field,$type = "value") {
   return $array[0][$type];
 }
 
-function parish_fetch_parishes($district=FALSE,$city=FALSE,$limit=FALSE) {
+function parish_fetch_parishes($district=FALSE,$city=FALSE,$limit=FALSE,$nid=FALSE) {
   $query = db_select("node","n");
   $query->leftJoin("field_data_field_parish_home_city","c","c.entity_id = n.nid");
   $query->leftJoin("field_data_field_parish_district","d","d.entity_id = n.nid");
   $query->fields('n',array('nid'))
     ->condition("n.type","parish","=")
-    ->orderBy('d.field_parish_district_value','ASC')
     ->orderBy('c.field_parish_home_city_value','ASC')
+    ->orderBy('n.title','ASC')
     ->orderBy('n.title','ASC')
     ->condition('n.status', 1);
   if ($limit) {
     $query = $query->extend('PagerDefault')->limit($limit);
+  }
+  if ($nid) {
+    $query->condition("n.nid",$nid);
+  }
+  if ($district) {
+    $query->condition("d.field_parish_district_value",$district);
   }
   $result = $query->execute();
   $parishes = array('nodes' => array(), 'pager' => '');
