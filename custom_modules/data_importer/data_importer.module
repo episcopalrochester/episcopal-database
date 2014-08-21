@@ -40,6 +40,7 @@ function data_importer_import_form($form,&$form_state) {
       'update'=>'Update existing Drupal nodes only, overwriting with data from this CSV.',
       'make'=>'Create nodes using CSV data, but do not update existing Drupal nodes.',
       'accessid' => 'Assign Access ID only',
+      'supply' => 'Make supply clergy assignments',
     ),
     '#default_value' => 'dry',
   );
@@ -132,6 +133,22 @@ function data_importer_import_form_submit($form, &$form_state) {
     $array[] = $sub;
   }
   foreach ($array as $item) {
+    if ($item['type'] == "supply") {
+     $person = data_importer_fetch_asc("person_".$item['PersonID']);
+     $parish = data_importer_fetch_asc("parish_".$item['ParishID']);
+     $date = new DateTime($item['date']); 
+     if (!supply_clergy_is_booked($person->nid,$date) && isset($person->nid) && isset($parish->nid) && $date) {
+       $record = array(
+         'cid' => $person->nid,
+         'pid' => $parish->nid,
+         'date' => date_format($date,'c'),
+         'uid' => 1,
+       );
+       drupal_write_record("supply_clergy",$record);
+       drupal_set_message("Booked ".node_load($person->nid)->title." at ".node_load($parish->nid)->title." on ".date_format($date,'Y-m-d'));
+     }
+     $access_id = "false";
+    }
     $node = false;
     // Try to find an existing nid via access_ids table
     if ($source == "access") {
@@ -144,7 +161,7 @@ function data_importer_import_form_submit($form, &$form_state) {
       elseif ($item['type'] == "professional_relationship") {
         $access_id = data_importer_fetch_asc("pf_".$item['pf_id']);
       }
-      $node = ($access_id ? node_load($access_id->nid) : false);
+      $node = (isset($access_id->nid) ? node_load($access_id->nid) : false);
     }
     // If no node is found via imported data, try to find one with matching data
     if (!$node) {
