@@ -138,6 +138,12 @@ function supply_clergy_cancel_form_submit($form,&$form_state) {
   $args = $form_state['build_info']['args'];
   $booking = $args[0];
   $date = new DateTime($booking->date);
+  $person = node_load($booking->cid);
+  $parish = node_load($booking->pid);
+  global $user;
+  if ($parish) {
+    rules_invoke_event("supply_clergy_cancel",$user,$person,$parish,$booking);
+  }
   db_delete("supply_clergy")
     ->condition("bid",$booking->bid)
     ->execute();
@@ -238,6 +244,9 @@ function supply_clergy_edit_form_submit($form,&$form_state) {
       "unavailable for ".date_format($date,"l, F j, Y, g:i a").".");
 
   }
+  if ($parish) {
+    rules_invoke_event("supply_clergy_update",$user,$person,$parish,$record);
+  }
   drupal_goto("supply/".date_format($date,"Y/m/d"));
 }
 
@@ -316,18 +325,18 @@ function supply_clergy_book_form_submit($form,&$form_state) {
     'pid' => $form_state['input']['parish'],
     'date' => date_format($date,'c'),
     'uid' => $uid,
-    );
+  );
   $name = person_get_title($person)." ".person_get_full_name($person);
   $parish = node_load($form_state['input']['parish']);
   drupal_write_record("supply_clergy",$record);
   if ($parish) {
     drupal_set_message("You have successfully booked $name at ".
-  $parish->title." for ".date_format($date,"l, F j, Y, g:i a")."."); 
+      $parish->title." for ".date_format($date,"l, F j, Y, g:i a")."."); 
+    rules_invoke_event("supply_clergy_booked",$user,$person,$parish,$record);
   }
   else {
     drupal_set_message("You have successfully marked $name ".
-  "unavailable for ".date_format($date,"l, F j, Y, g:i a")."."); 
-  
+      "unavailable for ".date_format($date,"l, F j, Y, g:i a")."."); 
   }
   drupal_goto("supply/".$args[0]."/".$args[1]."/".$args[2]);
 }
@@ -778,4 +787,78 @@ function supply_clergy_build_calendar($month,$year) {
 
   return $calendar;
 
+}
+
+// rules
+
+function supply_clergy_rules_event_info() {
+  $variables = array(
+    'user' => array('type' => 'user', 'label' => t('The user who made the booking')),
+    'clergy' => array('type' => 'node', 'label' => t('The clergy who was booked')),
+    'parish' => array('type' => 'node', 'label' => t('The parish that was booked')),
+    'booking' => array('type' => 'supply', 'label' => t('The booking object')),
+    );
+  return array(
+    'supply_clergy_booked' => array(
+      'label' => t('Supply clergy booking is made'),
+      'Group' => 'Supply Clergy',
+      'variables' => $variables,
+    ),
+    'supply_clergy_update' => array(
+      'label' => t('Supply clergy booking is updated'),
+      'Group' => 'Supply Clergy',
+      'variables' => $variables,
+    ),
+    'supply_clergy_cancel' => array(
+      'label' => t('Supply clergy booking is cancelled'),
+      'Group' => 'Supply Clergy',
+      'variables' => $variables,
+    ),
+  );
+}
+
+function supply_clergy_token_info() {
+  $types['supply'] = array(
+    'name' => t("Booking object"),
+    'description' => t("Provides information on the booking"),
+  );
+  $supply['supply_id'] = array(
+    'name' => t("ID"),
+    'description' => t("Supply clergy booking id"),
+  );
+  $supply['supply_date'] = array(
+    'name' => t("Date"),
+    'description' => t("Supply clergy booking date"),
+  );
+  return array(
+    'types' => $types,
+    'tokens' => array(
+      'supply' => $supply,
+    ),
+  );
+}
+
+function supply_clergy_tokens($type, $tokens, array $data = array(), array $options = array()) {
+
+  $replacements = array();
+
+  if ($type == 'supply') {
+    foreach ($tokens as $name => $original) {
+      switch ($name) {
+      case 'supply_date':
+        if (is_array($data['supply'])) {
+        $replacements[$original] = date('m/d/Y H:i a',strtotime($data['supply']['date']));
+        }
+        else {
+        $replacements[$original] = date('m/d/Y H:i a',strtotime($data['supply']->date));
+        }
+        break;
+      case 'supply_id':
+        $replacements[$original] = $data['supply']['bid'];
+        break;
+      }
+    }
+  }
+
+  return $replacements;
 }
