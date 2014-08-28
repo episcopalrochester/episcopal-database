@@ -142,7 +142,9 @@ function person_type_queries($type = FALSE) {
   $queries = array(
     'All People' => 'All People',
     'Clergy' => 'Clergy',
-    'Laity' => 'Deceased People',
+    'Clergy in Congregations' => 'Clergy in Congregations',
+    'Laity' => 'Laity',
+    'Wardens' => 'Wardens',
     'Retired Clergy' => array(
       'table' => 'field_data_field_person_employment',
       'field' => 'field_person_employment_value',
@@ -254,6 +256,10 @@ function person_lists_submit_form($form,&$form_state) {
       in_array('Clergy Ordination Anniversaries Next Month',$form['who']['#value'])) {
         print ',"Diaconate Ord.","Priesthood Ord."';
       }
+    if (in_array('Wardens',$form['who']['#value']) ||
+      in_array('Clergy in Congregations',$form['who']['#value'])) {
+        print ',"Parish","Title"';
+      }
     print "\n";
 
     foreach ($people['nodes'] as $person) {
@@ -349,6 +355,23 @@ function person_lists_submit_form($form,&$form_state) {
           else { 
             print ","; 
           }
+        }
+      if (in_array('Wardens',$form['who']['#value']) ||
+        in_array('Clergy in Congregations',$form['who']['#value'])) {
+          $p_types = pro_relationship_types();
+          $rels = find_pro_relationships(FALSE,$person);
+          $parishes = array();
+          $types = array();
+          foreach ($rels as $rel) {
+            if (isset($rel['relative']->title)) {
+              $parishes[] = $rel['relative']->title;
+            }
+            else {
+              $parishes[] = _get_value($rel['node'],"field_org_nr");
+            }
+            $types[] = $p_types[$rel['type']];
+          }
+          print ',"'.implode(";",$parishes).'",'.'"'.implode(";",$types).'"';
         }
       print "\n";
     }
@@ -962,6 +985,12 @@ function person_fetch_people($type="All People",$last="",$first="",$status="livi
       if (is_array($q)) {
         $query->leftJoin($q['table'],$q['abv'],$q['abv'].".entity_id = n.nid");
       }
+      elseif ($q == "Wardens" || $q == "Clergy in Congregations") {
+        $query->leftJoin("field_data_field_pf_first","ft","ft.field_pf_first_nid = n.nid");
+        $query->leftJoin("field_data_field_pf_type","jt","jt.entity_id = ft.entity_id");
+        $query->leftJoin("field_data_field_pf_start","js","js.entity_id = ft.entity_id");
+        $query->leftJoin("field_data_field_pf_end","je","je.entity_id = ft.entity_id");
+      }
     }
   }
   $query->fields('n',array('nid'))
@@ -1054,6 +1083,49 @@ function person_fetch_people($type="All People",$last="",$first="",$status="livi
           ->condition($Danniversary);
         $who->condition($anniversary);
       }
+      elseif ($q == "Wardens") {
+        $wardens = db_or();
+        $wardens->condition("jt.field_pf_type_value","wardenjr");
+        $wardens->condition("jt.field_pf_type_value","wardensr");
+        $wardens->condition("jt.field_pf_type_value","warden");
+        $now = date("Y-m-d");
+        $not_past = db_or()
+          ->condition("js.field_pf_start_value",$now,"<")
+          ->isNull("js.field_pf_start_value");
+        $not_future = db_or()
+          ->condition("je.field_pf_end_value",$now,">")
+          ->isNull("je.field_pf_end_value");
+        $is_a_warden_now = db_and()
+          ->condition($wardens)
+          ->condition($not_past)
+          ->condition($not_future);
+        $who->condition($is_a_warden_now);
+      }
+      elseif ($q == "Clergy in Congregations") {
+        $clergy = db_or();
+        $clergy->condition("jt.field_pf_type_value","rector");
+        $clergy->condition("jt.field_pf_type_value","pic");
+        $clergy->condition("jt.field_pf_type_value","associate");
+        $clergy->condition("jt.field_pf_type_value","assistant");
+        $clergy->condition("jt.field_pf_type_value","priest");
+        $clergy->condition("jt.field_pf_type_value","vicar");
+        $clergy->condition("jt.field_pf_type_value","pastor");
+        $clergy->condition("jt.field_pf_type_value","deacon");
+        $clergy->condition("jt.field_pf_type_value","chaplain");
+        $now = date("Y-m-d");
+        $not_past = db_or()
+          ->condition("js.field_pf_start_value",$now,"<")
+          ->isNull("js.field_pf_start_value");
+        $not_future = db_or()
+          ->condition("je.field_pf_end_value",$now,">")
+          ->isNull("je.field_pf_end_value");
+        $is_a_warden_now = db_and()
+          ->condition($clergy)
+          ->condition($not_past)
+          ->condition($not_future);
+        $who->condition($is_a_warden_now);
+      }
+
       else {
         $who->condition($q['abv'].".".$q['field'],$q['value'],$q['operation']);
       }
@@ -1063,6 +1135,7 @@ function person_fetch_people($type="All People",$last="",$first="",$status="livi
   if ($limit) {
     $query = $query->extend('PagerDefault')->limit($limit);
   }
+  $query->distinct();
   $result = $query->execute();
   $people = array('nodes' => array(), 'pager' => '');
   while ($record = $result->fetchAssoc()) {
