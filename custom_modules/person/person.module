@@ -145,6 +145,7 @@ function person_type_queries($type = FALSE) {
     'Clergy in Congregations' => 'Clergy in Congregations',
     'Laity' => 'Laity',
     'Wardens' => 'Wardens',
+    'Parish Administrators' => 'Parish Administrators',
     'Retired Clergy' => array(
       'table' => 'field_data_field_person_employment',
       'field' => 'field_person_employment_value',
@@ -257,6 +258,7 @@ function person_lists_submit_form($form,&$form_state) {
         print ',"Diaconate Ord.","Priesthood Ord."';
       }
     if (in_array('Wardens',$form['who']['#value']) ||
+      in_array('Parish Administrators',$form['who']['#value']) ||
       in_array('Clergy in Congregations',$form['who']['#value'])) {
         print ',"Parish","Title"';
       }
@@ -357,6 +359,7 @@ function person_lists_submit_form($form,&$form_state) {
           }
         }
       if (in_array('Wardens',$form['who']['#value']) ||
+        in_array('Parish Administrators',$form['who']['#value']) ||
         in_array('Clergy in Congregations',$form['who']['#value'])) {
           $p_types = pro_relationship_types();
           $rels = find_pro_relationships(FALSE,$person);
@@ -985,7 +988,7 @@ function person_fetch_people($type="All People",$last="",$first="",$status="livi
       if (is_array($q)) {
         $query->leftJoin($q['table'],$q['abv'],$q['abv'].".entity_id = n.nid");
       }
-      elseif ($q == "Wardens" || $q == "Clergy in Congregations") {
+      elseif ($q == "Wardens" || $q == "Clergy in Congregations" || $q == "Parish Administrators") {
         $query->leftJoin("field_data_field_pf_first","ft","ft.field_pf_first_nid = n.nid");
         $query->leftJoin("field_data_field_pf_type","jt","jt.entity_id = ft.entity_id");
         $query->leftJoin("field_data_field_pf_start","js","js.entity_id = ft.entity_id");
@@ -1101,6 +1104,22 @@ function person_fetch_people($type="All People",$last="",$first="",$status="livi
           ->condition($not_future);
         $who->condition($is_a_warden_now);
       }
+      elseif ($q == "Parish Administrators") {
+        $admins = db_or();
+        $admins->condition("jt.field_pf_type_value","admin");
+        $now = date("Y-m-d");
+        $not_past = db_or()
+          ->condition("js.field_pf_start_value",$now,"<")
+          ->isNull("js.field_pf_start_value");
+        $not_future = db_or()
+          ->condition("je.field_pf_end_value",$now,">")
+          ->isNull("je.field_pf_end_value");
+        $is_a_admin_now = db_and()
+          ->condition($admins)
+          ->condition($not_past)
+          ->condition($not_future);
+        $who->condition($is_a_admin_now);
+      }
       elseif ($q == "Clergy in Congregations") {
         $clergy = db_or();
         $clergy->condition("jt.field_pf_type_value","rector");
@@ -1149,6 +1168,30 @@ function person_is_alive($person) {
     return false;
   }
   return true; 
+}
+
+function person_is_warden($person) {
+  if (!person_is_alive($person)) {
+    return false;
+  }
+  $rels = find_pro_relationships(array("warden","wardenjr","wardensr"),$person);
+  foreach ($rels as $rel) {
+    if (isset($rel['node'])) {
+      return true;
+    }
+  }
+}
+
+function person_is_admin($person) {
+  if (!person_is_alive($person)) {
+    return false;
+  }
+  $rels = find_pro_relationships(array("admin"),$person);
+  foreach ($rels as $rel) {
+    if (isset($rel['node'])) {
+      return true;
+    }
+  }
 }
 
 function person_is_clergy($person) {
