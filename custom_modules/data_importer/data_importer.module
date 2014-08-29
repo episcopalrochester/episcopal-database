@@ -184,7 +184,7 @@ function data_importer_import_form_submit($form, &$form_state) {
         }
       }
     }
-    if ($node) {
+    if ($node && $process <> "make") {
       foreach ($item as $key => $cell) {
         $key = strtolower(preg_replace("/[^A-Za-z0-9_]/", '', $key));
         if ($key <> "title" && $key <> "type" && $key <> "status") {
@@ -247,7 +247,7 @@ function data_importer_import_form_submit($form, &$form_state) {
           drupal_set_message("Could not find matching relationship",'error');
         }
       }
-      elseif ($process == "make") {
+      elseif ($process == "make" && !$node) {
         $node = new StdClass();
         $node->bundle = $item['type'];
         $node->type = $item['type'];
@@ -261,6 +261,8 @@ function data_importer_import_form_submit($form, &$form_state) {
         }
         if ($item['type'] == "person") {
           $node->title = person_get_full_name($node);
+          node_save($node);
+          drupal_set_message("Created node ". $node->title ." (".$node->nid.")");
         }
         if ($item['type'] == "professional_relationship") {
           if (isset($item['PersonID'])) {
@@ -269,28 +271,57 @@ function data_importer_import_form_submit($form, &$form_state) {
               $node->field_pf_first['und'][0]['nid'] = $person->nid;
             }
           }
+          else {
+            $person = person_find_person(
+              $item['field_person_first_name']." ".
+              $item['field_person_middle_name']." ".
+              $item['field_person_last_name'],
+              $item['field_person_email_pref']);
+            if (isset($person->nid)) {
+              $node->field_pf_first['und'][0]['nid'] = $person->nid;
+            }
+            else {
+              drupal_set_message("No person found for ".$item['field_person_email_pref']);
+            }
+          }
           if (isset($item['ParishID'])) {
             $parish = data_importer_fetch_asc("parish_".$item['ParishID']);
             if (isset($parish->nid)) {
               $node->field_pf_second['und'][0]['nid'] = $parish->nid;
             }
           }
+          else {
+            $query = db_select('node','n')
+              ->fields('n',array('nid'))
+              ->condition('n.title',$item['parish name']);
+            $result = $query->execute();
+            $parish = FALSE;
+            while ($record = $result->fetchAssoc()) {
+              $parish = node_load($record['nid']);
+            }
+            if (isset($parish->nid)) {
+              $node->field_pf_second['und'][0]['nid'] = $parish->nid;
+            }
+            else {
+              drupal_set_message("No parish found for ".$item['parish name']);
+            }
+          }
         }
         if (isset($node->field_pf_first) && isset($node->field_pf_second)) {
           node_save($node);
-          drupal_set_message("Created relationship between ".node_load($person->nid)->title." ".node_load($parish->nid)->title);
+          drupal_set_message("Created relationship between ".node_load($person->nid)->title." and ".node_load($parish->nid)->title);
         }
       }
     }
     // Associate with an Access ID, if a node exists
     if (isset($node->nid) && ($process == "accessid" || $process == "make")) {
-      if ($item['type'] == "person") {
+      if ($item['type'] == "person" && isset($item['PersonID'])) {
         data_importer_write_asc("person_".$item['PersonID'],$node->nid);
       }
-      elseif ($item['type'] == "parish")  {
+      elseif ($item['type'] == "parish" && isset($item['ParishID']))  {
         data_importer_write_asc("parish_".$item['ParishID'],$node->nid);
       }
-      elseif ($item['type'] == "professional_relationship")  {
+      elseif ($item['type'] == "professional_relationship" && isset($item['pf_id']))  {
         data_importer_write_asc("pf_".$item['pf_id'],$node->nid);
       }
     }
