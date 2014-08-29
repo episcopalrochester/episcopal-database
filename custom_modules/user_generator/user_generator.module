@@ -1,6 +1,9 @@
 <?php
 
 function user_generator_run() { 
+  if (module_exists("rules")) {
+    module_disable(array("rules","rules_admin"));
+  }
   $persons = user_generator_scan_persons();
   $emails = array();
   $rid = user_role_load_by_name('database user')->rid;
@@ -8,7 +11,7 @@ function user_generator_run() {
     $email_field = field_get_items('node',$person,'field_person_email_pref');
     if ($email_field) {
       $email = trim(strtolower($email_field[0]['value']));
-      if(!user_generator_check_mail($email)) {
+      if(!user_generator_check_mail($email) && (!empty($email))) {
         user_generator_create_account($email,$person,$rid);
       }
       $uid = user_generator_check_mail($email);
@@ -18,6 +21,7 @@ function user_generator_run() {
       }
     }
   }
+  module_enable(array("rules","rules_admin"));
 }
 
 function user_generator_scan_clergy() {
