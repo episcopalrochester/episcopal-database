@@ -72,9 +72,9 @@ function supply_clergy_menu() {
 
 function supply_clergy_cancel_form($form,&$form_state,$booking) {
    $date = new DateTime($booking->date);
-  $notice ="<strong>NOTE:</strong><br />";
+  $notice ="<span style='font-size: 24px'><strong>NOTE:</strong><br />";
   $notice .= "You <em>must</em> contact this person directly to confirm 
-    cancellation.<br />";
+    cancellation.</span><br />";
   $person = node_load($booking->cid);
   $notice .= "<br /><strong>Contact Info:</strong><br />";
   $phone =  _get_value($person,"field_person_phone_pref");
@@ -129,7 +129,7 @@ function supply_clergy_cancel_form($form,&$form_state,$booking) {
   $form['submit'] = array(
     '#type' => 'submit',
     '#submit' => array('supply_clergy_cancel_form_submit'),
-    '#value' => 'Cancel this booking',
+    '#value' => 'Cancel this booking - I have discussed the cancellation with the above person',
     );
   return $form;
 }
@@ -154,11 +154,11 @@ function supply_clergy_cancel_form_submit($form,&$form_state) {
 
 function supply_clergy_edit_form($form,&$form_state,$booking) {
    $date = new DateTime($booking->date);
-  $notice ="<strong>NOTE:</strong><br />";
+  $notice ="<span style='font-size:24px;'><strong>NOTE:</strong><br />";
   $notice .= "You <em>must</em> contact this person directly to confirm 
     the booking. Do not assume you have booked this person for supply
     simply by filling out this form. If they don't check their email or
-    this site, they may not even know!<br />";
+    this site, they may not even know!</span><br />";
   $person = node_load($booking->cid);
   $notice .= "<br /><strong>Contact Info:</strong><br />";
   $phone =  _get_value($person,"field_person_phone_pref");
@@ -211,7 +211,7 @@ function supply_clergy_edit_form($form,&$form_state,$booking) {
   $form['submit'] = array(
     '#type' => 'submit',
     '#submit' => array('supply_clergy_edit_form_submit'),
-    '#value' => 'Update this booking',
+    '#value' => 'Update this booking - I have discussed the update with the above person',
     );
   return $form;
 }
@@ -253,11 +253,11 @@ function supply_clergy_edit_form_submit($form,&$form_state) {
 function supply_clergy_book_form($form,&$form_state,$year,$month,$day,$person) {
   drupal_set_title("Booking ".person_get_title($person)." ".person_get_full_name($person));
     $date = new DateTime("$month/$day/$year");
-  $notice ="<strong>NOTE:</strong><br />";
+  $notice ="<span style='font-size: 24px;'><strong>NOTE:</strong><br />";
   $notice .= "You <em>must</em> contact this person directly to confirm 
     the booking. Do not assume you have booked this person for supply
     simply by filling out this form. If they don't check their email or
-    this site, they may not even know!<br />";
+    this site, they may not even know!</span><br />";
   $notice .= "<br /><strong>Contact Info:</strong><br />";
   $phone =  _get_value($person,"field_person_phone_pref");
   if ($phone) {
@@ -308,7 +308,7 @@ function supply_clergy_book_form($form,&$form_state,$year,$month,$day,$person) {
   $form['submit'] = array(
     '#type' => 'submit',
     '#submit' => array('supply_clergy_book_form_submit'),
-    '#value' => 'Make this booking',
+    '#value' => 'Make this booking - I have discussed it directly with the above person',
     );
   return $form;
 }
