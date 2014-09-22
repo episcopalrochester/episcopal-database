@@ -1220,6 +1220,18 @@ function person_is_warden($person) {
   }
 }
 
+function person_is_dean($person) {
+  if (!person_is_alive($person)) {
+    return false;
+  }
+  $rels = find_pro_relationships(array("dean"),$person);
+  foreach ($rels as $rel) {
+    if (isset($rel['node'])) {
+      return true;
+    }
+  }
+}
+
 function person_is_admin($person) {
   if (!person_is_alive($person)) {
     return false;

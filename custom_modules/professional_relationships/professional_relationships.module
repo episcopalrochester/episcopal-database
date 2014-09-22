@@ -132,6 +132,7 @@ function pro_relationship_splits($key = FALSE) {
     "retirement"=>"Retirement",
     "resignation"=>"Resignation",
     "reassignment"=>"Reassignment",
+    "term" => "Term Ended",
     "termination"=>"Termination",
     "other"=>"Other (see notes)",
   );

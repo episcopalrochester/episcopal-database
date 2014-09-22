@@ -6,11 +6,20 @@ function data_importer_menu() {
     'title' => 'Import Data',
     'page callback' => 'drupal_get_form',
     'page arguments' => array('data_importer_import_form'),
-    'access arguments' => array('access people listing'),
+    'access arguments' => array('import data'),
     'weight' => 3,
     'type' => MENU_LOCAL_TASK,
   );
   return $items;
+}
+
+function data_importer_permission() {
+  return array(
+    'import data' => array(
+      'title' => t("Import Data"),
+      'description' => t("Import data into the data system"),
+    ),
+  );
 }
 
 function data_importer_import_form($form,&$form_state) {
