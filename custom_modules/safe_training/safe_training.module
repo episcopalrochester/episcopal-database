@@ -1,0 +1,246 @@
+<?php
+
+function safe_training_menu() {
+  $items = array();
+  $items['staff/safe-training'] = array(
+    'title' => 'Update Safe Training Data',
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('safe_training_admin_form'),
+    'access arguments' => array('access people listing'),
+    'weight' => 2,
+    'type' => MENU_LOCAL_TASK,
+  );
+  return $items;
+}
+
+function safe_training_permission() {
+/*  return array(
+    'access people listing' => array(
+      'title' => t("Access People Listing"),
+      'description' => t("Allow users to view listing of all people"),
+    ),
+    'access clergy directory' => array(
+      'title' => t("Access Clergy Directory"),
+      'description' => t("Allow user to access a directory of clergy"),
+    ),
+  );
+  */
+}
+
+function safe_training_admin_form($form,&$form_state) {
+  $form['import'] = array(
+    '#type' => 'fieldset',
+    '#title' => 'Import Safe Training Data',
+    );
+  $form['import']['csv'] = array(
+    '#type' => 'file',
+    '#title' => "Upload a CSV",
+    '#tree' => TRUE,
+  );
+  $form['import']['submit_data'] = array(
+
+    '#type' => 'submit',
+    '#value' => 'Process CSV',
+    '#submit' => array('safe_training_import_data'),
+  );
+  $people = person_fetch_people("Clergy");
+  $form['requireall'] = array(
+    '#type' => 'checkbox',
+    '#tree' => true,
+    '#title' => 'Set all listed people to required',
+  );
+  $form['people'] = array(
+    '#theme' => 'table',
+    '#header' => array('Title','Required','Date'),
+    '#rows'=> array(),
+    '#tree' => true,
+  );
+  $expired = "";
+  foreach ($people['nodes'] as $person) {
+    $name = $person->field_person_last_name['und'][0]['value'].", ";
+    if (isset($person->field_person_title['und']['0']['value'])) {
+      $name .= $person->field_person_title['und']['0']['value']." ";
+    }
+    if (isset($person->field_person_first_name['und']['0']['value'])) {
+      $name .=  $person->field_person_first_name['und']['0']['value']." ";
+    }
+    if (isset($person->field_person_middle_name['und']['0']['value'])) {
+      $name .= $person->field_person_middle_name['und']['0']['value']." ";
+    }
+    if (isset($person->field_person_suffix['und']['0']['value'])) {
+      $name .= $person->field_person_suffix['und']['0']['value']." ";
+    }
+    if (isset($person->field_person_email_pref['und']['0']['value'])) {
+      $email = $person->field_person_email_pref['und']['0']['value'];
+    }
+    $required = 0;
+    if (isset($person->field_person_safe_church['und'][0]['value'])) {
+      $required = $person->field_person_safe_church['und'][0]['value'];
+    }
+    $modules = array();
+    $refresher = "";
+    if (isset($person->field_person_safe_meet_sam['und'][0]['value'])) {
+      $modules[] = $person->field_person_safe_meet_sam['und'][0]['value'];
+    }
+    if (isset($person->field_person_safe_it_happened['und'][0]['value'])) {
+      $modules[] = $person->field_person_safe_it_happened['und'][0]['value'];
+    }
+    if (isset($person->field_person_safe_keeping_church['und'][0]['value'])) {
+      $modules[] = $person->field_person_safe_keeping_church['und'][0]['value'];
+    }
+    if (isset($person->field_person_safe_policies['und'][0]['value'])) {
+      $modules[] = $person->field_person_safe_policies['und'][0]['value'];
+    }
+    if (isset($person->field_person_safe_refresher['und'][0]['value'])) {
+      $refresher = $person->field_person_safe_refresher['und'][0]['value'];
+    }
+    $style ="";
+    $expiration = date('Y')-5 ."-".date("m-d\T00:00:00");
+    if (!count($modules)) {
+      $modules = array(0);
+    }
+    if ($required == "1" && (min($modules) < $expiration && $refresher < $expiration)) {
+      $date = min(array(min($modules),$refresher));
+      $style = "background: #ff7777; ";
+      $expired .= trim($name);
+      if (isset($email)) {
+        $expired.=" <".$email.">";
+      }
+      $expired .="\n";
+    }
+    else {
+      $date = max(array(min($modules),$refresher));
+    }
+    if ($date == 0) {
+      $date == "";
+    }
+    else {
+      $date_obj = new DateTime($date);
+      $date = date_format($date_obj,"m/d/Y");
+    }
+    $name = l(rtrim($name," ,"),"node/".$person->nid);
+    $req_field = array(
+      '#name' => 'required-'.$person->nid,
+      '#type' => 'checkbox',
+      '#tree' => true,
+    );
+    if ($required) {
+      $req_field['#attributes']['checked'] = TRUE;
+    }
+    $date_field = array(
+      '#name' => 'safedate-'.$person->nid,
+      '#type'=> 'textfield',
+      '#value' => $date,
+      '#tree' => true,
+    );
+    $row = array(
+      'Title' => $name,
+      array('data'=>&$req_field),
+      array('data'=>&$date_field),
+    );
+    $form['people']['#rows'][] = array('data'=>$row,'style'=>$style);
+    unset($req_field);
+    unset($date_field);
+    unset($email);
+  }
+  $form['expired'] = array(
+    '#type'=>'textarea',
+    '#value'=>$expired,
+    '#title'=>'People with expired training',
+    '#weight'=>-10,
+  );
+  $form['#submit'] = array('safe_training_admin_form_submit');
+  return $form;
+}
+
+function safe_training_import_data($form, &$form_state) {
+/*  $people = person_fetch_people();
+  foreach ($people['nodes'] as $person) {
+    if (isset($form_state['input']['requireall'])) {
+      $person->field_person_safe_church['und'] = array('0' => array('value' => 1));  
+    }
+    elseif (isset($form_state['input']['required-'.$person->nid])) {
+      $person->field_person_safe_church['und'] = array('0' => array('value' => $form_state['input']['required-'.$person->nid]));
+    }
+    else {
+      $person->field_person_safe_church['und'] = array('0' => array('value' => 0));
+    }
+    if (isset($form_state['input']['safedate-'.$person->nid]) && !empty($form_state['input']['safedate-'.$person->nid])) {
+      $person->field_safe_church_training_date['und'] = array('0' => array('value' => strtotime($form_state['input']['safedate-'.$person->nid])));
+    }
+    else {
+      unset($person->field_safe_church_training_date['und'][0]);
+    }
+    node_save($person);
+  }
+ */
+  $file = file_save_upload('csv',array(
+    'file_validate_extensions' => array('csv'),FILE_EXISTS_REPLACE));
+  if (!$file) {
+    return;
+  }
+  $csv = explode("\n",str_replace("\r","\n",file_get_contents(drupal_realpath($file->destination)))); 
+  $header = str_getcsv($csv[0]);
+  unset($csv[0]);
+  $key['first_name'] = array_shift(array_values(array_keys($header,"First Name")));
+  $key['last_name'] = array_shift(array_values(array_keys($header,"Last Name")));
+  $key['email'] = array_shift(array_values(array_keys($header,"Email")));
+  $key['date'] = array_shift(array_values(array_keys($header,"Completion Date")));
+  $key['course'] = array_shift(array_values(array_keys($header,"Course Name")));
+  $modules = array(
+    'field_person_safe_meet_sam' => 'Meet Sam',
+    'field_person_safe_it_happened' => 'It Happened to Me',
+    'field_person_safe_keeping_church' => 'Keeping Your Church Safe',
+    'field_person_safe_policies' => 'Policies - Episcopal Diocese of Rochester',
+    'field_person_safe_risk' => 'Abuse Risk Management for Volunteers - Generic',
+    'field_person_safe_refresher' => 'Abuse Prevention Refresher',
+    );
+  if (is_null($key['first_name']) || is_null($key['last_name']) || is_null($key['email']) || is_null($key['date'])) {
+    return false;
+  }
+  ini_set("max_execution_time","120");
+  foreach ($csv as $row) {
+    $data = str_getcsv($row);
+    $count = 0;
+    if (isset($data[$key['date']]) && !empty($data[$key['date']]) && $data[$key['first_name']] && isset($data[$key['last_name']])) {
+      $date = new DateTime(trim($data[$key['date']]));
+      $course = trim($data[$key['course']]);
+      $name = trim($data[$key['first_name']])." ".trim($data[$key['last_name']]);
+      if (isset($data[$key['email']])) {
+        $email = trim($data[$key['email']]);
+        $email = str_replace("rochesterepiscopaldiocese","episcopaldioceseofrochester",$email);
+      }
+      else {
+        $email = false;
+      }
+      $person = person_find_person($name,$email);
+      if ($person) {
+        $lang = $person->language; 
+        foreach ($modules as $field => $module) {
+          if ($course == $module) {
+            $date_data = array(
+              $lang => array('0' => array('value' => date_format($date,"Y-m-d\T00:00:00"))),
+            );
+            eval("\$person->$field = \$date_data;");
+          }
+        }
+        node_save($person);
+        drupal_set_message("Updated $name.");
+      }
+      else {
+        drupal_set_message("Could not find ".$name.". Please update by hand.","error");
+      }
+    }
+  }
+  $form_state['rebuild'] = TRUE;  
+}
+
+function safe_training_node_load($nodes, $types) {
+  if (in_array("person",$types)) {
+    foreach ($nodes as $key => $node) {
+//      $nodes[$key]->title = person_get_full_name($node);
+ //     $nodes[$key]->is_alive = person_is_alive($node);
+    }
+  }
+}
+
