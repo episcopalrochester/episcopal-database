@@ -146,6 +146,7 @@ function person_type_queries($type = FALSE) {
       'value' => 'retired',
       'abv' => 'emp',
     ),
+    'Clergy Spouses' => 'Clergy Spouses',
     'Surviving Spouses' => array(
       'table' => 'field_data_field_person_clergy_spouse',
       'field' => 'field_person_clergy_spouse_value',
@@ -848,6 +849,18 @@ function person_fetch_people($type="All People",$last="",$first="",$status="livi
         $query->leftJoin("field_data_field_pf_start","js","js.entity_id = ft.entity_id");
         $query->leftJoin("field_data_field_pf_end","je","je.entity_id = ft.entity_id");
       }
+      elseif ($q == "Clergy Spouses") {
+        $query->leftJoin("field_data_field_pr_first","pr1","pr1.field_pr_first_nid = n.nid");
+        $query->leftJoin("field_data_field_pr_second","pr2","pr2.field_pr_second_nid = n.nid");
+        $query->leftJoin("field_data_field_pr_type","prt","prt.entity_id = pr1.entity_id OR prt.entity_id = pr2.entity_id");
+        $query->leftJoin("field_data_field_pr_end","pre","pre.entity_id = prt.entity_id");
+        $query->leftJoin("field_data_field_pr_end_reason","prer","prer.entity_id = prt.entity_id");
+        $query->leftJoin("field_data_field_pr_first","person1","person1.entity_id = prt.entity_id");
+        $query->leftJoin("field_data_field_pr_second","person2","person2.entity_id = prt.entity_id");
+        $query->leftJoin("field_data_field_person_priesthood","p1p","p1p.entity_id = person1.field_pr_first_nid OR p1p.entity_id = person2.field_pr_second_nid");
+        $query->leftJoin("field_data_field_person_diaconate","p1d","p1d.entity_id = person1.field_pr_first_nid OR p1p.entity_id = person2.field_pr_second_nid");
+        $query->leftJoin("field_data_field_person_consecration","p1c","p1c.entity_id = person1.field_pr_first_nid OR p1p.entity_id = person2.field_pr_second_nid");
+      }
     }
   }
   $query->fields('n',array('nid'))
@@ -939,6 +952,28 @@ function person_fetch_people($type="All People",$last="",$first="",$status="livi
           ->condition($Panniversary)
           ->condition($Danniversary);
         $who->condition($anniversary);
+      }
+      elseif ($q == "Clergy Spouses") {
+        $relationship = db_or()
+          ->condition("prt.field_pr_type_value","marriage","=")
+          ->condition("prt.field_pr_type_value","partnership","=");
+        $is_now = db_and()
+          ->isNull("pre.field_pr_end_value")
+          ->isNull("prer.field_pr_end_reason_value");
+        $has_clergy = db_or()
+          ->isNotNull("p1d.field_person_diaconate_value")
+          ->isNotNull("p1p.field_person_priesthood_value")
+          ->isNotNull("p1c.field_person_consecration_value");
+        $i_am_not_clergy = db_and()
+          ->isNull("p.field_person_priesthood_value")
+          ->isNull("d.field_person_diaconate_value")
+          ->isNull("c.field_person_consecration_value");
+        $is_spouse_to_someone = db_and()
+          ->condition($relationship)
+          ->condition($is_now)
+          ->condition($has_clergy)
+          ->condition($i_am_not_clergy);
+        $who->condition($is_spouse_to_someone);
       }
       elseif ($q == "District Deans") {
         $deans = db_or();
