@@ -198,7 +198,7 @@ function safe_training_import_data($form, &$form_state) {
   if (is_null($key['first_name']) || is_null($key['last_name']) || is_null($key['email']) || is_null($key['date'])) {
     return false;
   }
-  ini_set("max_execution_time","120");
+  ini_set("max_execution_time","180");
   foreach ($csv as $row) {
     $data = str_getcsv($row);
     $count = 0;

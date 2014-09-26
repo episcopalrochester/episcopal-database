@@ -561,6 +561,7 @@ function person_find_person($name=FALSE,$email=FALSE) {
     $split_name = explode(" ",$name);
     $first = array_shift($split_name);
     $last = array_pop($split_name);
+    /*
     $full_name_query = new EntityFieldQuery();
     $full_name_result = $full_name_query
       ->entityCondition('entity_type', 'node')
@@ -576,6 +577,7 @@ function person_find_person($name=FALSE,$email=FALSE) {
     if (isset($full_name_nid)) {
       return node_load($full_name_nid);
     }
+     */
   }
   if ($email) {
     $email_query = new EntityFieldQuery();
