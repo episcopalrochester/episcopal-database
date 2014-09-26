@@ -704,17 +704,17 @@ function person_directory_form_submit($form, &$form_state) {
 }
 
 function person_people_form($form,&$form_state,$type="All People",$last="",$first="",$status="living") {
-  if (isset($form_state['values']['type'])) {
-    $type = $form_state['values']['type'];
+  if (isset($_GET['type'])) {
+    $type = $_GET['type'];
   }
-  if (isset($form_state['values']['last'])) {
-    $last = $form_state['values']['last'];
+  if (isset($_GET['last'])) {
+    $last = $_GET['last'];
   }
-  if (isset($form_state['values']['first'])) {
-    $first = $form_state['values']['first'];
+  if (isset($_GET['first'])) {
+    $first = $_GET['first'];
   }
-  if (isset($form_state['values']['status'])) {
-    $status = $form_state['values']['status'];
+  if (isset($_GET['status'])) {
+    $status = $_GET['status'];
   }
   $people = person_fetch_people($type,$last,$first,$status,20);
   $people_table = array(
@@ -809,6 +809,7 @@ function person_people_form($form,&$form_state,$type="All People",$last="",$firs
     '#type' => 'item',
     '#markup' => theme('pager', array('tags' => array())),
   );
+  $form['#method'] = "get";
   $form['#submit'] = array('person_people_form_submit');
   return $form;
 }
