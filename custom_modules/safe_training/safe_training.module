@@ -116,7 +116,18 @@ function safe_training_admin_form($form,&$form_state) {
       $modules = array(0);
     }
     if ($required == "1" && (min($modules) < $expiration && $refresher < $expiration)) {
-      $date = min(array(min($modules),$refresher));
+      if ($refresher == 0 && $modules == array(0)) {
+        $date = 0;
+      } 
+      elseif ($refresher <> 0 ) {
+        $date = $refresher;
+      }
+      elseif ($modules <> array(0)) {
+        $date = min($modules);
+      }
+      else {
+        $date = min(array(min($modules),$refresher));
+      }
       $style = "background: #ff7777; ";
       $expired .= trim($name);
       if (isset($email)) {
@@ -127,26 +138,26 @@ function safe_training_admin_form($form,&$form_state) {
     else {
       $date = max(array(min($modules),$refresher));
     }
-    if ($date == 0) {
-      $date == "";
+    if ($date === 0) {
+      $date = "Never";
     }
     else {
       $date_obj = new DateTime($date);
       $date = date_format($date_obj,"m/d/Y");
     }
-    $name = l(rtrim($name," ,"),"node/".$person->nid);
+    $name = l(rtrim($name," ,"),"node/".$person->nid."/edit",array('query'=>array('destination'=>'staff/safe-training')));
     $req_field = array(
       '#name' => 'required-'.$person->nid,
       '#type' => 'checkbox',
-      '#tree' => true,
+      '#attributes' => array('disabled'=>true),
     );
     if ($required) {
       $req_field['#attributes']['checked'] = TRUE;
     }
     $date_field = array(
       '#name' => 'safedate-'.$person->nid,
-      '#type'=> 'textfield',
-      '#value' => $date,
+      '#type'=> 'item',
+      '#markup' => $date,
       '#tree' => true,
     );
     $row = array(
