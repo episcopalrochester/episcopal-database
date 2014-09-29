@@ -562,7 +562,6 @@ function person_find_person($name=FALSE,$email=FALSE) {
     $split_name = explode(" ",$name);
     $first = array_shift($split_name);
     $last = array_pop($split_name);
-    /*
     $full_name_query = new EntityFieldQuery();
     $full_name_result = $full_name_query
       ->entityCondition('entity_type', 'node')
@@ -578,7 +577,21 @@ function person_find_person($name=FALSE,$email=FALSE) {
     if (isset($full_name_nid)) {
       return node_load($full_name_nid);
     }
-     */
+    $nick_name_query = new EntityFieldQuery();
+    $nick_name_result = $nick_name_query
+      ->entityCondition('entity_type', 'node')
+      ->entityCondition('bundle', 'person')
+      ->fieldCondition('field_person_nickname','value',$first,"=")
+      ->fieldCondition('field_person_last_name','value',$last,"=")
+      ->propertyCondition('status', 1)
+      ->range(0,1)
+      ->execute();
+    if (isset($nick_name_result['node'])) {
+      $nick_name_nid = array_shift($nick_name_result['node'])->nid;
+    }
+    if (isset($nick_name_nid)) {
+      return node_load($nick_name_nid);
+    }
   }
   if ($email) {
     $email_query = new EntityFieldQuery();
