@@ -174,20 +174,20 @@ function person_field_group_info() {
     'label' => 'Personal Data',
     'weight' => '1',
     'children' => array(
-      0 => 'group_person_training',
-      1 => 'group_person_address',
-      2 => 'group_person_ecclesiastical',
-      3 => 'group_person_email',
-      4 => 'group_person_mailing',
-      5 => 'group_person_phones',
-      6 => 'group_person_vitals',
-      7 => 'group_personal_relationships',
-      8 => 'group_editors',
-      9 => 'group_professional_relationships',
-      10 => 'group_person_privacy',
-      11 => 'group_person_subscriptions',
-      12 => 'group_person_access',
-      13 => 'group_person_supply',
+      0 => 'group_editors',
+      1 => 'group_person_access',
+      2 => 'group_person_address',
+      3 => 'group_person_ecclesiastical',
+      4 => 'group_person_email',
+      5 => 'group_person_mailing',
+      6 => 'group_person_phones',
+      7 => 'group_person_privacy',
+      8 => 'group_person_subscriptions',
+      9 => 'group_person_supply',
+      10 => 'group_person_training',
+      11 => 'group_person_vitals',
+      12 => 'group_personal_relationships',
+      13 => 'group_professional_relationships',
     ),
     'format_type' => 'tabs',
     'format_settings' => array(
@@ -506,6 +506,73 @@ function person_field_group_info() {
   $field_group = new stdClass();
   $field_group->disabled = FALSE; /* Edit this to true to make a default field_group disabled initially */
   $field_group->api_version = 1;
+  $field_group->identifier = 'group_person_safe_training|node|person|default';
+  $field_group->group_name = 'group_person_safe_training';
+  $field_group->entity_type = 'node';
+  $field_group->bundle = 'person';
+  $field_group->mode = 'default';
+  $field_group->parent_name = 'group_person_training';
+  $field_group->data = array(
+    'label' => 'Safe Training',
+    'weight' => '12',
+    'children' => array(
+      0 => 'field_person_safe_church',
+      1 => 'field_safe_church_training_date',
+      2 => 'field_person_safe_meet_sam',
+      3 => 'field_person_safe_it_happened',
+      4 => 'field_person_safe_keeping_church',
+      5 => 'field_person_safe_policies',
+      6 => 'field_person_safe_risk',
+      7 => 'field_person_safe_refresher',
+    ),
+    'format_type' => 'fieldset',
+    'format_settings' => array(
+      'formatter' => 'collapsible',
+      'instance_settings' => array(
+        'description' => '',
+        'classes' => 'group-person-safe-training field-group-fieldset',
+      ),
+    ),
+  );
+  $export['group_person_safe_training|node|person|default'] = $field_group;
+
+  $field_group = new stdClass();
+  $field_group->disabled = FALSE; /* Edit this to true to make a default field_group disabled initially */
+  $field_group->api_version = 1;
+  $field_group->identifier = 'group_person_safe_training|node|person|form';
+  $field_group->group_name = 'group_person_safe_training';
+  $field_group->entity_type = 'node';
+  $field_group->bundle = 'person';
+  $field_group->mode = 'form';
+  $field_group->parent_name = 'group_person_training';
+  $field_group->data = array(
+    'label' => 'Safe Church Training',
+    'weight' => '70',
+    'children' => array(
+      0 => 'field_person_safe_church',
+      1 => 'field_safe_church_training_date',
+      2 => 'field_person_safe_meet_sam',
+      3 => 'field_person_safe_it_happened',
+      4 => 'field_person_safe_keeping_church',
+      5 => 'field_person_safe_policies',
+      6 => 'field_person_safe_risk',
+      7 => 'field_person_safe_refresher',
+    ),
+    'format_type' => 'fieldset',
+    'format_settings' => array(
+      'formatter' => 'collapsible',
+      'instance_settings' => array(
+        'description' => '',
+        'classes' => 'group-person-safe-training field-group-fieldset',
+        'required_fields' => 1,
+      ),
+    ),
+  );
+  $export['group_person_safe_training|node|person|form'] = $field_group;
+
+  $field_group = new stdClass();
+  $field_group->disabled = FALSE; /* Edit this to true to make a default field_group disabled initially */
+  $field_group->api_version = 1;
   $field_group->identifier = 'group_person_subscriptions|node|person|default';
   $field_group->group_name = 'group_person_subscriptions';
   $field_group->entity_type = 'node';
@@ -631,8 +698,7 @@ function person_field_group_info() {
     'label' => 'Training',
     'weight' => '14',
     'children' => array(
-      0 => 'field_person_safe_church',
-      1 => 'field_safe_church_training_date',
+      0 => 'group_person_safe_training',
     ),
     'format_type' => 'tab',
     'format_settings' => array(
@@ -658,8 +724,7 @@ function person_field_group_info() {
     'label' => 'Training',
     'weight' => '8',
     'children' => array(
-      0 => 'field_person_safe_church',
-      1 => 'field_safe_church_training_date',
+      0 => 'group_person_safe_training',
     ),
     'format_type' => 'tab',
     'format_settings' => array(
