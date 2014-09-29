@@ -237,7 +237,7 @@ function safe_training_cron() {
     }
     ini_set("max_execution_time","180");
     $count = 0;
-    while ($count < 200) {
+    while ($count < 100) {
       $row = array_shift($csv);
       $data = str_getcsv($row);
       if (isset($data[$key['date']]) && !empty($data[$key['date']]) && $data[$key['first_name']] && isset($data[$key['last_name']])) {
