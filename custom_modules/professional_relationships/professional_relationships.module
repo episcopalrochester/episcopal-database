@@ -41,7 +41,10 @@ function find_pro_relationships($types = FALSE, $person,$inactive = FALSE) {
     }
     $query->condition($or);
   }
-   $query->condition(db_or()->condition('f.field_pf_first_nid',$person->nid)->condition('s.field_pf_second_nid',$person->nid))
+  $query->condition(
+    db_or()
+    ->condition('f.field_pf_first_nid',$person->nid)
+    ->condition('s.field_pf_second_nid',$person->nid))
     ->condition('n.status', 1);
   if (!$inactive) {
     $inactive_or = db_or();
