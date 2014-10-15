@@ -1105,6 +1105,13 @@ function person_is_alive($person) {
   return true; 
 }
 
+function person_is_survivor($person) {
+    if (field_get_items('node',$person,'field_person_surviving_spouse')) {
+          return true;
+            }
+      return false;
+}
+
 function person_is_warden($person) {
   if (!person_is_alive($person)) {
     return false;
@@ -1115,6 +1122,7 @@ function person_is_warden($person) {
       return true;
     }
   }
+  return false;
 }
 
 function person_is_dean($person) {
