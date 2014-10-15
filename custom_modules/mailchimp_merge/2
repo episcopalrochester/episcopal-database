@@ -1,0 +1,103 @@
+<?php
+/**
+ * Implementation of hook_menu
+ */
+
+function mailchimp_merge_menu() {
+  /*
+  $menu['my-data'] = array(
+    'title' => "My Data",
+    'description' => "Page showing user's data",
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('mailchimp_merge_mydata_page_form'),
+    'access arguments' => array ('access content'),
+    'type' => MENU_NORMAL_ITEM,
+  );
+  return $menu;
+   */
+}
+
+function mailchimp_merge_subscribe() {
+  $subscribe_merge = variable_get("mm_subscribe_merge",false);
+  $cache = array();
+  if (!$subscribe_merge) {
+    $people = person_fetch_people();
+    foreach ($people['nodes'] as $person) {
+      $id = '9bae7a5861';
+      $email = person_get_email($person,"pref");
+      $email = $email['addy'];
+      if ($email) {
+
+        $internal = array();
+        if (person_is_clergy($person)) {
+          $internal[] = "All Clergy";
+        }
+        if (person_is_warden($person)) {
+          $internal[] = "Wardens";
+        }
+        if (person_is_admin($person)) {
+          $internal[] = "Parish Administrators";
+        }
+        if (person_is_survivor($person)) {
+          $internal[] = "Surviving Spouses";
+        }
+        $merge_vars = array(
+          'GROUPINGS' => array(
+            array(
+              'id' => "8725",
+              'groups' => array_values($external),
+            ),
+            array(
+              'id' => '8737',
+              'groups' => array_values($internal),
+            ),
+          ),
+        );
+        $cache[] = array(
+          'email' => $email,
+          'merge_vars' => $merge_vars,
+          );
+
+      }
+    }
+    variable_set("mm_subscribe_merge",$cache);
+
+  }
+
+}
+
+function mailchimp_merge_run_batch() {
+  $cache = variable_get("mm_subscribe_merge",false);
+  if ($cache) {
+    $n = 0;
+    while ($n < 100) {
+      $row = array_shift($cache);
+      $memberinfo = mailchimp_get_memberinfo('9bae7a5861', $row['email']);
+      $external = array();
+      if (isset($memberinfo['merges']['GROUPINGS'])) {
+        foreach ($memberinfo['merges']['GROUPINGS'] as $grouping) {
+          if ($grouping['id'] == "8725") {
+            foreach ($grouping['groups'] as $group) {
+              if ($group['interested'] == true) {
+                $external[] = $group["name"];
+              }
+            }
+          }
+        }
+      }
+      mailchimp_subscribe(
+        '9bae7a5861',
+        $row['email'],
+        $row['merge_vars'],
+        FALSE,
+        FALSE,
+        'html',
+        TRUE,
+        TRUE
+      );
+      drupal_set_message("Subscribed ".$row['email']);
+      $n++;
+    }
+    variable_set("mm_subscribe_merge",$cache);
+  }
+}
