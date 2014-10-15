@@ -67,7 +67,7 @@ function safe_training_admin_form($form,&$form_state) {
   );
   $form['people'] = array(
     '#theme' => 'table',
-    '#header' => array('Title','Required','Date'),
+    '#header' => array('Title','Required','Employed','Supply','Date'),
     '#rows'=> array(),
     '#tree' => true,
   );
@@ -112,8 +112,12 @@ function safe_training_admin_form($form,&$form_state) {
     }
     $style ="";
     $expiration = date('Y')-5 ."-".date("m-d\T00:00:00");
+    $warning = date('Y')-4 ."-".date("m-d\T00:00:00");
     if (!count($modules)) {
       $modules = array(0);
+    }
+    if ($required == "1" && (min($modules) < $warning && $refresher < $warning)) {
+      $style = "background: #ffff77; ";
     }
     if ($required == "1" && (min($modules) < $expiration && $refresher < $expiration)) {
       if ($refresher == 0 && $modules == array(0)) {
@@ -154,6 +158,29 @@ function safe_training_admin_form($form,&$form_state) {
     if ($required) {
       $req_field['#attributes']['checked'] = TRUE;
     }
+    $employed = array(
+      '#name' => 'required-'.$person->nid,
+      '#type' => 'checkbox',
+      '#attributes' => array('disabled'=>true),
+    );
+    if (find_pro_relationships(FALSE,$person)) {
+      $employed['#attributes']['checked'] = TRUE;
+    }
+    $he = false; $mp = false;
+    if (isset($person->field_person_supply_he['und'][0]['value'])) {
+      $he = $person->field_person_supply_he['und'][0]['value'];
+    }
+    if (isset($person->field_person_supply_mp['und'][0]['value'])) {
+      $mp = $person->field_person_supply_mp['und'][0]['value']; 
+    }
+    $supply = array(
+      '#name' => 'required-'.$person->nid,
+      '#type' => 'checkbox',
+      '#attributes' => array('disabled'=>true),
+    );
+    if ($mp || $he) {
+      $supply['#attributes']['checked'] = TRUE;
+    }
     $date_field = array(
       '#name' => 'safedate-'.$person->nid,
       '#type'=> 'item',
@@ -163,10 +190,14 @@ function safe_training_admin_form($form,&$form_state) {
     $row = array(
       'Title' => $name,
       array('data'=>&$req_field),
+      array('data'=>&$employed),
+      array('data'=>&$supply),
       array('data'=>&$date_field),
     );
     $form['people']['#rows'][] = array('data'=>$row,'style'=>$style);
     unset($req_field);
+    unset($employed);
+    unset($supply);
     unset($date_field);
     unset($email);
   }

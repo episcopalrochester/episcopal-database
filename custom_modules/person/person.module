@@ -333,7 +333,7 @@ function person_lists_submit_form($form,&$form_state) {
       if (in_array('Clergy Birthdays This Month',$form['who']['#value']) ||
         in_array('Clergy Birthdays Next Month',$form['who']['#value'])) {
           $dob = new DateTime(_get_value($person,"field_person_dob"));
-          print ",".date_format($dob,'m/d/Y');
+          print ",".date_format($dob,'F j');
         }
       if (in_array('Clergy Ordination Anniversaries This Month',$form['who']['#value']) ||
         in_array('Clergy Ordination Anniversaries Next Month',$form['who']['#value'])) {
@@ -341,14 +341,14 @@ function person_lists_submit_form($form,&$form_state) {
           $diaconate = _get_value($person,"field_person_diaconate");
           if ($diaconate && !$priesthood) {
             $diaconate = new DateTime(_get_value($person,"field_person_diaconate"));
-            print ",".date_format($diaconate,'m/d/Y');
+            print ",".date_format($diaconate,'F j');
           }
           else { 
             print ",";
           }
           if ($priesthood) {
             $priesthood = new DateTime(_get_value($person,"field_person_priesthood"));
-            print ",".date_format($priesthood,'m/d/Y');
+            print ",".date_format($priesthood,'F j');
           }
           else { 
             print ","; 
