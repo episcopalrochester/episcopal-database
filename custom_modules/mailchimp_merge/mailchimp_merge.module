@@ -23,12 +23,24 @@ function mailchimp_merge_form($form,&$form_state) {
       '#title' => 'Merge in Progress',
       '#type' => 'item',
       '#markup' => 'Mailchimp merge in progress. '.count($cache)." more record(s) to merge.",
-      );
+    );
     $form['reset'] = array(
       '#type' => 'submit',
       '#value' => 'Reset and begin new merge',
       '#submit' => array('mailchimp_merge_reset'),
-      );
+    );
+  }
+  else {
+    $form['progress'] = array(
+      '#title' => 'Merge not in progress',
+      '#type' => 'item',
+      '#markup' => 'Mailchimp merge not started.',
+    );
+    $form['reset'] = array(
+      '#type' => 'submit',
+      '#value' => 'Begin new merge',
+      '#submit' => array('mailchimp_merge_reset'),
+    );
   }
   return $form;
 }
@@ -55,6 +67,9 @@ function mailchimp_merge_prepare_batch() {
         }
         if (person_is_warden($person)) {
           $internal[] = "Wardens";
+        }
+        if (person_is_staff($person)) {
+          $internal[] = "Bishop's Staff";
         }
         if (person_is_admin($person)) {
           $internal[] = "Parish Administrators";

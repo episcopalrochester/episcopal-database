@@ -1106,10 +1106,10 @@ function person_is_alive($person) {
 }
 
 function person_is_survivor($person) {
-    if (field_get_items('node',$person,'field_person_surviving_spouse')) {
-          return true;
-            }
-      return false;
+  if (_get_value($person,'field_person_clergy_spouse')) {
+    return true;
+  }
+  return false;
 }
 
 function person_is_warden($person) {
@@ -1120,6 +1120,21 @@ function person_is_warden($person) {
   foreach ($rels as $rel) {
     if (isset($rel['node'])) {
       return true;
+    }
+  }
+  return false;
+}
+
+function person_is_staff($person) {
+  if (!person_is_alive($person)) {
+    return false;
+  }
+  $rels = find_pro_relationships(false,$person);
+  foreach ($rels as $rel) {
+    if (isset($rel['node']->field_org_nr['und'][0]['value'])) {
+      if ($rel['node']->field_org_nr['und'][0]['value'] == "Episcopal Diocese of Rochester") {
+        return true;
+      }
     }
   }
   return false;
