@@ -154,6 +154,7 @@ function prayer_requests_types() {
     'thanksgiving'=>'Thanksgivings',
     'peace'=>'Prayers for peace in the world',
     'parish'=>'Parishes in transition',
+    'died' => 'For those who have died',
   );
 }
 
