@@ -77,6 +77,10 @@ function mailchimp_merge_prepare_batch() {
         if (person_is_survivor($person)) {
           $internal[] = "Surviving Spouses";
         }
+        if (isset($cache[$email])) {
+          $internal = array_merge($internal,$cache[$email]['merge_vars']['GROUPINGS'][0]['groups']);
+
+        }
         $merge_vars = array(
           'GROUPINGS' => array(
             array(
@@ -85,11 +89,10 @@ function mailchimp_merge_prepare_batch() {
             ),
           ),
         );
-        $cache[] = array(
+        $cache[$email] = array(
           'email' => $email,
           'merge_vars' => $merge_vars,
-          );
-
+        );
       }
     }
     variable_set("mm_subscribe_merge",$cache);
