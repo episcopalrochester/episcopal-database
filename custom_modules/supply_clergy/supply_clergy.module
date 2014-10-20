@@ -502,16 +502,19 @@ function supply_clergy_date_form($form,&$form_state,$year,$month,$day) {
   return $form;
 }
 
-function supply_clergy_find($type = "he") {
+function supply_clergy_find($type = "he", $person = false) {
   $query = new EntityFieldQuery();
-  $result = $query
+  $query
     ->entityCondition('entity_type','node')
     ->entityCondition('bundle','person')
     ->propertyCondition('status',1)
     ->fieldCondition('field_person_supply_'.$type,'value',1)
     ->fieldOrderBy('field_person_last_name','value','ASC')
-    ->fieldOrderBy('field_person_first_name','value','ASC')
-    ->execute();
+    ->fieldOrderBy('field_person_first_name','value','ASC');
+  if ($person) {
+    $query->entityCondition('entity_id',$person->nid);
+  }
+  $result = $query->execute();
   if (isset($result['node'])) {
     $nodes = array();
     foreach (array_keys($result['node']) as $nid) {

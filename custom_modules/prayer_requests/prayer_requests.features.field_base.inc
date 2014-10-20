@@ -120,6 +120,7 @@ function prayer_requests_field_default_field_bases() {
         'travel' => 'Travelers',
         'peace' => 'Prayers for peace',
         'parish' => 'Parish in transition',
+        'died' => 'For those who have died',
       ),
       'allowed_values_function' => '',
     ),

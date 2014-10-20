@@ -12,5 +12,10 @@ fieldset.form-wrapper .fieldset-wrapper {
 }
 
 .page-user-password div.tabs {
-    display: none !important;
-  } 
+  display: none !important;
+} 
+
+.page-staff-safe-training table * {
+  font-weight: bold;
+    color: black !important;
+}
