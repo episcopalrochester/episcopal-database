@@ -23,22 +23,24 @@ function data_importer_permission() {
 }
 
 function data_importer_import_form($form,&$form_state) {
-  $form['markup'] = array(
-    '#type' => 'markup',
-    '#markup' => 'Include a header with title, type, and field names.',
-    '#prefix' => '<p><strong>',
-    '#suffix' => '</strong></p>',
-  );
-  $form['csv'] = array(
-    '#type' => 'file',
-    '#title' => "Upload a CSV",
-    '#tree' => TRUE,
-  );
-  $last = variable_get("data_importer_last",false);
-  if ($last) {
-    $form['last'] = array(
+  $cache = variable_get("data_importer_cache",false);
+  if ($cache) {
+    $form['remaining'] = array(
       '#type' => 'item',
-      '#markup' => 'Last file uploaded: '.$last,
+      '#markup' => 'Lines to process: '.count($cache['csv']),
+    );
+  }
+  else {
+    $form['markup'] = array(
+      '#type' => 'markup',
+      '#markup' => 'Include a header with title, type, and field names.',
+      '#prefix' => '<p><strong>',
+      '#suffix' => '</strong></p>',
+    );
+    $form['csv'] = array(
+      '#type' => 'file',
+      '#title' => "Upload a CSV",
+      '#tree' => TRUE,
     );
   }
   $form['process'] = array(
@@ -62,17 +64,31 @@ function data_importer_import_form($form,&$form_state) {
     ),
     '#default_value' => 'excel',
   );
-  $form['submit'] = array(
-    '#type' => 'submit',
-    '#value' => 'Process CSV',
-    '#submit' =>  array('data_importer_import_form_submit')
-  );
-  $form['expunge'] = array(
-    '#type' => 'submit',
-    '#prefix' => '&nbsp;&nbsp;',
-    '#value' => 'Expunge previously uploaded files',
-    '#submit' =>  array('data_importer_expunge')
-  );
+  if ($cache) {
+    $form['batch'] = array(
+      '#type' => 'submit',
+      '#value' => 'Process next 50 lines',
+      '#submit' => array('data_importer_batch_run'),
+      );
+    $form['expunge'] = array(
+      '#type' => 'submit',
+      '#prefix' => '&nbsp;&nbsp;',
+      '#value' => 'Cancel Processing',
+      '#submit' =>  array('data_importer_expunge')
+    );
+    $form['source']['#default_value'] = $cache['source'];
+    $form['source']['#disabled'] = true;
+    $form['process']['#default_value'] = $cache['process'];
+    $form['process']['#disabled'] = true;
+  }
+  else {
+    $form['submit'] = array(
+      '#type' => 'submit',
+      '#value' => 'Process CSV',
+      '#submit' =>  array('data_importer_import_form_submit')
+    );
+  }
+
   return $form;
 }
 
@@ -81,15 +97,12 @@ function data_importer_expunge() {
     file_unmanaged_delete_recursive("public://data_importer");
     drupal_mkdir("public://data_importer");
   }
-  variable_del("data_importer_last");
-  drupal_set_message("Previous uploads expunged.");
+  variable_del("data_importer_cache");
+  drupal_set_message("Previous upload expunged.");
 }
 
 function data_importer_import_form_submit($form, &$form_state) {
-  if (module_exists("rules")) {
-    module_disable(array("rules","rules_admin"));
-    drupal_set_message("Suspending the rules.");
-  }
+
   $process = $form_state['input']['process'];
   $source =  $form_state['input']['source'];
   if (!file_exists(drupal_realpath("public://data_importer"))) {
@@ -104,27 +117,10 @@ function data_importer_import_form_submit($form, &$form_state) {
     FILE_EXISTS_REPLACE
   );
   if (!$file) {
-    $last = variable_get("data_importer_last",false);
-    if ($last) {
-      if (file_exists($last)) {
-        $path = $last;
-        drupal_set_message("Using last file uploaded.");
-      }
-      else {
-        variable_del("data_importer_last");
-        drupal_set_message("Couldn't access last file uploaded and no file present in this attempt.","error");
-        return;
-      }
-    }
-    else {
-      drupal_set_message("File could not be parsed.","error");
-      return;
-    }
+    drupal_set_message("File could not be parsed.","error");
+    return;
   }
-  else {
-    $path = drupal_realpath($file->destination);
-  }
-  variable_set("data_importer_last",$path);
+  $path = drupal_realpath($file->destination);
   $csv = explode("\n",str_replace("\r","\n",file_get_contents($path))); 
   $header = str_getcsv($csv[0]);
   if (!in_array("type",$header)) {
@@ -132,215 +128,248 @@ function data_importer_import_form_submit($form, &$form_state) {
     return;
   }
   unset($csv[0]);
-  $array = array();
-  foreach ($csv as $row) {
-    $sub = array();
-    $data = str_getcsv($row);
-    foreach ($data as $key => $value) {
-      $sub[$header[$key]] = $value;
+  variable_set("data_importer_cache",array(
+    'csv'=>$csv,
+    'header'=>$header,
+    'source' => $source,
+    'process' => $process,
+  ));
+}
+
+function data_importer_batch_run() {
+  $cache = variable_get("data_importer_cache",FALSE);
+  if ($cache) {
+    if (module_exists("rules")) {
+      module_disable(array("rules","rules_admin"));
+      drupal_set_message("Suspending the rules.");
     }
-    $array[] = $sub;
-  }
-  foreach ($array as $item) {
-    if ($item['type'] == "supply") {
-     $person = data_importer_fetch_asc("person_".$item['PersonID']);
-     $parish = data_importer_fetch_asc("parish_".$item['ParishID']);
-     $date = new DateTime($item['date']); 
-     if (!supply_clergy_is_booked($person->nid,$date) && isset($person->nid) && isset($parish->nid) && $date) {
-       $record = array(
-         'cid' => $person->nid,
-         'pid' => $parish->nid,
-         'date' => date_format($date,'c'),
-         'uid' => 1,
-       );
-       drupal_write_record("supply_clergy",$record);
-       drupal_set_message("Booked ".node_load($person->nid)->title." at ".node_load($parish->nid)->title." on ".date_format($date,'Y-m-d'));
-     }
-     $access_id = "false";
+    extract($cache);
+    $count = 0;
+    $array = array();
+    while ($count < 50) {
+      $row = array_shift($csv);
+      $sub = array();
+      $data = str_getcsv($row);
+      foreach ($data as $key => $value) {
+        $sub[$header[$key]] = $value;
+      }
+      $array[] = $sub;
+      $count++;
     }
-    $node = false;
-    // Try to find an existing nid via access_ids table
-    if ($source == "access") {
-      if ($item['type'] == "person") {
-        $access_id = data_importer_fetch_asc("person_".$item['PersonID']);
-      }
-      elseif ($item['type'] == "parish") {
-        $access_id = data_importer_fetch_asc("parish_".$item['ParishID']);
-      }
-      elseif ($item['type'] == "professional_relationship") {
-        $access_id = data_importer_fetch_asc("pf_".$item['pf_id']);
-      }
-      $node = (isset($access_id->nid) ? node_load($access_id->nid) : false);
+    if (!count($csv)) {
+      data_importer_expunge();
     }
-    // If no node is found via imported data, try to find one with matching data
-    if (!$node) {
-      if ($item['type'] == "person") {
-        $node = person_find_person(
-          $item['field_person_first_name']." ".
-          $item['field_person_middle_name']." ".
-          $item['field_person_last_name'],
-          $item['field_person_email_pref']);
-      }
-      elseif ($item['type'] == "parish" && isset($item['field_parish_home_city']) && isset($item['title'])) {
-        $query = db_select('node','n')
-          ->fields('n',array('nid'));
-        if ($item['type'] == "parish") {
-          $query->condition('n.title',$item['field_parish_home_city'].', '.$item['title']);
-        }
-        $result = $query->execute();
-        while ($record = $result->fetchAssoc()) {
-          $node = node_load($record['nid']);
-        }
-      }
-    }
-    if ($node && $process <> "make") {
-      foreach ($item as $key => $cell) {
-        $key = strtolower(preg_replace("/[^A-Za-z0-9_]/", '', $key));
-        if ($key <> "title" && $key <> "type" && $key <> "status") {
-          eval("\$key_exists = isset(\$node->".$key.");");
-          if ($key_exists) {
-            if ($cell == "FALSE") {
-              $cell = 0;
-            }
-            elseif ($cell == "TRUE") {
-              $cell = 1;
-            }
-            if ($cell === 0) {
-              eval("\$node->".$key." = 'und';");
-            }
-            else {
-              eval("\$node->".$key." = array('und'=>array(0=>array('value'=>\"".$cell."\")));");
-            }
-          }
-        }
-      }
-      if (!isset($node->title) && $item['type'] == "person") {
-        $node->title = $item['field_person_first_name']." ".
-          $item['field_person_middle_name']." ".
-          $item['field_person_last_name'];
-      }
-      if ($process == "dry") {
-        if (isset($node->nid)) {
-          drupal_set_message("DRY RUN - Updated node ".$node->title." (".$node->nid.").");
-        }
-        else {
-          drupal_set_message("DRY RUN - Created ".$node->title);
-        }
-      }
-      elseif ($process == "update") {
-        if ($item['type'] == "person") {
-          $node->title = person_get_full_name($node);
-        }
-        node_save($node);
-        drupal_set_message("Updated node ".$node->title." (".$node->nid.").");
-      }
-    }
-    // No node found
     else {
-      if ($process == "dry" || $process == "update") {
-        if ($item['type'] == "person") {
-          drupal_set_message("No node found for ".
-            $item['field_person_first_name']." ".
-            $item['field_person_middle_name']." ".
-            $item['field_person_last_name'],
-            "error"
-          );
-        }
-        elseif ($item['type'] == "parish") {
-          drupal_set_message("No node found for ".
-            $item['ParishID'],
-            "error"
-          );
-        }
-        elseif ($item['type'] == "professional_relationship") {
-          drupal_set_message("Could not find matching relationship",'error');
-        }
-      }
-      elseif ($process == "make" && !$node) {
-        $node = new StdClass();
-        $node->bundle = $item['type'];
-        $node->type = $item['type'];
-        $node->language = 'und';
-        node_object_prepare($node);
-        foreach ($item as $key => $cell) {
-          $key = strtolower(preg_replace("/[^A-Za-z0-9_]/", '', $key));
-          if (field_info_instance("node",$key,$item['type'])) {
-            eval("\$node->".$key."['und'][0]['value'] = \"".$cell."\";");
+      variable_set("data_importer_cache",array(
+        'csv' => $csv,
+        'header' => $header,
+        'process' => $process,
+        'source' => $source
+        ));
+    }
+    foreach ($array as $item) {
+      if (isset($item['type'])) {
+        if ($item['type'] == "supply") {
+          $person = data_importer_fetch_asc("person_".$item['PersonID']);
+          $parish = data_importer_fetch_asc("parish_".$item['ParishID']);
+          $date = new DateTime($item['date']); 
+          if (!supply_clergy_is_booked($person->nid,$date) && isset($person->nid) && isset($parish->nid) && $date) {
+            $record = array(
+              'cid' => $person->nid,
+              'pid' => $parish->nid,
+              'date' => date_format($date,'c'),
+              'uid' => 1,
+            );
+            drupal_write_record("supply_clergy",$record);
+            drupal_set_message("Booked ".node_load($person->nid)->title." at ".node_load($parish->nid)->title." on ".date_format($date,'Y-m-d'));
           }
+          $access_id = "false";
         }
-        if ($item['type'] == "person") {
-          $node->title = person_get_full_name($node);
-          node_save($node);
-          drupal_set_message("Created node ". $node->title ." (".$node->nid.")");
-        }
-        if ($item['type'] == "professional_relationship") {
-          if (isset($item['PersonID'])) {
-            $person = data_importer_fetch_asc("person_".$item['PersonID']);
-            if (isset($person->nid)) {
-              $node->field_pf_first['und'][0]['nid'] = $person->nid;
-            }
+        $node = false;
+        // Try to find an existing nid via access_ids table
+        if ($source == "access") {
+          if ($item['type'] == "person") {
+            $access_id = data_importer_fetch_asc("person_".$item['PersonID']);
           }
-          else {
-            $person = person_find_person(
+          elseif ($item['type'] == "parish") {
+            $access_id = data_importer_fetch_asc("parish_".$item['ParishID']);
+          }
+          elseif ($item['type'] == "professional_relationship") {
+            $access_id = data_importer_fetch_asc("pf_".$item['pf_id']);
+          }
+          $node = (isset($access_id->nid) ? node_load($access_id->nid) : false);
+        }
+        // If no node is found via imported data, try to find one with matching data
+        if (!$node) {
+          if ($item['type'] == "person") {
+            $node = person_find_person(
               $item['field_person_first_name']." ".
               $item['field_person_middle_name']." ".
               $item['field_person_last_name'],
               $item['field_person_email_pref']);
-            if (isset($person->nid)) {
-              $node->field_pf_first['und'][0]['nid'] = $person->nid;
-            }
-            else {
-              drupal_set_message("No person found for ".$item['field_person_email_pref']);
-            }
           }
-          if (isset($item['ParishID'])) {
-            $parish = data_importer_fetch_asc("parish_".$item['ParishID']);
-            if (isset($parish->nid)) {
-              $node->field_pf_second['und'][0]['nid'] = $parish->nid;
-            }
-          }
-          else {
+          elseif ($item['type'] == "parish" && isset($item['field_parish_home_city']) && isset($item['title'])) {
             $query = db_select('node','n')
-              ->fields('n',array('nid'))
-              ->condition('n.title',$item['parish name']);
+              ->fields('n',array('nid'));
+            if ($item['type'] == "parish") {
+              $query->condition('n.title',$item['field_parish_home_city'].', '.$item['title']);
+            }
             $result = $query->execute();
-            $parish = FALSE;
             while ($record = $result->fetchAssoc()) {
-              $parish = node_load($record['nid']);
-            }
-            if (isset($parish->nid)) {
-              $node->field_pf_second['und'][0]['nid'] = $parish->nid;
-            }
-            else {
-              drupal_set_message("No parish found for ".$item['parish name']);
+              $node = node_load($record['nid']);
             }
           }
         }
-        if (isset($node->field_pf_first) && isset($node->field_pf_second)) {
-          node_save($node);
-          drupal_set_message("Created relationship between ".node_load($person->nid)->title." and ".node_load($parish->nid)->title);
+        if ($node && $process <> "make") {
+          foreach ($item as $key => $cell) {
+            $key = strtolower(preg_replace("/[^A-Za-z0-9_]/", '', $key));
+            if ($key <> "title" && $key <> "type" && $key <> "status") {
+              eval("\$key_exists = isset(\$node->".$key.");");
+              if ($key_exists) {
+                if ($cell == "FALSE") {
+                  $cell = 0;
+                }
+                elseif ($cell == "TRUE") {
+                  $cell = 1;
+                }
+                if ($cell === 0) {
+                  eval("\$node->".$key." = 'und';");
+                }
+                else {
+                  eval("\$node->".$key." = array('und'=>array(0=>array('value'=>\"".$cell."\")));");
+                }
+              }
+            }
+          }
+          if (!isset($node->title) && $item['type'] == "person") {
+            $node->title = $item['field_person_first_name']." ".
+              $item['field_person_middle_name']." ".
+              $item['field_person_last_name'];
+          }
+          if ($process == "dry") {
+            if (isset($node->nid)) {
+              drupal_set_message("DRY RUN - Updated node ".$node->title." (".$node->nid.").");
+            }
+            else {
+              drupal_set_message("DRY RUN - Created ".$node->title);
+            }
+          }
+          elseif ($process == "update") {
+            if ($item['type'] == "person") {
+              $node->title = person_get_full_name($node);
+            }
+            node_save($node);
+            drupal_set_message("Updated node ".$node->title." (".$node->nid.").");
+          }
+        }
+        // No node found
+        else {
+          if ($process == "dry" || $process == "update") {
+            if ($item['type'] == "person") {
+              drupal_set_message("No node found for ".
+                $item['field_person_first_name']." ".
+                $item['field_person_middle_name']." ".
+                $item['field_person_last_name'],
+                "error"
+              );
+            }
+            elseif ($item['type'] == "parish") {
+              drupal_set_message("No node found for ".
+                $item['ParishID'],
+                "error"
+              );
+            }
+            elseif ($item['type'] == "professional_relationship") {
+              drupal_set_message("Could not find matching relationship",'error');
+            }
+          }
+          elseif ($process == "make" && !$node) {
+            $node = new StdClass();
+            $node->bundle = $item['type'];
+            $node->type = $item['type'];
+            $node->language = 'und';
+            node_object_prepare($node);
+            foreach ($item as $key => $cell) {
+              $key = strtolower(preg_replace("/[^A-Za-z0-9_]/", '', $key));
+              if (field_info_instance("node",$key,$item['type'])) {
+                eval("\$node->".$key."['und'][0]['value'] = \"".$cell."\";");
+              }
+            }
+            if ($item['type'] == "person") {
+              $node->title = person_get_full_name($node);
+              node_save($node);
+              drupal_set_message("Created node ". $node->title ." (".$node->nid.")");
+            }
+            if ($item['type'] == "professional_relationship") {
+              if (isset($item['PersonID'])) {
+                $person = data_importer_fetch_asc("person_".$item['PersonID']);
+                if (isset($person->nid)) {
+                  $node->field_pf_first['und'][0]['nid'] = $person->nid;
+                }
+              }
+              else {
+                $person = person_find_person(
+                  $item['field_person_first_name']." ".
+                  $item['field_person_middle_name']." ".
+                  $item['field_person_last_name'],
+                  $item['field_person_email_pref']);
+                if (isset($person->nid)) {
+                  $node->field_pf_first['und'][0]['nid'] = $person->nid;
+                }
+                else {
+                  drupal_set_message("No person found for ".$item['field_person_email_pref']);
+                }
+              }
+              if (isset($item['ParishID'])) {
+                $parish = data_importer_fetch_asc("parish_".$item['ParishID']);
+                if (isset($parish->nid)) {
+                  $node->field_pf_second['und'][0]['nid'] = $parish->nid;
+                }
+              }
+              else {
+                $query = db_select('node','n')
+                  ->fields('n',array('nid'))
+                  ->condition('n.title',$item['parish name']);
+                $result = $query->execute();
+                $parish = FALSE;
+                while ($record = $result->fetchAssoc()) {
+                  $parish = node_load($record['nid']);
+                }
+                if (isset($parish->nid)) {
+                  $node->field_pf_second['und'][0]['nid'] = $parish->nid;
+                }
+                else {
+                  drupal_set_message("No parish found for ".$item['parish name']);
+                }
+              }
+            }
+            if (isset($node->field_pf_first) && isset($node->field_pf_second)) {
+              node_save($node);
+              drupal_set_message("Created relationship between ".node_load($person->nid)->title." and ".node_load($parish->nid)->title);
+            }
+          }
+        }
+        // Associate with an Access ID, if a node exists
+        if (isset($node->nid) && ($process == "accessid" || $process == "make")) {
+          if ($item['type'] == "person" && isset($item['PersonID'])) {
+            data_importer_write_asc("person_".$item['PersonID'],$node->nid);
+          }
+          elseif ($item['type'] == "parish" && isset($item['ParishID']))  {
+            data_importer_write_asc("parish_".$item['ParishID'],$node->nid);
+          }
+          elseif ($item['type'] == "professional_relationship" && isset($item['pf_id']))  {
+            data_importer_write_asc("pf_".$item['pf_id'],$node->nid);
+          }
         }
       }
     }
-    // Associate with an Access ID, if a node exists
-    if (isset($node->nid) && ($process == "accessid" || $process == "make")) {
-      if ($item['type'] == "person" && isset($item['PersonID'])) {
-        data_importer_write_asc("person_".$item['PersonID'],$node->nid);
-      }
-      elseif ($item['type'] == "parish" && isset($item['ParishID']))  {
-        data_importer_write_asc("parish_".$item['ParishID'],$node->nid);
-      }
-      elseif ($item['type'] == "professional_relationship" && isset($item['pf_id']))  {
-        data_importer_write_asc("pf_".$item['pf_id'],$node->nid);
-      }
+    $form_state['rebuild'] = TRUE;  
+    if (!module_exists("rules")) {
+      module_enable(array("rules","rules_admin"));
+      drupal_set_message("Engaging the rules.");
     }
+    cache_clear_all();
   }
-  $form_state['rebuild'] = TRUE;  
-  if (!module_exists("rules")) {
-    module_enable(array("rules","rules_admin"));
-    drupal_set_message("Engaging the rules.");
-  }
-  cache_clear_all();
 }
 
 function data_importer_write_asc($id,$nid) {
