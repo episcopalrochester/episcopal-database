@@ -249,7 +249,7 @@ function person_lists_submit_form($form,&$form_state) {
       }
     if (in_array('Clergy Ordination Anniversaries This Month',$form['who']['#value']) ||
       in_array('Clergy Ordination Anniversaries Next Month',$form['who']['#value'])) {
-        print ',"Diaconate Ord.","Priesthood Ord."';
+        print ',"Diaconate Ord.","Priesthood Ord.","Anniversary"';
       }
     if (in_array('Wardens',$form['who']['#value']) ||
       in_array('Parish Administrators',$form['who']['#value']) ||
@@ -353,6 +353,7 @@ function person_lists_submit_form($form,&$form_state) {
           else { 
             print ","; 
           }
+          print ',""';
         }
       if (in_array('Wardens',$form['who']['#value']) ||
         in_array('Parish Administrators',$form['who']['#value']) ||
