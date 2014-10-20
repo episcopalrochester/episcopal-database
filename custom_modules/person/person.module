@@ -1490,10 +1490,9 @@ function person_form_person_node_form_alter(&$form, &$form_state, $form_id) {
         if ($uid) {
           $account = user_load($uid);
           $form['field_db_uid'] = array(
-            '#type' => 'textfield',
+            '#type' => 'item',
             '#title' => 'Database User ID:',
-            '#value' => $account->uid,
-            '#disabled' => true,
+            '#markup' => $account->uid . " (".l("edit","user/".$account->uid).")",
           );
           $form['field_db_roles'] = array(
             '#type' => 'checkboxes',
