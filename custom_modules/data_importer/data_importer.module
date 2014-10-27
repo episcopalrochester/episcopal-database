@@ -49,6 +49,7 @@ function data_importer_import_form($form,&$form_state) {
     '#options' => array(
       'dry' => 'Dry run only',
       'update'=>'Update existing Drupal nodes only, overwriting with data from this CSV.',
+      'update_no_ow'=>'Update existing Drupal nodes only, but do not overwrite existing content with data from this CSV.',
       'make'=>'Create nodes using CSV data, but do not update existing Drupal nodes.',
       'accessid' => 'Assign Access ID only',
       'supply' => 'Make supply clergy assignments',
@@ -102,7 +103,6 @@ function data_importer_expunge() {
 }
 
 function data_importer_import_form_submit($form, &$form_state) {
-
   $process = $form_state['input']['process'];
   $source =  $form_state['input']['source'];
   if (!file_exists(drupal_realpath("public://data_importer"))) {
@@ -236,7 +236,10 @@ function data_importer_batch_run() {
                   eval("\$node->".$key." = 'und';");
                 }
                 else {
-                  eval("\$node->".$key." = array('und'=>array(0=>array('value'=>\"".$cell."\")));");
+                  eval("\$val_exists = isset(\$node->".$key."['und'][0]['value']);");
+                  if (!$val_exists || $process <> "update_no_ow") {
+                    eval("\$node->".$key." = array('und'=>array(0=>array('value'=>\"".$cell."\")));");
+                  }
                 }
               }
             }
@@ -254,7 +257,7 @@ function data_importer_batch_run() {
               drupal_set_message("DRY RUN - Created ".$node->title);
             }
           }
-          elseif ($process == "update") {
+          elseif ($process == "update" || $process == "update_no_ow") {
             if ($item['type'] == "person") {
               $node->title = person_get_full_name($node);
             }
@@ -264,7 +267,7 @@ function data_importer_batch_run() {
         }
         // No node found
         else {
-          if ($process == "dry" || $process == "update") {
+          if ($process == "dry" || $process == "update" || $process == "update_no_w") {
             if ($item['type'] == "person") {
               drupal_set_message("No node found for ".
                 $item['field_person_first_name']." ".
