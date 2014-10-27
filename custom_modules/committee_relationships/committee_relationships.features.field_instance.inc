@@ -10,46 +10,6 @@
 function committee_relationships_field_default_field_instances() {
   $field_instances = array();
 
-  // Exported field_instance: 'node-committee_relationship-field_cmt_nr'
-  $field_instances['node-committee_relationship-field_cmt_nr'] = array(
-    'bundle' => 'committee_relationship',
-    'default_value' => NULL,
-    'deleted' => 0,
-    'description' => 'Name of organization if there is no record.',
-    'display' => array(
-      'default' => array(
-        'label' => 'above',
-        'module' => 'text',
-        'settings' => array(),
-        'type' => 'text_default',
-        'weight' => 7,
-      ),
-      'teaser' => array(
-        'label' => 'above',
-        'settings' => array(),
-        'type' => 'hidden',
-        'weight' => 0,
-      ),
-    ),
-    'entity_type' => 'node',
-    'field_name' => 'field_cmt_nr',
-    'label' => 'Organization (if no record)',
-    'required' => 0,
-    'settings' => array(
-      'text_processing' => 0,
-      'user_register_form' => FALSE,
-    ),
-    'widget' => array(
-      'active' => 1,
-      'module' => 'text',
-      'settings' => array(
-        'size' => 60,
-      ),
-      'type' => 'text_textfield',
-      'weight' => 5,
-    ),
-  );
-
   // Exported field_instance: 'node-committee_relationship-field_cmt_end'
   $field_instances['node-committee_relationship-field_cmt_end'] = array(
     'bundle' => 'committee_relationship',
@@ -99,7 +59,7 @@ function committee_relationships_field_default_field_instances() {
         'year_range' => '-3:+3',
       ),
       'type' => 'date_text',
-      'weight' => 7,
+      'weight' => 8,
     ),
   );
 
@@ -136,7 +96,7 @@ function committee_relationships_field_default_field_instances() {
       'module' => 'options',
       'settings' => array(),
       'type' => 'options_select',
-      'weight' => 8,
+      'weight' => 9,
     ),
   );
 
@@ -177,7 +137,7 @@ function committee_relationships_field_default_field_instances() {
         'size' => 60,
       ),
       'type' => 'node_reference_autocomplete',
-      'weight' => 3,
+      'weight' => 4,
     ),
   );
 
@@ -186,7 +146,7 @@ function committee_relationships_field_default_field_instances() {
     'bundle' => 'committee_relationship',
     'default_value' => NULL,
     'deleted' => 0,
-    'description' => 'Add a specific job title if one exists.',
+    'description' => 'E.G. District, At-Large, Unexpired Term, etc.',
     'display' => array(
       'default' => array(
         'label' => 'above',
@@ -204,7 +164,7 @@ function committee_relationships_field_default_field_instances() {
     ),
     'entity_type' => 'node',
     'field_name' => 'field_cmt_job',
-    'label' => 'Job Title',
+    'label' => 'Election Specifics',
     'required' => 0,
     'settings' => array(
       'text_processing' => 0,
@@ -217,6 +177,83 @@ function committee_relationships_field_default_field_instances() {
         'size' => 60,
       ),
       'type' => 'text_textfield',
+      'weight' => 3,
+    ),
+  );
+
+  // Exported field_instance: 'node-committee_relationship-field_cmt_nr'
+  $field_instances['node-committee_relationship-field_cmt_nr'] = array(
+    'bundle' => 'committee_relationship',
+    'default_value' => NULL,
+    'deleted' => 0,
+    'description' => 'Name of organization if there is no record.',
+    'display' => array(
+      'default' => array(
+        'label' => 'above',
+        'module' => 'text',
+        'settings' => array(),
+        'type' => 'text_default',
+        'weight' => 7,
+      ),
+      'teaser' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 0,
+      ),
+    ),
+    'entity_type' => 'node',
+    'field_name' => 'field_cmt_nr',
+    'label' => 'Organization (if no record)',
+    'required' => 0,
+    'settings' => array(
+      'text_processing' => 0,
+      'user_register_form' => FALSE,
+    ),
+    'widget' => array(
+      'active' => 1,
+      'module' => 'text',
+      'settings' => array(
+        'size' => 60,
+      ),
+      'type' => 'text_textfield',
+      'weight' => 6,
+    ),
+  );
+
+  // Exported field_instance: 'node-committee_relationship-field_cmt_roles'
+  $field_instances['node-committee_relationship-field_cmt_roles'] = array(
+    'bundle' => 'committee_relationship',
+    'default_value' => NULL,
+    'deleted' => 0,
+    'description' => '',
+    'display' => array(
+      'default' => array(
+        'label' => 'above',
+        'module' => 'list',
+        'settings' => array(),
+        'type' => 'list_default',
+        'weight' => 9,
+      ),
+      'teaser' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 0,
+      ),
+    ),
+    'entity_type' => 'node',
+    'field_name' => 'field_cmt_roles',
+    'label' => 'Committee Roles',
+    'required' => 0,
+    'settings' => array(
+      'user_register_form' => FALSE,
+    ),
+    'widget' => array(
+      'active' => 1,
+      'module' => 'options',
+      'settings' => array(),
+      'type' => 'options_select',
       'weight' => 2,
     ),
   );
@@ -258,7 +295,7 @@ function committee_relationships_field_default_field_instances() {
         'size' => 60,
       ),
       'type' => 'node_reference_autocomplete',
-      'weight' => 4,
+      'weight' => 5,
     ),
   );
 
@@ -311,7 +348,7 @@ function committee_relationships_field_default_field_instances() {
         'year_range' => '-3:+3',
       ),
       'type' => 'date_text',
-      'weight' => 6,
+      'weight' => 7,
     ),
   );
 
@@ -338,7 +375,7 @@ function committee_relationships_field_default_field_instances() {
     ),
     'entity_type' => 'node',
     'field_name' => 'field_cmt_type',
-    'label' => 'Relationship Type',
+    'label' => 'Membership Type',
     'required' => 1,
     'settings' => array(
       'user_register_form' => FALSE,
@@ -354,15 +391,16 @@ function committee_relationships_field_default_field_instances() {
 
   // Translatables
   // Included for use with string extractors like potx.
-  t('Add a specific job title if one exists.');
+  t('Committee Roles');
+  t('E.G. District, At-Large, Unexpired Term, etc.');
+  t('Election Specifics');
   t('End Date');
-  t('Job Title');
+  t('Membership Type');
   t('Name of organization if there is no record.');
   t('Organization');
   t('Organization (if no record)');
   t('Person');
   t('Reason for End');
-  t('Relationship Type');
   t('Start Date');
 
   return $field_instances;

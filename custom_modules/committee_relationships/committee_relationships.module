@@ -7,11 +7,15 @@
 include_once 'committee_relationships.features.inc';
 
 function committee_relationships_form_committee_relationship_node_form_alter(&$form,&$form_state,$form_id) {
-  $form['field_cmt_type']['und']['#options'] = array_filter(pro_relationship_types());
+  $form['field_cmt_type']['und']['#options'] = array_filter(cmt_relationship_types());
+  $form['field_cmt_roles']['und']['#options'] = cmt_relationship_roles();
   if (isset($form['field_cmt_type']['und']['#entity']->field_cmt_type['und'][0]['value'])) {
     $form['field_cmt_type']['und']['#default_value'] = $form['field_cmt_type']['und']['#entity']->field_cmt_type['und'][0]['value'];
   }
- $form['field_cmt_end_reason']['und']['#options'] = pro_relationship_splits();
+  if (isset($form['field_cmt_roles']['und']['#entity']->field_cmt_roles['und'][0]['value'])) {
+          $form['field_cmt_roles']['und']['#default_value'] = $form['field_cmt_roles']['und']['#entity']->field_cmt_roles['und'][0]['value'];
+            }
+ $form['field_cmt_end_reason']['und']['#options'] = cmt_relationship_splits();
   if (isset($form['field_cmt_end_reason']['und']['#entity']->field_cmt_end_reason['und'][0]['value'])) {
     $form['field_cmt_end_reason']['und']['#default_value'] = $form['field_cmt_end_reason']['und']['#entity']->field_cmt_end_reason['und'][0]['value'];
   }
@@ -101,31 +105,29 @@ function find_cmt_relationships($types = FALSE, $person,$inactive = FALSE) {
 function cmt_relationship_types() {
   return array(
     ''=>'',
-    'rector'=>'Rector',
-    'pic'=>'Priest-in-Charge',
-    'associate'=>'Associate Priest',
-    'assistant'=>'Assistant Priest',
-    'priest'=>'Priest',
-    'vicar'=>'Vicar',
-    'pastor'=>'Pastor',
-    'supply'=>'Covenanted Supply Priest',
-    'deacon'=>'Deacon',
-    'chaplain' => 'Chaplain',
-    'bishop' => 'Bishop',
-    'cmm' => 'Canon for Mission & Ministry',
-    'director' => 'Director',
-    'exec' => 'Executive Director',
-    'missioner' => 'Missioner',
-    'coordinator' => 'Coordinator',
+    'elected' => 'Elected Member',
+    'appointed' => 'Appointed Member',
+    'exofficio' => 'Ex-Officio Member',
+    'mailings' => 'Mailings Only',
+  );
+}
+
+function cmt_relationship_roles() {
+  return array(
+    ''=>'',
+    'president' => 'President',
+    'chair' => 'Chair',
+    'vicechair' => 'Vice Chair',
+    'cochair' => 'Co-Chair',
+    'secretary' => 'Secretary',
   );
 }
 
 function cmt_relationship_splits($key = FALSE) {
   $splits =  array(
     '' => '',
-    "retirement"=>"Retirement",
     "resignation"=>"Resignation",
-    "reassignment"=>"Reassignment",
+    "term_end"=>"Term Ended",
     "termination"=>"Termination",
     "other"=>"Other (see notes)",
   );
