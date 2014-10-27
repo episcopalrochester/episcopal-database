@@ -350,8 +350,62 @@ function data_importer_batch_run() {
               node_save($node);
               drupal_set_message("Created relationship between ".node_load($person->nid)->title." and ".node_load($parish->nid)->title);
             }
+            if ($item['type'] == "committee_relationship") {
+              if (isset($item['PersonID'])) {
+                $person = data_importer_fetch_asc("person_".$item['PersonID']);
+                if (isset($person->nid)) {
+                  $node->field_cmt_first['und'][0]['nid'] = $person->nid;
+                }
+              }
+              else {
+                $person = person_find_person(
+                  $item['field_person_first_name']." ".
+                  $item['field_person_middle_name']." ".
+                  $item['field_person_last_name'],
+                  $item['field_person_email_pref']);
+                if (isset($person->nid)) {
+                  $node->field_cmt_first['und'][0]['nid'] = $person->nid;
+                }
+                else {
+                  drupal_set_message("No person found for ".$item['field_person_email_pref']);
+                }
+              }
+              if (isset($item['CmtID'])) {
+                $cmt = data_importer_fetch_asc("cmt_".$item['CmtID']);
+                if (isset($cmt->nid)) {
+                  $node->field_cmt_second['und'][0]['nid'] = $cmt->nid;
+                }
+              }
+              else {
+                $query = db_select('node','n')
+                  ->fields('n',array('nid'))
+                  ->condition('n.title',$item['title']);
+                $result = $query->execute();
+                $cmt = FALSE;
+                while ($record = $result->fetchAssoc()) {
+                  $cmt = node_load($record['nid']);
+                }
+                if (isset($cmt->nid)) {
+                  $node->field_cmt_second['und'][0]['nid'] = $cmt->nid;
+                }
+                else {
+                  drupal_set_message("No committee found for ".$item['title']);
+                }
+              }
+              foreach ($item as $key => $cell) {
+                $key = strtolower(preg_replace("/[^A-Za-z0-9_]/", '', $key));
+                if (field_info_instance("node",$key,$item['type'])) {
+                  eval("\$node->".$key."['und'][0]['value'] = \"".$cell."\";");
+                }
+              }
+            }
+            if (isset($node->field_cmt_first) && isset($node->field_cmt_second)) {
+              node_save($node);
+              drupal_set_message("Created relationship between ".node_load($person->nid)->title." and ".node_load($cmt->nid)->title);
+            }
           }
         }
+
         // Associate with an Access ID, if a node exists
         if (isset($node->nid) && ($process == "accessid" || $process == "make")) {
           if ($item['type'] == "person" && isset($item['PersonID'])) {
