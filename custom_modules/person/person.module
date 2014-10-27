@@ -1065,6 +1065,7 @@ function person_fetch_people($type="All People",$last="",$first="",$status="livi
         $clergy->condition("jt.field_pf_type_value","priest");
         $clergy->condition("jt.field_pf_type_value","vicar");
         $clergy->condition("jt.field_pf_type_value","pastor");
+        $clergy->condition("jt.field_pf_type_value","supply");
         $clergy->condition("jt.field_pf_type_value","deacon");
         $clergy->condition("jt.field_pf_type_value","chaplain");
         $now = date("Y-m-d");
@@ -1118,6 +1119,32 @@ function person_is_warden($person) {
     return false;
   }
   $rels = find_pro_relationships(array("warden","wardenjr","wardensr"),$person);
+  foreach ($rels as $rel) {
+    if (isset($rel['node'])) {
+      return true;
+    }
+  }
+  return false;
+}
+
+function person_is_clergy_in_cong($person) {
+  if (!person_is_alive($person)) {
+    return false;
+  }
+  $rels = find_pro_relationships(array("rector","pic","associate","assistant","priest","vicar","pastor","supply","deacon","chaplain"),$person);
+  foreach ($rels as $rel) {
+    if (isset($rel['node'])) {
+      return true;
+    }
+  }
+  return false;
+}
+
+function person_is_treasurer($person) {
+  if (!person_is_alive($person)) {
+    return false;
+  }
+  $rels = find_pro_relationships(array("treasurer"),$person);
   foreach ($rels as $rel) {
     if (isset($rel['node'])) {
       return true;

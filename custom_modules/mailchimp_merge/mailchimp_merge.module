@@ -68,6 +68,12 @@ function mailchimp_merge_prepare_batch() {
         if (person_is_warden($person)) {
           $internal[] = "Wardens";
         }
+        if (person_is_treasurer($person)) {
+          $internal[] = "Treasurers";
+        }
+        if (person_is_clergy_in_cong($person)) {
+          $internal[] = "Clergy in Congregations";
+        }
         if (person_is_staff($person)) {
           $internal[] = "Bishop's Staff";
         }
