@@ -91,8 +91,10 @@ function find_cmt_relationships($types = FALSE, $person,$inactive = FALSE) {
     else {
       $relationship['relative'] = false;
     }
-    if ((empty($record['field_cmt_end_value']) && !empty($record['field_cmt_end_reason_value'])) || (!empty($record['field_cmt_end_value']) && $record['field_cmt_end_value'] < date("Y-m-d")."T00:00:00")) {
+    if ((empty($record['field_cmt_end_value']) && !empty($record['field_cmt_end_reason_value'])) || $record['field_cmt_end_value'] < date("Y-m-d")."T00:00:00") {
       $relationship['active'] = FALSE;
+      var_dump($record['field_cmt_end_value']);
+
     }
     else {
       $relationship['active'] = TRUE;

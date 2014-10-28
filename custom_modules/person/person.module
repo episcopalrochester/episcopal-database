@@ -1395,11 +1395,11 @@ function person_node_view($node, $view_mode, $langcode) {
       $pf_node = $job['node'];
       $lang = $pf_node->language;
       $nid = $pf_node->nid;
-      $node->content['#group_children']['field_pf_head_'.$nid] = "group_professional_relationships";
-      $node->content['#group_children']['field_pf_job_'.$nid] = "group_professional_relationships";
-      $node->content['#group_children']['field_pf_start_'.$nid] = "group_professional_relationships";
-      $node->content['#group_children']['field_pf_end_'.$nid] = "group_professional_relationships";
-      $node->content['#group_children']['field_pf_end_reason_'.$nid] = "group_professional_relationships";
+      $node->content['#group_children']['field_pf_head_'.$nid] = "group_committee_relationships";
+      $node->content['#group_children']['field_pf_job_'.$nid] = "group_committee_relationships";
+      $node->content['#group_children']['field_pf_start_'.$nid] = "group_committee_relationships";
+      $node->content['#group_children']['field_pf_end_'.$nid] = "group_committee_relationships";
+      $node->content['#group_children']['field_pf_end_reason_'.$nid] = "group_committee_relationships";
       if ($job['relative']) {
         $job_title = $job['relative']->title;
       }
@@ -1480,6 +1480,105 @@ function person_node_view($node, $view_mode, $langcode) {
           '#items' => array(0 => array('value'=>$job['end_reason'])),
           '#formatter' => 'text_default',
           0 => array('#markup' =>pro_relationship_splits($job['end_reason'])),
+        );
+      }
+    }
+    $count = 1;
+    if ($admin) {
+      $jobs = find_cmt_relationships(array_filter(array_keys(cmt_relationship_types())),$node,TRUE);
+    }
+    else {
+      $jobs = find_cmt_relationships(array_filter(array_keys(cmt_relationship_types())),$node,FALSE);
+    }
+    foreach ($jobs as $job) {
+      $cmt_node = $job['node'];
+      $lang = $cmt_node->language;
+      $nid = $cmt_node->nid;
+      $node->content['#group_children']['field_cmt_head_'.$nid] = "group_committee_relationships";
+      $node->content['#group_children']['field_cmt_job_'.$nid] = "group_committee_relationships";
+      $node->content['#group_children']['field_cmt_start_'.$nid] = "group_committee_relationships";
+      $node->content['#group_children']['field_cmt_end_'.$nid] = "group_committee_relationships";
+      $node->content['#group_children']['field_cmt_end_reason_'.$nid] = "group_committee_relationships";
+      if ($job['relative']) {
+        $job_title = $job['relative']->title;
+      }
+      elseif(isset($cmt_node->field_org_nr[$lang][0]['value'])) {
+        $job_title = $cmt_node->field_org_nr[$lang][0]['value'];
+      }
+      else {
+        $job_title = "No record entered for employer";
+      }
+      $title = "Job";
+      if (!$job['active']) {
+        $title .= " (inactive)";
+      }
+      if (node_access("update",$cmt_node)) {
+        $title .= " - ".l("edit","node/".$cmt_node->nid."/edit");
+      }
+      $node->content['field_cmt_head_'.$nid] = array(
+        '#theme' => 'field',
+        '#label_display' => 'hidden',
+        '#field_name' => 'field_cmt_head',
+        '#field_type' => 'textfield',
+        '#view_mode' => 'full',
+        '#bundle' => 'person',
+        '#items' => array(0 => array('value'=>"Partnership")),
+        '#formatter' => 'text_default',
+        0 => array('#markup' => "<h2>".$title."</h2>"),
+      );
+      $types = cmt_relationship_types();
+      $node->content['field_cmt_job_'.$nid] = array(
+        '#theme' => 'field',
+        '#label_display' => 'inline',
+        '#field_name' => 'field_cmt_job',
+        '#field_type' => 'textfield',
+        '#view_mode' => 'full',
+        '#title' => $types[$job['type']],
+        '#bundle' => 'person',
+        '#items' => array(0 => array('value'=>$job_title)),
+        '#formatter' => 'text_default',
+        0 => array('#markup' => $job_title),
+      );
+      if ($job['start']) {
+        $node->content['field_cmt_start_'.$nid] = array(
+          '#theme' => 'field',
+          '#label_display' => 'inline',
+          '#field_name' => 'field_cmt_start_'.$nid,
+          '#field_type' => 'textfield',
+          '#view_mode' => 'full',
+          '#title' => "Start Date",
+          '#bundle' => 'person',
+          '#items' => array(0 => array('value'=>$job['start'])),
+          '#formatter' => 'text_default',
+          0 => array('#markup' => $job['start']),
+        );
+      }
+      if ($job['end']) {
+        $node->content['field_cmt_end_'.$nid] = array(
+          '#theme' => 'field',
+          '#label_display' => 'inline',
+          '#field_name' => 'field_cmt_end_'.$nid,
+          '#field_type' => 'textfield',
+          '#view_mode' => 'full',
+          '#title' => "End Date",
+          '#bundle' => 'person',
+          '#items' => array(0 => array('value'=>$job['end'])),
+          '#formatter' => 'text_default',
+          0 => array('#markup' =>$job['end']),
+        );
+      }
+      if ($job['end_reason']) {
+        $node->content['field_cmt_end_reason_'.$nid] = array(
+          '#theme' => 'field',
+          '#label_display' => 'inline',
+          '#field_name' => 'field_cmt_end_reason_'.$nid,
+          '#field_type' => 'textfield',
+          '#view_mode' => 'full',
+          '#title' => "Reason for End",
+          '#bundle' => 'person',
+          '#items' => array(0 => array('value'=>$job['end_reason'])),
+          '#formatter' => 'text_default',
+          0 => array('#markup' =>cmt_relationship_splits($job['end_reason'])),
         );
       }
     }
@@ -1678,7 +1777,82 @@ function person_form_person_node_form_alter(&$form, &$form_state, $form_id) {
       );
       $count++;
     }
-
+    if ($admin) {
+      $jobs = find_cmt_relationships(FALSE,$form['#node'],TRUE);
+    }
+    else {
+      $jobs = find_cmt_relationships(FALSE,$form['#node'],FALSE);
+    }
+    $count = 1;
+    foreach ($jobs as $job) {
+      $cmt_node = $job['node'];
+      $lang = $cmt_node->language;
+      $nid = $cmt_node->nid;
+      $form['#group_children']['field_cmt_head_'.$nid] = "group_committee_relationships";
+      $form['#group_children']['field_cmt_job_'.$nid] = "group_committee_relationships";
+      $form['#group_children']['field_cmt_type_'.$nid] = "group_committee_relationships";
+      $form['#group_children']['field_cmt_title_'.$nid] = "group_committee_relationships";
+      $form['#group_children']['field_cmt_start_'.$nid] = "group_committee_relationships";
+      $form['#group_children']['field_cmt_end_'.$nid] = "group_committee_relationships";
+      $form['#group_children']['field_cmt_end_reason_'.$nid] = "group_committee_relationships";
+      if ($job['relative']) {
+        $job_title = $job['relative']->title;
+      }
+      elseif(isset($cmt_node->field_cmt_nr[$lang][0]['value'])) {
+        $job_title = $cmt_node->field_cmt_nr[$lang][0]['value'];
+      }
+      else {
+        $job_title = "No record entered for job";
+      }
+      $title = "Job";
+      if (node_access("update",$cmt_node)) {
+        $title .= " - ".l("edit","node/".$cmt_node->nid."/edit");
+      }
+      if (!$job['active']) {
+        $title .= " (inactive)";
+      }
+      $form['field_cmt_head_'.$nid] = array(
+        '#type' => 'markup',
+        '#markup' => '<h2>'.$title.'</h2>',
+      );
+      $form['field_cmt_job_'.$nid] = array(
+        '#type'=> 'item',
+        '#title' => 'Employer:',
+        '#markup'=>$job_title,
+      );
+      $form['field_cmt_type_'.$nid] = array(
+        '#type'=> 'select',
+        '#title' => 'Job Type:',
+        '#options' => cmt_relationship_types(),
+        '#default_value' => $job['type'],
+      );
+      $form['field_cmt_title_'.$nid] = array(
+        '#type'=> 'textfield',
+        '#title' => 'Job Title:',
+        '#description' => 'Optional.',
+        '#default_value' => $job['title'],
+      );
+      $form['field_cmt_start_'.$nid] = array(
+        '#type'=> 'textfield',
+        '#title' => 'Job Start Date:',
+        '#description' => 'Format: '.date('m/d/Y')." - not visible in directory",
+        '#default_value' => $job['start'],
+      );
+      $form['field_cmt_end_'.$nid] = array(
+        '#type'=> 'textfield',
+        '#title' => 'Job End Date:',
+        '#description' => 'Format: '.date('m/d/Y')." - not visible in directory",
+        '#default_value' => $job['end'],
+      );
+      $form['field_cmt_end_reason_'.$nid] = array(
+        '#type'=> 'select',
+        '#title' => 'Job End Reason:',
+        '#description' => 'Not visible in directory',
+        '#options' => cmt_relationship_splits(),
+        '#default_value' => $job['end_reason'],
+      );
+      $count++;
+    }
   }
 }
 

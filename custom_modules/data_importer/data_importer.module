@@ -395,6 +395,10 @@ function data_importer_batch_run() {
               foreach ($item as $key => $cell) {
                 $key = strtolower(preg_replace("/[^A-Za-z0-9_]/", '', $key));
                 if (field_info_instance("node",$key,$item['type'])) {
+                  if ($key == "field_cmt_end" && !empty($cell)) {
+                    $date = new DateTime($cell);
+                    $cell = date_format($date,"Y-m-d")."T00:00:00";
+                  }
                   eval("\$node->".$key."['und'][0]['value'] = \"".$cell."\";");
                 }
               }

@@ -13,6 +13,31 @@ function person_field_group_info() {
   $field_group = new stdClass();
   $field_group->disabled = FALSE; /* Edit this to true to make a default field_group disabled initially */
   $field_group->api_version = 1;
+  $field_group->identifier = 'group_committee_relationships|node|person|form';
+  $field_group->group_name = 'group_committee_relationships';
+  $field_group->entity_type = 'node';
+  $field_group->bundle = 'person';
+  $field_group->mode = 'form';
+  $field_group->parent_name = 'group_person_data';
+  $field_group->data = array(
+    'label' => 'Committee Relationships',
+    'weight' => '11',
+    'children' => array(),
+    'format_type' => 'tab',
+    'format_settings' => array(
+      'formatter' => 'closed',
+      'instance_settings' => array(
+        'description' => '',
+        'classes' => 'group-committee-relationships field-group-tab',
+        'required_fields' => 1,
+      ),
+    ),
+  );
+  $export['group_committee_relationships|node|person|form'] = $field_group;
+
+  $field_group = new stdClass();
+  $field_group->disabled = FALSE; /* Edit this to true to make a default field_group disabled initially */
+  $field_group->api_version = 1;
   $field_group->identifier = 'group_editors|node|person|form';
   $field_group->group_name = 'group_editors';
   $field_group->entity_type = 'node';
@@ -21,7 +46,7 @@ function person_field_group_info() {
   $field_group->parent_name = 'group_person_data';
   $field_group->data = array(
     'label' => 'Editors',
-    'weight' => '11',
+    'weight' => '12',
     'children' => array(
       0 => 'field_editors',
     ),
@@ -48,7 +73,7 @@ function person_field_group_info() {
   $field_group->parent_name = 'group_person_data';
   $field_group->data = array(
     'label' => 'Database Access',
-    'weight' => '15',
+    'weight' => '16',
     'children' => array(),
     'format_type' => 'tab',
     'format_settings' => array(
@@ -188,6 +213,7 @@ function person_field_group_info() {
       11 => 'group_person_vitals',
       12 => 'group_personal_relationships',
       13 => 'group_professional_relationships',
+      14 => 'group_committee_relationships',
     ),
     'format_type' => 'tabs',
     'format_settings' => array(
@@ -483,7 +509,7 @@ function person_field_group_info() {
   $field_group->parent_name = 'group_person_data';
   $field_group->data = array(
     'label' => 'Privacy',
-    'weight' => '12',
+    'weight' => '13',
     'children' => array(
       0 => 'field_person_no_directory',
       1 => 'field_person_no_partnerships',
@@ -551,12 +577,12 @@ function person_field_group_info() {
     'children' => array(
       0 => 'field_person_safe_church',
       1 => 'field_safe_church_training_date',
-      2 => 'field_person_safe_meet_sam',
-      3 => 'field_person_safe_it_happened',
-      4 => 'field_person_safe_keeping_church',
+      2 => 'field_person_safe_it_happened',
+      3 => 'field_person_safe_keeping_church',
+      4 => 'field_person_safe_meet_sam',
       5 => 'field_person_safe_policies',
-      6 => 'field_person_safe_risk',
-      7 => 'field_person_safe_refresher',
+      6 => 'field_person_safe_refresher',
+      7 => 'field_person_safe_risk',
     ),
     'format_type' => 'fieldset',
     'format_settings' => array(
@@ -610,7 +636,7 @@ function person_field_group_info() {
   $field_group->parent_name = 'group_person_data';
   $field_group->data = array(
     'label' => 'Subscriptions',
-    'weight' => '13',
+    'weight' => '14',
     'children' => array(
       0 => 'field_person_enews',
       1 => 'field_person_printed_news',
@@ -667,7 +693,7 @@ function person_field_group_info() {
   $field_group->parent_name = 'group_person_data';
   $field_group->data = array(
     'label' => 'Supply Availability',
-    'weight' => '14',
+    'weight' => '15',
     'children' => array(
       0 => 'field_person_supply_he',
       1 => 'field_person_supply_mp',
