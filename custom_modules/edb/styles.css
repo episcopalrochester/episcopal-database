@@ -19,3 +19,7 @@ fieldset.form-wrapper .fieldset-wrapper {
   font-weight: bold;
     color: black !important;
 }
+
+#navigation ul li a {
+    padding: 15px 15px !important;
+  }
