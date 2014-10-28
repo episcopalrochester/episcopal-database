@@ -23,3 +23,9 @@ fieldset.form-wrapper .fieldset-wrapper {
 #navigation ul li a {
     padding: 15px 15px !important;
   }
+
+  #wrap .fieldset-legend {
+  font-size: 20px;
+  line-height: 26px;
+  font-weight: bold;
+  }
