@@ -134,6 +134,7 @@ function person_type_queries($type = FALSE) {
     'All People' => 'All People',
     'Clergy' => 'Clergy',
     'Clergy in Congregations' => 'Clergy in Congregations',
+    'Leadership' => 'Leadership',
     'Laity' => 'Laity',
     'Wardens' => 'Wardens',
     'Parish Administrators' => 'Parish Administrators',
@@ -258,6 +259,9 @@ function person_lists_submit_form($form,&$form_state) {
       in_array('Clergy in Congregations',$form['who']['#value'])) {
         print ',"Organization","Title"';
       }
+      if (in_array('Leadership',$form['who']['#value'])) {
+        print ',"Committee","Role","Membership","Ends"';
+      }
     print "\n";
 
     foreach ($people['nodes'] as $person) {
@@ -375,6 +379,30 @@ function person_lists_submit_form($form,&$form_state) {
           }
           print ',"'.implode(";",$parishes).'",'.'"'.implode(";",$types).'"';
         }
+      if (in_array('Leadership',$form['who']['#value'])) {
+        $p_types = cmt_relationship_types();
+        $c_roles = cmt_relationship_roles();
+        $rels = find_cmt_relationships(FALSE,$person);
+        $committees = array();
+        $roles = array();
+        $ends = array();
+        $types = array();
+        foreach ($rels as $rel) {
+          if (isset($rel['relative']->title)) {
+            $committees[] = $rel['relative']->title;
+          }
+          else {
+            $committees[] = _get_value($rel['node'],"field_cmt_nr");
+          }
+          $roles[] = $c_roles[_get_value($rel['node'],"field_cmt_roles")];
+          if (_get_value($rel['node'],"field_cmt_end")) {
+            $end = new DateTime(_get_value($rel['node'],"field_cmt_end"));
+            $ends[] = date_format($end,"m/d/Y");
+          }
+          $types[] = $p_types[$rel['type']];
+        }
+        print ',"'.implode(";",$committees).'",'.'"'.implode(";",$roles).'",'.'"'.implode(";",$types).'","'.implode(";",$ends).'"';
+      }
       print "\n";
     }
     exit;
@@ -864,6 +892,12 @@ function person_fetch_people($type="All People",$last="",$first="",$status="livi
         $query->leftJoin("field_data_field_pf_start","js","js.entity_id = ft.entity_id");
         $query->leftJoin("field_data_field_pf_end","je","je.entity_id = ft.entity_id");
       }
+      elseif ($q == "Leadership") {
+        $query->leftJoin("field_data_field_cmt_first","ftc","ftc.field_cmt_first_nid = n.nid");
+        $query->leftJoin("field_data_field_cmt_type","jtc","jtc.entity_id = ftc.entity_id");
+        $query->leftJoin("field_data_field_cmt_start","jsc","jsc.entity_id = ftc.entity_id");
+        $query->leftJoin("field_data_field_cmt_end","jec","jec.entity_id = ftc.entity_id");
+      }
       elseif ($q == "Clergy Spouses") {
         $query->leftJoin("field_data_field_pr_first","pr1","pr1.field_pr_first_nid = n.nid");
         $query->leftJoin("field_data_field_pr_second","pr2","pr2.field_pr_second_nid = n.nid");
@@ -1075,13 +1109,29 @@ function person_fetch_people($type="All People",$last="",$first="",$status="livi
         $not_future = db_or()
           ->condition("je.field_pf_end_value",$now,">")
           ->isNull("je.field_pf_end_value");
-        $is_a_warden_now = db_and()
+        $is_a_clergy_now = db_and()
           ->condition($clergy)
           ->condition($not_past)
           ->condition($not_future);
-        $who->condition($is_a_warden_now);
+        $who->condition($is_a_clergy_now);
       }
-
+      elseif ($q == "Leadership") {
+        $leader = db_or();
+        $leader->isNotNull("jtc.field_cmt_type_value");
+        $now = date("Y-m-d");
+        $not_past = db_or()
+          ->condition("jsc.field_cmt_start_value",$now,"<")
+          ->isNull("jsc.field_cmt_start_value");
+        $not_future = db_or()
+          ->condition("jec.field_cmt_end_value",$now,">")
+          ->condition("jec.field_cmt_end_value","")
+          ->isNull("jec.field_cmt_end_value");
+        $is_a_leader_now = db_and()
+          ->condition($leader)
+          ->condition($not_past)
+          ->condition($not_future);
+        $who->condition($is_a_leader_now);
+      }
       else {
         $who->condition($q['abv'].".".$q['field'],$q['value'],$q['operation']);
       }

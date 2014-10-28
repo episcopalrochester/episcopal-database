@@ -5,3 +5,94 @@
  */
 
 include_once 'committee.features.inc';
+
+function committee_menu() {
+  $items = array();
+  $items['committees'] = array(
+    'title' => 'Committees',
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('committee_dir_form'),
+    'access arguments' => array('access content'),
+    'type' => MENU_NORMAL_ITEM,
+  );
+  return $items;
+}
+
+function committee_dir_form($form,&$form_state) {
+  $committees = committee_fetch_committees();
+  $types = cmt_relationship_types();
+  $roles = cmt_relationship_roles();
+  foreach ($committees['nodes'] as $cmt) {
+    $cmt_table = array(
+      'header' => array('Name','Role','Membership','City','Phone','Email','Edit'),
+      'rows' => array(),
+      'attributes' => array(),
+      'caption' => '',
+      'colgroups' => array(),
+      'sticky' => FALSE,
+      'empty' => '',
+    );
+    $item = array(
+      '#type' => 'fieldset',
+      '#title' => $cmt->title,
+    );
+    $rel = find_cmt_relationships(FALSE,$cmt);
+    foreach ($rel as $r) {
+      if ($r['relative']) {
+        $type = $r['type'];
+        $name = _get_value($r['relative'],"field_person_title")." ".person_get_full_name($r['relative']);
+        $role = _get_value($r['node'],"field_cmt_roles");
+        $addy = person_get_address($r['relative'],"home");
+        $phone = person_get_phone($r['relative'],"pref");
+        $email = person_get_email($r['relative'],"pref");
+        if (isset($email['addy'])) {
+          $email = l($email['addy'],"mailto:".$email['addy']);
+        }
+        $edit = "";
+        if (node_access("update",$r['relative'])) {
+          $edit .= l(
+            'edit person',
+            'node/'.$r['relative']->nid.'/edit'
+          );
+        }
+        if (node_access("update",$r['node'])) {
+          $edit .= "<br />";
+          $edit .= l(
+            'edit relationship',
+            'node/'.$r['node']->nid.'/edit'
+          );
+        }
+        $row = array(
+          $name,
+          $roles[$role],
+          $types[$type],
+          $addy['city'],
+          $phone['number'],
+          $email,
+          $edit
+        );
+        $cmt_table['rows'][] = $row;
+      }
+    }
+    $item['people'] = array(
+      '#type' => 'item',
+      '#markup' => theme_table($cmt_table),
+    );
+    $form[] = $item;
+  }
+  return $form;
+}
+
+function committee_fetch_committees() {
+  $query = db_select("node","n");
+  $query->fields('n',array('nid'))
+    ->condition("n.type","committee","=")
+    ->orderBy('n.title','ASC')
+    ->condition('n.status', 1);
+  $result = $query->execute();
+  $committees = array('nodes' => array(), 'pager' => '');
+  while ($record = $result->fetchAssoc()) {
+    $committees['nodes'][] = node_load($record['nid']);
+  }
+  return $committees;
+}
