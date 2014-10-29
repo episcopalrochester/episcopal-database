@@ -103,7 +103,7 @@ function person_lists_form($form,&$form_state) {
     '#options' => array(
       'home'=>"Where people live",
       'mail'=>"Where people want their mail",
-      'mailparish' => "Where people want their mail, including parishes for clergy",
+      'mailparish' => "Where people want their mail, preferring parishes for clergy",
       'both'=>"Both where they live and want their mail",
     ),
     '#default_value' => 'home',
@@ -1215,6 +1215,26 @@ function person_is_warden($person) {
     if (isset($rel['node'])) {
       return true;
     }
+  }
+  return false;
+}
+
+function person_is_leader($person) {
+  if (!person_is_alive($person)) {
+    return false;
+  }
+  $rels = find_cmt_relationships(FALSE,$person);
+  foreach ($rels as $rel) {
+    if (isset($rel['node'])) {
+      return true;
+    }
+  }
+  return false;
+}
+
+function person_has_enews($person) {
+  if (_get_value($person,"field_person_enews")) {
+    return true;
   }
   return false;
 }

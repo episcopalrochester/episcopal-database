@@ -77,6 +77,9 @@ function mailchimp_merge_prepare_batch() {
         if (person_is_staff($person)) {
           $internal[] = "Bishop's Staff";
         }
+        if (person_is_leader($person)) {
+          $internal[] = "Leadership";
+        }
         if (person_is_admin($person)) {
           $internal[] = "Parish Administrators";
         }
@@ -98,13 +101,12 @@ function mailchimp_merge_prepare_batch() {
         $cache[$email] = array(
           'email' => $email,
           'merge_vars' => $merge_vars,
+          'enews' => person_has_enews($person),
         );
       }
     }
     variable_set("mm_subscribe_merge",$cache);
-
   }
-
 }
 
 function mailchimp_merge_run_batch() {
@@ -125,9 +127,12 @@ function mailchimp_merge_run_batch() {
             }
           }
         }
+        if ($row['enews']) {
+          $external[] = "E-Newsletter";
+        }
         $row['merge_vars']['GROUPINGS'][] = array(
           'id' => "8725",
-          'groups' => array_values($external),
+          'groups' => array_unique(array_values($external)),
         );
       }
       mailchimp_subscribe(
