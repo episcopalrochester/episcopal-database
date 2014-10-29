@@ -10,6 +10,49 @@
 function parish_field_default_field_instances() {
   $field_instances = array();
 
+  // Exported field_instance: 'node-parish-field_parish_cluster'
+  $field_instances['node-parish-field_parish_cluster'] = array(
+    'bundle' => 'parish',
+    'default_value' => array(
+      0 => array(
+        'value' => 0,
+      ),
+    ),
+    'deleted' => 0,
+    'description' => '',
+    'display' => array(
+      'default' => array(
+        'label' => 'above',
+        'module' => 'list',
+        'settings' => array(),
+        'type' => 'list_default',
+        'weight' => 27,
+      ),
+      'teaser' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 0,
+      ),
+    ),
+    'entity_type' => 'node',
+    'field_name' => 'field_parish_cluster',
+    'label' => 'This parish is the office of a clustered ministry',
+    'required' => 0,
+    'settings' => array(
+      'user_register_form' => FALSE,
+    ),
+    'widget' => array(
+      'active' => 1,
+      'module' => 'options',
+      'settings' => array(
+        'display_label' => 1,
+      ),
+      'type' => 'options_onoff',
+      'weight' => 2,
+    ),
+  );
+
   // Exported field_instance: 'node-parish-field_parish_district'
   $field_instances['node-parish-field_parish_district'] = array(
     'bundle' => 'parish',
@@ -652,6 +695,7 @@ function parish_field_default_field_instances() {
   t('Office Phone');
   t('Other');
   t('State/Province');
+  t('This parish is the office of a clustered ministry');
   t('Website');
   t('ZIP/Postal Code');
 

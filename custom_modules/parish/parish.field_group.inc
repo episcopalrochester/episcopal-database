@@ -52,7 +52,7 @@ function parish_field_group_info() {
   $field_group->parent_name = 'group_parish_data';
   $field_group->data = array(
     'label' => 'Home Address',
-    'weight' => '3',
+    'weight' => '43',
     'children' => array(
       0 => 'field_parish_home_1',
       1 => 'field_parish_home_2',
@@ -84,10 +84,10 @@ function parish_field_group_info() {
   $field_group->parent_name = 'group_parish_data';
   $field_group->data = array(
     'label' => 'Contact Information',
-    'weight' => '5',
+    'weight' => '45',
     'children' => array(
-      0 => 'field_parish_phone',
-      1 => 'field_parish_email',
+      0 => 'field_parish_email',
+      1 => 'field_parish_phone',
       2 => 'field_parish_site',
     ),
     'format_type' => 'tab',
@@ -113,11 +113,11 @@ function parish_field_group_info() {
   $field_group->parent_name = '';
   $field_group->data = array(
     'label' => 'Parish Data',
-    'weight' => '2',
+    'weight' => '3',
     'children' => array(
       0 => 'group_parish_address',
-      1 => 'group_parish_mailing',
-      2 => 'group_parish_contact',
+      1 => 'group_parish_contact',
+      2 => 'group_parish_mailing',
     ),
     'format_type' => 'tabs',
     'format_settings' => array(
@@ -171,7 +171,7 @@ function parish_field_group_info() {
   $field_group->parent_name = 'group_parish_data';
   $field_group->data = array(
     'label' => 'Mailing Address',
-    'weight' => '4',
+    'weight' => '44',
     'children' => array(
       0 => 'field_parish_mail_1',
       1 => 'field_parish_mail_2',
