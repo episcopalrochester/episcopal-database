@@ -1901,12 +1901,18 @@ function person_form_person_node_form_alter(&$form, &$form_state, $form_id) {
       $lang = $cmt_node->language;
       $nid = $cmt_node->nid;
       $form['#group_children']['field_cmt_head_'.$nid] = "group_committee_relationships";
+      $form['#group_children']['field_cmt_add'] = "group_committee_relationships";
       $form['#group_children']['field_cmt_job_'.$nid] = "group_committee_relationships";
       $form['#group_children']['field_cmt_type_'.$nid] = "group_committee_relationships";
       $form['#group_children']['field_cmt_title_'.$nid] = "group_committee_relationships";
       $form['#group_children']['field_cmt_start_'.$nid] = "group_committee_relationships";
       $form['#group_children']['field_cmt_end_'.$nid] = "group_committee_relationships";
       $form['#group_children']['field_cmt_end_reason_'.$nid] = "group_committee_relationships";
+      $form['field_cmt_add'] = array(
+        '#type' => 'item',
+        '#markup' => "<a href='/node/add/committee-relationship?edit[field_cmt_first][und][0][nid]=[nid:".$form['#node']->nid."]'>+Add</a>",
+
+      );
       if ($job['relative']) {
         $job_title = $job['relative']->title;
       }
