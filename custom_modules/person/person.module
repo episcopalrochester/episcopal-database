@@ -217,7 +217,7 @@ function person_lists_submit_form($form,&$form_state) {
     header("Content-Disposition: attachment; filename=".$filename.".csv");
     header("Pragma: no-cache");
     header("Expires: 0");
-    print '"Prefix","First Name","Middle Name","Last Name","Suffix","Nickname","Full Name"';
+    print '"Prefix","First Name","Middle Name","Last Name","Suffix","Nickname","Full Name","Formal Name"';
     $labels = array("Line 1","Line 2","City","State","Other","ZIP");
     if ($address == "mail" || $address == "mailparish") {
       foreach ($labels as $label) {
@@ -249,10 +249,12 @@ function person_lists_submit_form($form,&$form_state) {
     if (in_array('Clergy Birthdays This Month',$form['who']['#value']) ||
       in_array('Clergy Birthdays Next Month',$form['who']['#value'])) {
         print ',"Date of Birth"';
+        print ',"Birthday Day"';
+        print ',"Birthday Num"';
       }
     if (in_array('Clergy Ordination Anniversaries This Month',$form['who']['#value']) ||
       in_array('Clergy Ordination Anniversaries Next Month',$form['who']['#value'])) {
-        print ',"Diaconate Ord.","Priesthood Ord.","Anniversary"';
+        print ',"Type","Ordination","Ord Day","Ord Num"';
       }
     if (in_array('Wardens',$form['who']['#value']) ||
       in_array('Parish Administrators',$form['who']['#value']) ||
@@ -286,6 +288,10 @@ function person_lists_submit_form($form,&$form_state) {
       print "\",\"";
       print _get_value($person,"field_person_title") . " ";
       print person_get_full_name($person);
+      print " "._get_value($person,"field_person_suffix");
+      print "\",\"";
+      print _get_value($person,"field_person_title") . " ";
+      print person_get_formal_name($person);
       print " "._get_value($person,"field_person_suffix");
       print "\",\"";
       $mailing = array_filter(person_get_address($person,"mail"));
@@ -375,25 +381,73 @@ function person_lists_submit_form($form,&$form_state) {
       if (in_array('Clergy Birthdays This Month',$form['who']['#value']) ||
         in_array('Clergy Birthdays Next Month',$form['who']['#value'])) {
           $dob = new DateTime(_get_value($person,"field_person_dob"));
-          print ",".date_format($dob,'F j');
+          print ",".date_format($dob,'m/d/Y');
+          $this_month = date('m');
+          $birth_month = date_format($dob,'m');
+          if (intval($birth_month) == 1 && intval($this_month == 12)) {
+            $birthday =  new DateTime(date_format($dob,'m/d')."/".(date('Y')+1));
+          }
+          else {
+            $birthday =  new DateTime(date_format($dob,'m/d')."/".(date('Y')));
+          }
+          print ",=\"".date_format($birthday,'F j')."\"";
+          $int = $dob->diff($birthday);
+          $ends = array('th','st','nd','rd','th','th','th','th','th','th');
+          $number = $int->format('%y');
+          if (($number %100) >= 11 && ($number%100) <= 13)
+            $ord = $number. 'th';
+          else
+            $ord = $number. $ends[$number % 10];
+          print ",".$ord;
         }
       if (in_array('Clergy Ordination Anniversaries This Month',$form['who']['#value']) ||
         in_array('Clergy Ordination Anniversaries Next Month',$form['who']['#value'])) {
           $priesthood = _get_value($person,"field_person_priesthood");
           $diaconate = _get_value($person,"field_person_diaconate");
           if ($diaconate && !$priesthood) {
+            print ',"diaconate"';
             $diaconate = new DateTime(_get_value($person,"field_person_diaconate"));
-            print ",".date_format($diaconate,'F j');
-          }
-          else { 
-            print ",";
+            print ",".date_format($diaconate,'m/d/Y');
+            $this_month = date('m');
+            $dia_month = date_format($diaconate,'m');
+            if (intval($dia_month) == 1 && intval($this_month == 12)) {
+              $diaday =  new DateTime(date_format($diaconate,'m/d')."/".(date('Y')+1));
+            }
+            else {
+              $diaday =  new DateTime(date_format($diaconate,'m/d')."/".(date('Y')));
+            }
+            print ",=\"".date_format($diaday,'F j')."\"";
+            $int = $diaconate->diff($diaday);
+            $ends = array('th','st','nd','rd','th','th','th','th','th','th');
+            $number = $int->format('%y');
+            if (($number %100) >= 11 && ($number%100) <= 13)
+              $ord = $number. 'th';
+            else
+              $ord = $number. $ends[$number % 10];
+            print ",".$ord;
           }
           if ($priesthood) {
+            print ',"priesthood"';
             $priesthood = new DateTime(_get_value($person,"field_person_priesthood"));
-            print ",".date_format($priesthood,'F j');
-          }
-          else { 
-            print ","; 
+            print ",".date_format($priesthood,'m/d/Y');
+            $this_month = date('m');
+            $pri_month = date_format($priesthood,'m');
+            if (intval($pri_month) == 1 && intval($this_month == 12)) {
+              $priday =  new DateTime(date_format($priesthood,'m/d')."/".(date('Y')+1));
+            }
+            else {
+              $priday =  new DateTime(date_format($priesthood,'m/d')."/".(date('Y')));
+            }
+            print ",=\"".date_format($priday,'F j')."\"";
+            $int = $priesthood->diff($priday);
+            $ends = array('th','st','nd','rd','th','th','th','th','th','th');
+            $number = $int->format('%y');
+            if (($number %100) >= 11 && ($number%100) <= 13)
+              $ord = $number. 'th';
+            else
+              $ord = $number. $ends[$number % 10];
+            print ",".$ord;
+
           }
           print ',""';
         }
@@ -490,6 +544,8 @@ function person_lists_submit_form($form,&$form_state) {
         (in_array('Clergy Birthdays Next Month',$form['who']['#value']) && $next_month == date_format($dob,'m'))) 
       {
         print "Birthday: ".date_format($dob,'m/d/Y')."\n";
+        print "Birthday: ".date_format($dob,'m/d/Y')."\n";
+        print "Birthday: ".date_format($dob,'F jS')."\n";
 
       }
       $priesthood = _get_value($person,"field_person_priesthood");
@@ -1337,6 +1393,20 @@ function person_get_full_name($person) {
   $last = field_get_items('node',$person,'field_person_last_name');
   return trim(preg_replace('!\s+!', ' ', implode(" ",array(
     $nick[0]['value'],
+    $first[0]['value'],
+    $middle[0]['value'],
+    $last[0]['value'],
+  ))));
+}
+
+function person_get_formal_name($person) {
+  $first = field_get_items('node',$person,'field_person_first_name');
+  $middle = field_get_items('node',$person,'field_person_middle_name');
+  if (!isset($middle[0]['value'])) {
+    $middle[0]['value'] = "";
+  }
+  $last = field_get_items('node',$person,'field_person_last_name');
+  return trim(preg_replace('!\s+!', ' ', implode(" ",array(
     $first[0]['value'],
     $middle[0]['value'],
     $last[0]['value'],
