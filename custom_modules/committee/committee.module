@@ -38,7 +38,7 @@ function committee_dir_form($form,&$form_state) {
     );
     $rel = find_cmt_relationships(FALSE,$cmt);
     foreach ($rel as $r) {
-      if ($r['relative']) {
+      if ($r['relative'] && person_is_alive($r['relative'])) {
         $type = $r['type'];
         $name = _get_value($r['relative'],"field_person_title")." ".person_get_full_name($r['relative']);
         $role = _get_value($r['node'],"field_cmt_roles");
