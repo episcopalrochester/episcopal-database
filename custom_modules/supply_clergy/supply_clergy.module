@@ -543,7 +543,7 @@ function supply_clergy_is_booked($cid,$date) {
 function supply_clergy_calendar_form($form,&$form_state) {
   drupal_set_title("Clergy Supply: Booking Calendar");
   $date = 0;
-  while ($date < 7) {
+  while ($date < 13) {
   $form['calendar_'.$date] = array(
     '#type' => 'item',
     '#markup' => supply_clergy_build_calendar(
