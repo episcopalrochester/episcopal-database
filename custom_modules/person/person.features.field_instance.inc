@@ -1085,6 +1085,189 @@ function person_field_default_field_instances() {
     ),
   );
 
+  // Exported field_instance: 'node-person-field_person_license'
+  $field_instances['node-person-field_person_license'] = array(
+    'bundle' => 'person',
+    'deleted' => 0,
+    'description' => '',
+    'display' => array(
+      'default' => array(
+        'label' => 'above',
+        'module' => 'date',
+        'settings' => array(
+          'format_type' => 'long',
+          'fromto' => 'both',
+          'multiple_from' => '',
+          'multiple_number' => '',
+          'multiple_to' => '',
+        ),
+        'type' => 'date_default',
+        'weight' => 64,
+      ),
+      'teaser' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 0,
+      ),
+    ),
+    'entity_type' => 'node',
+    'field_name' => 'field_person_license',
+    'label' => 'Date of License',
+    'required' => 0,
+    'settings' => array(
+      'default_value' => 'now',
+      'default_value2' => 'same',
+      'default_value_code' => '',
+      'default_value_code2' => '',
+      'user_register_form' => FALSE,
+    ),
+    'widget' => array(
+      'active' => 1,
+      'module' => 'date',
+      'settings' => array(
+        'increment' => 15,
+        'input_format' => 'm/d/Y - H:i:s',
+        'input_format_custom' => '',
+        'label_position' => 'above',
+        'text_parts' => array(),
+        'year_range' => '-3:+3',
+      ),
+      'type' => 'date_text',
+      'weight' => 79,
+    ),
+  );
+
+  // Exported field_instance: 'node-person-field_person_license_denom'
+  $field_instances['node-person-field_person_license_denom'] = array(
+    'bundle' => 'person',
+    'default_value' => NULL,
+    'deleted' => 0,
+    'description' => '',
+    'display' => array(
+      'default' => array(
+        'label' => 'above',
+        'module' => 'list',
+        'settings' => array(),
+        'type' => 'list_default',
+        'weight' => 66,
+      ),
+      'teaser' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 0,
+      ),
+    ),
+    'entity_type' => 'node',
+    'field_name' => 'field_person_license_denom',
+    'label' => 'Denomination',
+    'required' => 0,
+    'settings' => array(
+      'user_register_form' => FALSE,
+    ),
+    'widget' => array(
+      'active' => 1,
+      'module' => 'options',
+      'settings' => array(),
+      'type' => 'options_select',
+      'weight' => 81,
+    ),
+  );
+
+  // Exported field_instance: 'node-person-field_person_license_renewal'
+  $field_instances['node-person-field_person_license_renewal'] = array(
+    'bundle' => 'person',
+    'deleted' => 0,
+    'description' => '',
+    'display' => array(
+      'default' => array(
+        'label' => 'above',
+        'module' => 'date',
+        'settings' => array(
+          'format_type' => 'long',
+          'fromto' => 'both',
+          'multiple_from' => '',
+          'multiple_number' => '',
+          'multiple_to' => '',
+        ),
+        'type' => 'date_default',
+        'weight' => 65,
+      ),
+      'teaser' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 0,
+      ),
+    ),
+    'entity_type' => 'node',
+    'field_name' => 'field_person_license_renewal',
+    'label' => 'Date of License Renewal',
+    'required' => 0,
+    'settings' => array(
+      'default_value' => 'now',
+      'default_value2' => 'same',
+      'default_value_code' => '',
+      'default_value_code2' => '',
+      'user_register_form' => FALSE,
+    ),
+    'widget' => array(
+      'active' => 1,
+      'module' => 'date',
+      'settings' => array(
+        'increment' => 15,
+        'input_format' => 'm/d/Y - H:i:s',
+        'input_format_custom' => '',
+        'label_position' => 'above',
+        'text_parts' => array(),
+        'year_range' => '-3:+3',
+      ),
+      'type' => 'date_text',
+      'weight' => 80,
+    ),
+  );
+
+  // Exported field_instance: 'node-person-field_person_license_res'
+  $field_instances['node-person-field_person_license_res'] = array(
+    'bundle' => 'person',
+    'default_value' => NULL,
+    'deleted' => 0,
+    'description' => '',
+    'display' => array(
+      'default' => array(
+        'label' => 'above',
+        'module' => 'text',
+        'settings' => array(),
+        'type' => 'text_default',
+        'weight' => 67,
+      ),
+      'teaser' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 0,
+      ),
+    ),
+    'entity_type' => 'node',
+    'field_name' => 'field_person_license_res',
+    'label' => 'Canonical Residence',
+    'required' => 0,
+    'settings' => array(
+      'text_processing' => 0,
+      'user_register_form' => FALSE,
+    ),
+    'widget' => array(
+      'active' => 1,
+      'module' => 'text',
+      'settings' => array(
+        'size' => 60,
+      ),
+      'type' => 'text_textfield',
+      'weight' => 82,
+    ),
+  );
+
   // Exported field_instance: 'node-person-field_person_mail_1'
   $field_instances['node-person-field_person_mail_1'] = array(
     'bundle' => 'person',
@@ -1867,6 +2050,59 @@ function person_field_default_field_instances() {
     ),
   );
 
+  // Exported field_instance: 'node-person-field_person_retirement_date'
+  $field_instances['node-person-field_person_retirement_date'] = array(
+    'bundle' => 'person',
+    'deleted' => 0,
+    'description' => '',
+    'display' => array(
+      'default' => array(
+        'label' => 'above',
+        'module' => 'date',
+        'settings' => array(
+          'format_type' => 'long',
+          'fromto' => 'both',
+          'multiple_from' => '',
+          'multiple_number' => '',
+          'multiple_to' => '',
+        ),
+        'type' => 'date_default',
+        'weight' => 63,
+      ),
+      'teaser' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 0,
+      ),
+    ),
+    'entity_type' => 'node',
+    'field_name' => 'field_person_retirement_date',
+    'label' => 'Effective Retirement Date',
+    'required' => 0,
+    'settings' => array(
+      'default_value' => 'now',
+      'default_value2' => 'same',
+      'default_value_code' => '',
+      'default_value_code2' => '',
+      'user_register_form' => FALSE,
+    ),
+    'widget' => array(
+      'active' => 1,
+      'module' => 'date',
+      'settings' => array(
+        'increment' => 15,
+        'input_format' => 'm/d/Y - H:i:s',
+        'input_format_custom' => '',
+        'label_position' => 'above',
+        'text_parts' => array(),
+        'year_range' => '-3:+3',
+      ),
+      'type' => 'date_text',
+      'weight' => 16,
+    ),
+  );
+
   // Exported field_instance: 'node-person-field_person_safe_church'
   $field_instances['node-person-field_person_safe_church'] = array(
     'bundle' => 'person',
@@ -2504,12 +2740,16 @@ function person_field_default_field_instances() {
   t('Available for Sunday Eucharist (HE1/2)');
   t('Available for Sunday Morning Prayer (MP1/2)');
   t('Baptism');
+  t('Canonical Residence');
   t('City');
   t('Confirmation');
   t('Consecration');
   t('Date of Birth');
   t('Date of Death');
+  t('Date of License');
+  t('Date of License Renewal');
   t('Delivered by email');
+  t('Denomination');
   t('Diaconate Ordination');
   t('Diocesan Policies');
   t('Disable only if this person is no longer canonically required to complete Safe Church training.');
@@ -2520,6 +2760,7 @@ function person_field_default_field_instances() {
   t('Do not print my phone number(s) in directories');
   t('E-Newlsetter');
   t('Editors');
+  t('Effective Retirement Date');
   t('Employment Status');
   t('First Name');
   t('Gender');

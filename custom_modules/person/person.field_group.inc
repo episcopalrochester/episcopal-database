@@ -21,7 +21,7 @@ function person_field_group_info() {
   $field_group->parent_name = 'group_person_data';
   $field_group->data = array(
     'label' => 'Committee Relationships',
-    'weight' => '11',
+    'weight' => '13',
     'children' => array(),
     'format_type' => 'tab',
     'format_settings' => array(
@@ -46,7 +46,7 @@ function person_field_group_info() {
   $field_group->parent_name = 'group_person_data';
   $field_group->data = array(
     'label' => 'Editors',
-    'weight' => '12',
+    'weight' => '14',
     'children' => array(
       0 => 'field_editors',
     ),
@@ -73,7 +73,7 @@ function person_field_group_info() {
   $field_group->parent_name = 'group_person_data';
   $field_group->data = array(
     'label' => 'Database Access',
-    'weight' => '16',
+    'weight' => '18',
     'children' => array(),
     'format_type' => 'tab',
     'format_settings' => array(
@@ -129,7 +129,7 @@ function person_field_group_info() {
   $field_group->parent_name = 'group_person_data';
   $field_group->data = array(
     'label' => 'Home Address',
-    'weight' => '4',
+    'weight' => '6',
     'children' => array(
       0 => 'field_person_home_1',
       1 => 'field_person_home_2',
@@ -199,21 +199,23 @@ function person_field_group_info() {
     'label' => 'Personal Data',
     'weight' => '1',
     'children' => array(
-      0 => 'group_editors',
-      1 => 'group_person_access',
-      2 => 'group_person_address',
-      3 => 'group_person_ecclesiastical',
-      4 => 'group_person_email',
-      5 => 'group_person_mailing',
-      6 => 'group_person_phones',
-      7 => 'group_person_privacy',
-      8 => 'group_person_subscriptions',
-      9 => 'group_person_supply',
-      10 => 'group_person_training',
-      11 => 'group_person_vitals',
-      12 => 'group_personal_relationships',
-      13 => 'group_professional_relationships',
-      14 => 'group_committee_relationships',
+      0 => 'group_person_retirement',
+      1 => 'group_committee_relationships',
+      2 => 'group_editors',
+      3 => 'group_person_access',
+      4 => 'group_person_address',
+      5 => 'group_person_ecclesiastical',
+      6 => 'group_person_email',
+      7 => 'group_person_mailing',
+      8 => 'group_person_phones',
+      9 => 'group_person_privacy',
+      10 => 'group_person_subscriptions',
+      11 => 'group_person_supply',
+      12 => 'group_person_training',
+      13 => 'group_person_vitals',
+      14 => 'group_personal_relationships',
+      15 => 'group_professional_relationships',
+      16 => 'group_person_licensing',
     ),
     'format_type' => 'tabs',
     'format_settings' => array(
@@ -266,7 +268,7 @@ function person_field_group_info() {
   $field_group->parent_name = 'group_person_data';
   $field_group->data = array(
     'label' => 'Ecclesiastical Dates',
-    'weight' => '3',
+    'weight' => '5',
     'children' => array(
       0 => 'field_person_baptism',
       1 => 'field_person_confirmation',
@@ -326,7 +328,7 @@ function person_field_group_info() {
   $field_group->parent_name = 'group_person_data';
   $field_group->data = array(
     'label' => 'E-Mail/Social',
-    'weight' => '7',
+    'weight' => '9',
     'children' => array(
       0 => 'field_person_email_other',
       1 => 'field_person_email_other_type',
@@ -344,6 +346,36 @@ function person_field_group_info() {
     ),
   );
   $export['group_person_email|node|person|form'] = $field_group;
+
+  $field_group = new stdClass();
+  $field_group->disabled = FALSE; /* Edit this to true to make a default field_group disabled initially */
+  $field_group->api_version = 1;
+  $field_group->identifier = 'group_person_licensing|node|person|form';
+  $field_group->group_name = 'group_person_licensing';
+  $field_group->entity_type = 'node';
+  $field_group->bundle = 'person';
+  $field_group->mode = 'form';
+  $field_group->parent_name = 'group_person_data';
+  $field_group->data = array(
+    'label' => 'Licensing',
+    'weight' => '3',
+    'children' => array(
+      0 => 'field_person_license',
+      1 => 'field_person_license_renewal',
+      2 => 'field_person_license_denom',
+      3 => 'field_person_license_res',
+    ),
+    'format_type' => 'tab',
+    'format_settings' => array(
+      'formatter' => 'closed',
+      'instance_settings' => array(
+        'description' => '',
+        'classes' => 'group-person-licensing field-group-tab',
+        'required_fields' => 1,
+      ),
+    ),
+  );
+  $export['group_person_licensing|node|person|form'] = $field_group;
 
   $field_group = new stdClass();
   $field_group->disabled = FALSE; /* Edit this to true to make a default field_group disabled initially */
@@ -387,7 +419,7 @@ function person_field_group_info() {
   $field_group->parent_name = 'group_person_data';
   $field_group->data = array(
     'label' => 'Mailing Address',
-    'weight' => '5',
+    'weight' => '7',
     'children' => array(
       0 => 'field_person_mail_1',
       1 => 'field_person_mail_2',
@@ -449,7 +481,7 @@ function person_field_group_info() {
   $field_group->parent_name = 'group_person_data';
   $field_group->data = array(
     'label' => 'Phone Numbers',
-    'weight' => '6',
+    'weight' => '8',
     'children' => array(
       0 => 'field_person_phone_other',
       1 => 'field_person_phone_other_type',
@@ -509,7 +541,7 @@ function person_field_group_info() {
   $field_group->parent_name = 'group_person_data';
   $field_group->data = array(
     'label' => 'Privacy',
-    'weight' => '13',
+    'weight' => '15',
     'children' => array(
       0 => 'field_person_no_directory',
       1 => 'field_person_no_partnerships',
@@ -528,6 +560,34 @@ function person_field_group_info() {
     ),
   );
   $export['group_person_privacy|node|person|form'] = $field_group;
+
+  $field_group = new stdClass();
+  $field_group->disabled = FALSE; /* Edit this to true to make a default field_group disabled initially */
+  $field_group->api_version = 1;
+  $field_group->identifier = 'group_person_retirement|node|person|form';
+  $field_group->group_name = 'group_person_retirement';
+  $field_group->entity_type = 'node';
+  $field_group->bundle = 'person';
+  $field_group->mode = 'form';
+  $field_group->parent_name = 'group_person_data';
+  $field_group->data = array(
+    'label' => 'Retirement',
+    'weight' => '4',
+    'children' => array(
+      0 => 'field_person_employment',
+      1 => 'field_person_retirement_date',
+    ),
+    'format_type' => 'tab',
+    'format_settings' => array(
+      'formatter' => 'closed',
+      'instance_settings' => array(
+        'description' => '',
+        'classes' => 'group-person-retirement field-group-tab',
+        'required_fields' => 1,
+      ),
+    ),
+  );
+  $export['group_person_retirement|node|person|form'] = $field_group;
 
   $field_group = new stdClass();
   $field_group->disabled = FALSE; /* Edit this to true to make a default field_group disabled initially */
@@ -636,7 +696,7 @@ function person_field_group_info() {
   $field_group->parent_name = 'group_person_data';
   $field_group->data = array(
     'label' => 'Subscriptions',
-    'weight' => '14',
+    'weight' => '16',
     'children' => array(
       0 => 'field_person_enews',
       1 => 'field_person_printed_news',
@@ -693,7 +753,7 @@ function person_field_group_info() {
   $field_group->parent_name = 'group_person_data';
   $field_group->data = array(
     'label' => 'Supply Availability',
-    'weight' => '15',
+    'weight' => '17',
     'children' => array(
       0 => 'field_person_supply_he',
       1 => 'field_person_supply_mp',
@@ -748,7 +808,7 @@ function person_field_group_info() {
   $field_group->parent_name = 'group_person_data';
   $field_group->data = array(
     'label' => 'Training',
-    'weight' => '8',
+    'weight' => '10',
     'children' => array(
       0 => 'group_person_safe_training',
     ),
@@ -822,8 +882,7 @@ function person_field_group_info() {
       6 => 'field_person_nickname',
       7 => 'field_person_suffix',
       8 => 'field_person_title',
-      9 => 'field_person_employment',
-      10 => 'field_person_clergy_spouse',
+      9 => 'field_person_clergy_spouse',
     ),
     'format_type' => 'tab',
     'format_settings' => array(
@@ -873,7 +932,7 @@ function person_field_group_info() {
   $field_group->parent_name = 'group_person_data';
   $field_group->data = array(
     'label' => 'Personal Relationships',
-    'weight' => '9',
+    'weight' => '11',
     'children' => array(),
     'format_type' => 'tab',
     'format_settings' => array(
@@ -923,7 +982,7 @@ function person_field_group_info() {
   $field_group->parent_name = 'group_person_data';
   $field_group->data = array(
     'label' => 'Organizational Relationships',
-    'weight' => '10',
+    'weight' => '12',
     'children' => array(),
     'format_type' => 'tab',
     'format_settings' => array(
