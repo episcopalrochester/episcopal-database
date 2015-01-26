@@ -3,18 +3,6 @@
  * Implementation of hook_menu
  */
 
-function edb_menu() {
-  $menu['my-data'] = array(
-    'title' => "My Data",
-    'description' => "Page showing user's data",
-    'page callback' => 'drupal_get_form',
-    'page arguments' => array('edb_mydata_page_form'),
-    'access arguments' => array ('access content'),
-    'type' => MENU_NORMAL_ITEM,
-  );
-  return $menu;
-}
-
 function edb_init() {
   global $base_url;
   if ($base_url == "http://datadev.edordev.org") {
@@ -22,60 +10,11 @@ function edb_init() {
       module_disable(array("rules","rules_admin"));
     }
   }
-  variable_set("site_frontpage","my-data");
+  variable_set("site_frontpage","data");
   global $user;
   if (arg(1) <> "logout" && arg(0) == "user" && arg(2) <> "password" && $user->uid > 1) {
     drupal_goto("user/".$user->uid."/password");
   }
-}
-
-function edb_mydata_page_form($form,&$form_state) {
-  global $user;
-  $query = db_select('node','n');
-  $query->leftJoin("field_data_field_editors","e","e.entity_id = n.nid");
-  $query->fields('n',array('nid','type','title','changed'))
-    ->condition('status','1')
-    ->condition('type','person')
-    ->orderBy('type','ASC')
-    ->orderBy('changed','DESC');
-  $or = db_or();
-  $or->condition('uid',$user->uid);
-  $or->condition('e.field_editors_uid',$user->uid);
-  $query->condition($or);
-  $result = $query->execute();
-  $tables = array();
-  $variables = array(
-    'header' => array('Record','Last Edited'),
-    'rows' => array(),
-    'attributes' => array(),
-    'caption' => '',
-    'colgroups' => array(),
-    'sticky' => FALSE,
-    'empty' => '',
-  );
-  while ($record = $result->fetchAssoc()) {
-    if (!isset($tables[$record['type']])) {
-      $type = $record['type'];
-      $tables[$type] = $variables;
-      $tables[$type]['caption'] = ucwords(str_replace("_"," ",$type))." Records";
-    }
-    $row = array(
-      'data' => array(
-        l($record['title'],"node/".$record['nid'],array('html'=>TRUE)),
-        date('r',$record['changed']),
-        ),
-      );
-    $tables[$type]['rows'][] = $row;
-  }
-  $count = 1;
-  foreach ($tables as $table) {
-    $form['table'.$count] = array(
-      '#type' => 'item',
-      '#markup' => theme_table($table),
-      );
-   $count++;
-  }
-  return $form;
 }
 
 function edb_node_access($node, $op, $account) {
