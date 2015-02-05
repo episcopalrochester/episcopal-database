@@ -1,4 +1,13 @@
 <?php
+
+/**
+ * @file
+ * Code for the Episcopal Database feature.
+ */
+
+include_once 'edb.features.inc';
+
+
 /**
  * Implementation of hook_menu
  */
@@ -21,46 +30,46 @@ function edb_node_access($node, $op, $account) {
   switch ($op) {
     case "view":
       if (
-        in_array("database editor",$account->roles) ||
-        in_array("dean",$account->roles) ||
-        $node->uid == $account->uid ||
-        find_relationships(FALSE,$node) ||
-        edb_check_editors($account->uid,$node)
-      ) {
+          in_array("database editor",$account->roles) ||
+          in_array("dean",$account->roles) ||
+          $node->uid == $account->uid ||
+          find_relationships(FALSE,$node) ||
+          edb_check_editors($account->uid,$node)
+         ) {
         return NODE_ACCESS_ALLOW;
       }
-      elseif ($node->type == "admin_form") {
-        if (pro_relationship_owner(node_load($node->field_admin_form_parish['und'][0]['nid']),$account)) {
-          return NODE_ACCESS_ALLOW;
-        }
+    elseif ($node->type == "admin_form") {
+      if (pro_relationship_owner(node_load($node->field_admin_form_parish['und'][0]['nid']),$account)) {
+        return NODE_ACCESS_ALLOW;
       }
-      return NODE_ACCESS_DENY;
-      break;
+    }
+    return NODE_ACCESS_DENY;
+    break;
     case "update":
       if (
-        in_array("database editor",$account->roles) ||
-        $node->uid == $account->uid ||
-        edb_check_editors($account->uid,$node)
-      ) {
+          in_array("database editor",$account->roles) ||
+          $node->uid == $account->uid ||
+          edb_check_editors($account->uid,$node)
+         ) {
         return NODE_ACCESS_ALLOW;
       }
-      elseif ($node->type == "admin_form") {
-        if (pro_relationship_owner(node_load($node->field_admin_form_parish['und'][0]['nid']),$account)) {
-          return NODE_ACCESS_ALLOW;
-        }
+    elseif ($node->type == "admin_form") {
+      if (pro_relationship_owner(node_load($node->field_admin_form_parish['und'][0]['nid']),$account)) {
+        return NODE_ACCESS_ALLOW;
       }
-      return NODE_ACCESS_DENY;
-      break;
+    }
+    return NODE_ACCESS_DENY;
+    break;
   }
 }
 
 function edb_is_admin() {
   global $user;
   if (
-    in_array("database editor",$user->roles) ||
-    in_array("dean",$user->roles) ||
-    $user->uid == 1 ||
-    in_array("administrator",$user->roles)) {
+      in_array("database editor",$user->roles) ||
+      in_array("dean",$user->roles) ||
+      $user->uid == 1 ||
+      in_array("administrator",$user->roles)) {
     return true;
   }
   return false; 

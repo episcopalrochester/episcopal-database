@@ -1,10 +1,15 @@
 name = Episcopal Database
-description = Master module for Episcopal Database system.
 core = 7.x
-version = 7.x-1.1
+description = Master module for Episcopal Database system.
 package = Episcopal Database
+version = 7.x-1.2
+project = edb
+dependencies[] = views
+features[ctools][] = views:views_default:3.0
+features[features_api][] = api:2
+features[views_view][] = my_data
+features_exclude[dependencies][ctools] = ctools
 stylesheets[all][] = styles.css
 stylesheets[print][] = edb_print.css
 dependencies[] = person
 dependencies[] = personal_relationships
-
