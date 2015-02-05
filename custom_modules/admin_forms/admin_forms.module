@@ -59,3 +59,21 @@ function admin_forms_generate($form,&$form_state) {
     drupal_set_message("Generated ".$node->title);
   }
 }
+
+function admin_forms_form_admin_form_node_form_alter(&$form, &$form_state, $form_id) {
+  $form['actions']['submit']['#value'] = "Save & Continue"; 
+  $form['actions']['delete']['#access'] = false;
+  $form['actions']['exit'] = array(
+    '#type' => 'submit',
+    '#value' => 'Save & Exit',
+    '#weight' => 20,
+    '#submit' => array(
+      0 => 'admin_forms_save_exit',
+    ),
+  );
+}
+
+function admin_forms_save_exit($form,&$form_state) {
+  node_form_submit($form, $form_state);
+  drupal_goto();
+}

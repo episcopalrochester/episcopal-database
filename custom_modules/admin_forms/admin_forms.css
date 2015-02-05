@@ -1,0 +1,7 @@
+#admin-form-node-form .vertical-tabs {
+  display: none;
+}
+
+#admin-form-node-form #edit-preview-changes {
+  display: none;
+}
