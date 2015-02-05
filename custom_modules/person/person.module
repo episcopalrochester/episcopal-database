@@ -31,7 +31,7 @@ function person_menu() {
     'type' => MENU_LOCAL_TASK,
   );
   $items['staff/new-person'] = array(
-    'title' => 'New Person',
+    'title' => 'New',
     'page callback' => 'drupal_goto',
     'page arguments' => array('node/add/person'),
     'access arguments' => array('access people listing'),
@@ -1456,8 +1456,11 @@ function _get_value($node,$field,$type = "value") {
 function person_node_load($nodes, $types) {
   if (in_array("person",$types)) {
     foreach ($nodes as $key => $node) {
-      $nodes[$key]->title = person_get_full_name($node);
-      $nodes[$key]->is_alive = person_is_alive($node);
+      if ($node->type == "person") {
+        $nodes[$key]->title = person_get_full_name($node);
+        $nodes[$key]->is_alive = person_is_alive($node);
+      }
+      $nodes[$key]->title = str_replace("&amp;", "&",$nodes[$key]->title);
     }
   }
 }

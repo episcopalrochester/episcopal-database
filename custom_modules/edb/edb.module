@@ -29,6 +29,11 @@ function edb_node_access($node, $op, $account) {
       ) {
         return NODE_ACCESS_ALLOW;
       }
+      elseif ($node->type == "admin_form") {
+        if (pro_relationship_owner(node_load($node->field_admin_form_parish['und'][0]['nid']),$account)) {
+          return NODE_ACCESS_ALLOW;
+        }
+      }
       return NODE_ACCESS_DENY;
       break;
     case "update":
@@ -38,6 +43,11 @@ function edb_node_access($node, $op, $account) {
         edb_check_editors($account->uid,$node)
       ) {
         return NODE_ACCESS_ALLOW;
+      }
+      elseif ($node->type == "admin_form") {
+        if (pro_relationship_owner(node_load($node->field_admin_form_parish['und'][0]['nid']),$account)) {
+          return NODE_ACCESS_ALLOW;
+        }
       }
       return NODE_ACCESS_DENY;
       break;

@@ -5,3 +5,57 @@
  */
 
 include_once 'admin_forms.features.inc';
+
+function admin_forms_menu() {
+  $items = array();
+  $items['staff/adminforms'] = array(
+    'title' => 'Admin Forms',
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('admin_forms_form'),
+    'access arguments' => array('access people listing'),
+    'weight' => 20,
+    'type' => MENU_LOCAL_TASK,
+  );
+  return $items;
+}
+
+function admin_forms_form($form,&$form_state) {
+  $form['year'] = array(
+    '#type' => 'textfield',
+    '#title' => 'Year of Admin Forms',
+    '#default_value' => date('Y'),
+    );
+  $form['submit'] = array(
+    '#type' => 'submit',
+    '#value' => 'Generate Admin Forms',
+    );
+  $form['#submit'] = array('admin_forms_generate');
+  return $form;
+}
+
+function admin_forms_generate($form,&$form_state) {
+  $parishes = parish_fetch_parishes();
+  foreach ($parishes['nodes'] as $parish) {
+    $node = new stdClass();
+    $node->bundle = "admin_form";
+    $node->type = "admin_form";
+    $node->language = 'und';
+    node_object_prepare($node);
+    $node->field_admin_form_parish = array(
+      'und' => array(
+        '0' => array(
+          'nid' => $parish->nid,
+        ),
+      ),
+    );
+    $node->field_admin_form_year = array(
+      'und' => array(
+        '0' => array(
+          'value' => $form_state['values']['year'],
+        ),
+      ),
+    );
+    node_save($node);
+    drupal_set_message("Generated ".$node->title);
+  }
+}

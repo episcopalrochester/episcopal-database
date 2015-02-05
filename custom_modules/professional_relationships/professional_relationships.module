@@ -44,8 +44,8 @@ function find_pro_relationships($types = FALSE, $person,$inactive = FALSE) {
   $query->condition(
     db_or()
     ->condition('f.field_pf_first_nid',$person->nid)
-    ->condition('s.field_pf_second_nid',$person->nid))
-    ->condition('n.status', 1);
+    ->condition('s.field_pf_second_nid',$person->nid));
+  $query->condition('n.status', 1);
   if (!$inactive) {
     $inactive_or = db_or();
     $and_1 = db_and();
@@ -147,4 +147,14 @@ function pro_relationship_splits($key = FALSE) {
     return $splits[$key];
   }
   return $splits;
+}
+
+function pro_relationship_owner($node, $account) {
+  $rels = find_pro_relationships(FALSE,$node);
+  foreach ($rels as $rel) {
+    if ($rel['relative']->uid == $account->uid) {
+      return TRUE;
+    }
+  }
+  return FALSE;
 }
