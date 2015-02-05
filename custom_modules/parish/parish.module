@@ -460,9 +460,8 @@ function parish_fetch_parishes($district=FALSE,$city=FALSE,$limit=FALSE,$nid=FAL
   $query->leftJoin("field_data_field_parish_district","d","d.entity_id = n.nid");
   $query->fields('n',array('nid'))
     ->condition("n.type","parish","=")
+    ->orderBy('n.title','ASC')
     ->orderBy('c.field_parish_home_city_value','ASC')
-    ->orderBy('n.title','ASC')
-    ->orderBy('n.title','ASC')
     ->condition('n.status', 1);
   if ($limit) {
     $query = $query->extend('PagerDefault')->limit($limit);
