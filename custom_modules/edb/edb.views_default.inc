@@ -284,6 +284,18 @@ function edb_views_default_views() {
   $handler->display->display_options['fields']['title']['field'] = 'title';
   $handler->display->display_options['fields']['title']['alter']['word_boundary'] = FALSE;
   $handler->display->display_options['fields']['title']['alter']['ellipsis'] = FALSE;
+  /* Field: Content: I hereby certify that this form is now complete. */
+  $handler->display->display_options['fields']['field_admin_form_certification']['id'] = 'field_admin_form_certification';
+  $handler->display->display_options['fields']['field_admin_form_certification']['table'] = 'field_data_field_admin_form_certification';
+  $handler->display->display_options['fields']['field_admin_form_certification']['field'] = 'field_admin_form_certification';
+  $handler->display->display_options['fields']['field_admin_form_certification']['label'] = 'Completion';
+  $handler->display->display_options['fields']['field_admin_form_certification']['empty'] = 'Incomplete';
+  $handler->display->display_options['fields']['field_admin_form_certification']['hide_alter_empty'] = FALSE;
+  $handler->display->display_options['defaults']['sorts'] = FALSE;
+  /* Sort criterion: Content: Title */
+  $handler->display->display_options['sorts']['title']['id'] = 'title';
+  $handler->display->display_options['sorts']['title']['table'] = 'node';
+  $handler->display->display_options['sorts']['title']['field'] = 'title';
   $handler->display->display_options['defaults']['filter_groups'] = FALSE;
   $handler->display->display_options['filter_groups']['groups'] = array(
     1 => 'AND',

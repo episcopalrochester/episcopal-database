@@ -208,6 +208,32 @@ function admin_forms_field_default_field_bases() {
     'type' => 'tablefield',
   );
 
+  // Exported field_base: 'field_admin_form_certification'
+  $field_bases['field_admin_form_certification'] = array(
+    'active' => 1,
+    'cardinality' => 1,
+    'deleted' => 0,
+    'entity_types' => array(),
+    'field_name' => 'field_admin_form_certification',
+    'foreign keys' => array(),
+    'indexes' => array(
+      'value' => array(
+        0 => 'value',
+      ),
+    ),
+    'locked' => 0,
+    'module' => 'list',
+    'settings' => array(
+      'allowed_values' => array(
+        0 => 'Incomplete',
+        1 => 'Complete',
+      ),
+      'allowed_values_function' => '',
+    ),
+    'translatable' => 0,
+    'type' => 'list_boolean',
+  );
+
   // Exported field_base: 'field_admin_form_clergy'
   $field_bases['field_admin_form_clergy'] = array(
     'active' => 1,

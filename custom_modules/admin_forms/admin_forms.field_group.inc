@@ -13,6 +13,34 @@ function admin_forms_field_group_info() {
   $field_group = new stdClass();
   $field_group->disabled = FALSE; /* Edit this to true to make a default field_group disabled initially */
   $field_group->api_version = 1;
+  $field_group->identifier = 'group_admin_form_advanced|node|admin_form|form';
+  $field_group->group_name = 'group_admin_form_advanced';
+  $field_group->entity_type = 'node';
+  $field_group->bundle = 'admin_form';
+  $field_group->mode = 'form';
+  $field_group->parent_name = '';
+  $field_group->data = array(
+    'label' => 'Advanced',
+    'weight' => '5',
+    'children' => array(
+      0 => 'field_editors',
+    ),
+    'format_type' => 'fieldset',
+    'format_settings' => array(
+      'label' => 'Advanced',
+      'instance_settings' => array(
+        'required_fields' => 1,
+        'classes' => 'group-admin-form-advanced field-group-fieldset',
+        'description' => '',
+      ),
+      'formatter' => 'collapsed',
+    ),
+  );
+  $export['group_admin_form_advanced|node|admin_form|form'] = $field_group;
+
+  $field_group = new stdClass();
+  $field_group->disabled = FALSE; /* Edit this to true to make a default field_group disabled initially */
+  $field_group->api_version = 1;
   $field_group->identifier = 'group_admin_form_apmnt|node|admin_form|form';
   $field_group->group_name = 'group_admin_form_apmnt';
   $field_group->entity_type = 'node';
@@ -25,8 +53,8 @@ function admin_forms_field_group_info() {
     'children' => array(
       0 => 'field_2015_apportionments',
       1 => 'field_admin_form_apmnt_cmt',
-      2 => 'field_admin_form_apmnt_statement',
-      3 => 'field_admin_form_apmnt_signature',
+      2 => 'field_admin_form_apmnt_signature',
+      3 => 'field_admin_form_apmnt_statement',
       4 => 'field_apportmention_description',
     ),
     'format_type' => 'multipage',
@@ -54,8 +82,8 @@ function admin_forms_field_group_info() {
     'label' => 'Audit Dates',
     'weight' => '15',
     'children' => array(
-      0 => 'field_audit_form_aud_mgmt',
-      1 => 'field_admin_form_audit_fin',
+      0 => 'field_admin_form_audit_fin',
+      1 => 'field_audit_form_aud_mgmt',
     ),
     'format_type' => 'fieldset',
     'format_settings' => array(
@@ -84,9 +112,9 @@ function admin_forms_field_group_info() {
     'weight' => '3',
     'children' => array(
       0 => 'field_admin_form_audit_team',
-      1 => 'group_admin_form_cpa',
+      1 => 'group_admin_form_audit_dates',
       2 => 'group_admin_form_conflicts',
-      3 => 'group_admin_form_audit_dates',
+      3 => 'group_admin_form_cpa',
       4 => 'group_audit_form_info',
     ),
     'format_type' => 'multipage',
@@ -142,8 +170,8 @@ function admin_forms_field_group_info() {
     'label' => 'Certified Public Accountant',
     'weight' => '13',
     'children' => array(
-      0 => 'field_admin_form_cpa_name',
-      1 => 'field_admin_form_cpa_addr',
+      0 => 'field_admin_form_cpa_addr',
+      1 => 'field_admin_form_cpa_name',
     ),
     'format_type' => 'fieldset',
     'format_settings' => array(
@@ -171,8 +199,8 @@ function admin_forms_field_group_info() {
     'label' => 'Certificate of Lay Delegates',
     'weight' => '2',
     'children' => array(
-      0 => 'field_admin_form_delegates',
-      1 => 'field_admin_form_alternates',
+      0 => 'field_admin_form_alternates',
+      1 => 'field_admin_form_delegates',
     ),
     'format_type' => 'multipage',
     'format_settings' => array(
@@ -199,12 +227,12 @@ function admin_forms_field_group_info() {
     'label' => 'List of Parish Staff, Officers & Ministry Appointments',
     'weight' => '1',
     'children' => array(
-      0 => 'field_office_staff',
-      1 => 'field_admin_form_wardens',
-      2 => 'field_admin_form_clergy',
-      3 => 'field_finance_ministry',
-      4 => 'field_admin_form_formation',
-      5 => 'field_admin_form_music',
+      0 => 'field_admin_form_clergy',
+      1 => 'field_admin_form_formation',
+      2 => 'field_admin_form_music',
+      3 => 'field_admin_form_wardens',
+      4 => 'field_finance_ministry',
+      5 => 'field_office_staff',
     ),
     'format_type' => 'multipage',
     'format_settings' => array(
@@ -232,10 +260,10 @@ function admin_forms_field_group_info() {
     'label' => 'Admin Forms',
     'weight' => '4',
     'children' => array(
-      0 => 'group_admin_form_staff',
-      1 => 'group_admin_form_del',
-      2 => 'group_admin_form_audit',
-      3 => 'group_admin_form_apmnt',
+      0 => 'group_admin_form_apmnt',
+      1 => 'group_admin_form_audit',
+      2 => 'group_admin_form_del',
+      3 => 'group_admin_form_staff',
     ),
     'format_type' => 'multipage-group',
     'format_settings' => array(
@@ -264,11 +292,11 @@ function admin_forms_field_group_info() {
     'label' => 'Audit information has been provided by',
     'weight' => '16',
     'children' => array(
-      0 => 'field_audit_form_name',
-      1 => 'field_audit_form_title',
-      2 => 'field_audit_form_telephone',
-      3 => 'field_audit_form_email',
-      4 => 'field_audit_form_date',
+      0 => 'field_audit_form_date',
+      1 => 'field_audit_form_email',
+      2 => 'field_audit_form_name',
+      3 => 'field_audit_form_telephone',
+      4 => 'field_audit_form_title',
     ),
     'format_type' => 'fieldset',
     'format_settings' => array(

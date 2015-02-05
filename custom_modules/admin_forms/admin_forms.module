@@ -16,7 +16,7 @@ function admin_forms_menu() {
     'weight' => 20,
     'type' => MENU_LOCAL_TASK,
   );
-  return $items;
+//  return $items;
 }
 
 function admin_forms_form($form,&$form_state) {
@@ -71,6 +71,8 @@ function admin_forms_form_admin_form_node_form_alter(&$form, &$form_state, $form
       0 => 'admin_forms_save_exit',
     ),
   );
+  $form['field_admin_form_parish']['#disabled'] = true;
+  $form['field_admin_form_year']['#disabled'] = true;
 }
 
 function admin_forms_save_exit($form,&$form_state) {

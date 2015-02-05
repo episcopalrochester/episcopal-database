@@ -5,3 +5,29 @@
 #admin-form-node-form #edit-preview-changes {
   display: none;
 }
+
+#admin-form-node-form #edit-submit {
+  background: green;
+  color: white;
+  text-shadow: 0 1px 0px black;
+}
+
+#admin-form-node-form #edit-exit {
+  background: red;
+  color: white;
+  text-shadow: 0 1px 0px black;
+    } 
+
+    #admin-form-node-form .multipage-link-next {
+      background: yellow;
+    }
+
+    #admin-form-node-form .multipage-link-previous {
+      background: aqua;
+                  }
+
+                  #admin-form-node-form .fieldset-wrapper legend {
+                    background: Navy;
+                      color: white;
+                        text-shadow: 0 1px 0px black;
+                   }

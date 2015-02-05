@@ -491,6 +491,49 @@ function admin_forms_field_default_field_instances() {
     ),
   );
 
+  // Exported field_instance: 'node-admin_form-field_admin_form_certification'
+  $field_instances['node-admin_form-field_admin_form_certification'] = array(
+    'bundle' => 'admin_form',
+    'default_value' => array(
+      0 => array(
+        'value' => 0,
+      ),
+    ),
+    'deleted' => 0,
+    'description' => '',
+    'display' => array(
+      'default' => array(
+        'label' => 'above',
+        'module' => 'list',
+        'settings' => array(),
+        'type' => 'list_default',
+        'weight' => 30,
+      ),
+      'teaser' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 0,
+      ),
+    ),
+    'entity_type' => 'node',
+    'field_name' => 'field_admin_form_certification',
+    'label' => 'I hereby certify that this form is now complete.',
+    'required' => 0,
+    'settings' => array(
+      'user_register_form' => FALSE,
+    ),
+    'widget' => array(
+      'active' => 1,
+      'module' => 'options',
+      'settings' => array(
+        'display_label' => 1,
+      ),
+      'type' => 'options_onoff',
+      'weight' => 33,
+    ),
+  );
+
   // Exported field_instance: 'node-admin_form-field_admin_form_clergy'
   $field_instances['node-admin_form-field_admin_form_clergy'] = array(
     'bundle' => 'admin_form',
@@ -1561,6 +1604,7 @@ function admin_forms_field_default_field_instances() {
   t('Email');
   t('Finance Ministry');
   t('Find your parish\'s 2015 Apportionment below.');
+  t('I hereby certify that this form is now complete.');
   t('Music Ministry');
   t('Name');
   t('Name of CPA');
