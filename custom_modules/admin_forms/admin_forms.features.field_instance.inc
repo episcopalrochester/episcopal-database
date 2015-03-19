@@ -846,8 +846,8 @@ function admin_forms_field_default_field_instances() {
           'cell_0_0' => 'Music Ministry',
           'cell_0_1' => 'Last Name',
           'cell_0_2' => 'First Name',
-          'cell_0_3' => 'Street Address',
-          'cell_0_4' => 'City',
+          'cell_0_3' => 'Phone',
+          'cell_0_4' => 'E-Mail',
           'cell_1_0' => 'Director',
           'cell_1_1' => '',
           'cell_1_2' => '',
@@ -1103,59 +1103,6 @@ function admin_forms_field_default_field_instances() {
       'settings' => array(),
       'type' => 'markup',
       'weight' => 30,
-    ),
-  );
-
-  // Exported field_instance: 'node-admin_form-field_audit_form_aud_mgmt'
-  $field_instances['node-admin_form-field_audit_form_aud_mgmt'] = array(
-    'bundle' => 'admin_form',
-    'deleted' => 0,
-    'description' => '',
-    'display' => array(
-      'default' => array(
-        'label' => 'above',
-        'module' => 'date',
-        'settings' => array(
-          'format_type' => 'long',
-          'fromto' => 'both',
-          'multiple_from' => '',
-          'multiple_number' => '',
-          'multiple_to' => '',
-        ),
-        'type' => 'date_default',
-        'weight' => 18,
-      ),
-      'teaser' => array(
-        'label' => 'above',
-        'settings' => array(),
-        'type' => 'hidden',
-        'weight' => 0,
-      ),
-    ),
-    'entity_type' => 'node',
-    'field_name' => 'field_audit_form_aud_mgmt',
-    'label' => 'Date of last parish management audit',
-    'required' => 0,
-    'settings' => array(
-      'default_value' => 'blank',
-      'default_value2' => 'same',
-      'default_value_code' => '',
-      'default_value_code2' => '',
-      'user_register_form' => FALSE,
-    ),
-    'widget' => array(
-      'active' => 1,
-      'module' => 'date',
-      'settings' => array(
-        'increment' => 15,
-        'input_format' => 'm/d/Y - H:i:s',
-        'input_format_custom' => '',
-        'label_position' => 'above',
-        'text_parts' => array(),
-        'year_range' => '-3:+3',
-      ),
-      'type' => 'date_text',
-      'weight' => 19,
     ),
   );
 
@@ -1599,7 +1546,6 @@ function admin_forms_field_default_field_instances() {
   t('Conflicts of Interest');
   t('Date');
   t('Date of last parish financial audit');
-  t('Date of last parish management audit');
   t('Delegates');
   t('Email');
   t('Finance Ministry');

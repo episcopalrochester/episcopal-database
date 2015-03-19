@@ -1116,7 +1116,7 @@ function person_field_default_field_instances() {
     'label' => 'Date of License',
     'required' => 0,
     'settings' => array(
-      'default_value' => 'now',
+      'default_value' => 'blank',
       'default_value2' => 'same',
       'default_value_code' => '',
       'default_value_code2' => '',
@@ -1206,7 +1206,7 @@ function person_field_default_field_instances() {
     'label' => 'Date of License Renewal',
     'required' => 0,
     'settings' => array(
-      'default_value' => 'now',
+      'default_value' => 'blank',
       'default_value2' => 'same',
       'default_value_code' => '',
       'default_value_code2' => '',
