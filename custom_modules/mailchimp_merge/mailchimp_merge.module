@@ -86,6 +86,9 @@ function mailchimp_merge_prepare_batch() {
         if (person_is_survivor($person)) {
           $internal[] = "Surviving Spouses";
         }
+        if (person_is_moving_back($person)) {
+          $internal[] = "Moving Back into the Neighborhood";
+        }
         if (isset($cache[$email])) {
           $internal = array_merge($internal,$cache[$email]['merge_vars']['GROUPINGS'][0]['groups']);
 

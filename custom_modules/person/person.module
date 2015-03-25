@@ -1262,6 +1262,13 @@ function person_is_survivor($person) {
   return false;
 }
 
+function person_is_moving_back($person) {
+  if (_get_value($person,'field_person_neighborhood')) {
+    return true;
+  }
+  return false;
+}
+
 function person_is_warden($person) {
   if (!person_is_alive($person)) {
     return false;
