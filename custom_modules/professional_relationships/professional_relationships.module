@@ -120,6 +120,7 @@ function pro_relationship_types() {
     'warden' => 'Warden',
     'wardenjr' => 'Junion Warden',
     'wardensr' => 'Senior Warden',
+    'clerk' => 'Clerk',
     'admin' => 'Parish Administrator',
     'treasurer' => 'Treasurer',
     'bishop' => 'Bishop',

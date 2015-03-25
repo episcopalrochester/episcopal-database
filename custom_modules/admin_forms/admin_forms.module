@@ -32,6 +32,10 @@ function admin_forms_process_form($form,&$form_state) {
   if (isset($form_state['clicked_button'])) {
     if ($form_state['clicked_button']['#id'] == "edit-live") {
       $live = true;
+      drupal_set_message("Live Run.");
+    }
+    else {
+      drupal_set_message("Dry Run.");
     }
   }
 
@@ -60,7 +64,7 @@ function admin_forms_process_form($form,&$form_state) {
   $parishes = parish_fetch_parishes();
   foreach ($parishes['nodes'] as $parish) {
     $parishes_table = array(
-      'header' => array('Form Status','Sr. Warden','Jr. Warden','Treasurer'),
+      'header' => array('Form Status','Sr. Warden','Jr. Warden','Treasurer','Clerk'),
       'rows' => array(),
       'attributes' => array(),
       'caption' => '',
@@ -84,26 +88,27 @@ function admin_forms_process_form($form,&$form_state) {
     }
     $wardens = $admin_form->field_admin_form_wardens['und'][0]['tabledata'];
     $finance =  $admin_form->field_finance_ministry['und'][0]['tabledata'];
+    $clerkdata =  $admin_form->field_admin_form_clergy['und'][0]['tabledata'];
     $row = array(
       array('data'=>array(
-        '#name' => 'form-'.$parish->nid,
         '#type'=> 'item',
-        '#markup' => $comp,
+        '#markup' => "<em>From ".$comp." Form:</em>",
       )),
       array('data'=>array(
-        '#name' => 'srwarden-'.$parish->nid,
         '#type'=> 'item',
         '#markup' => $wardens[1][2]." ".$wardens[1][1],
       )),
       array('data'=>array(
-        '#name' => 'jrwarden-'.$parish->nid,
         '#type'=> 'item',
         '#markup' => $wardens[2][2]." ".$wardens[2][1],
       )),
       array('data'=>array(
-        '#name' => 'finance-'.$parish->nid,
         '#type'=> 'item',
         '#markup' => $finance[1][2]." ".$finance[1][1],
+      )),
+      array('data'=>array(
+        '#type'=> 'item',
+        '#markup' => $clerkdata[1][2]." ".$clerkdata[1][1],
       )),
     );
     $parishes_table['rows'][] = $row;
@@ -115,173 +120,105 @@ function admin_forms_process_form($form,&$form_state) {
       $person['rel'] = $rel['node'];
       $staff[$rel['type']] = $person;
     }
-    $row2 = array(
-      array('data'=>array(
-        '#type'=> 'item',
-        '#markup'=>'<em>Current:</em>',
-      )),
-    );
+    $row2 = array();
+    $row2[] = _markup_row('<em>Current:</em>');
     if (isset($staff['wardensr']['node'])) {
-      $row2[] =       array('data'=>array(
-        '#type'=> 'item',
-        '#markup' => $staff['wardensr']['node']->title,
-      ));
+      $row2[] = _markup_row($staff['wardensr']['node']->title);
     }
     else {
-      $row2[] =  array('data'=>array(
-        '#type'=> 'item',
-        '#markup'=>'',
-      ));
+      $row2[] = _markup_row('');
     }
     if (isset($staff['wardenjr']['node'])) {
-      $row2[] =       array('data'=>array(
-        '#type'=> 'item',
-        '#markup' => $staff['wardenjr']['node']->title,
-      ));
+      $row2[] = _markup_row($staff['wardenjr']['node']->title);
     }
     else {
-      $row2[] =  array('data'=>array(
-        '#type'=> 'item',
-        '#markup'=>'',
-      ));
+      $row2[] = _markup_row('');
     }
     if (isset($staff['treasurer']['node'])) {
-      $row2[] =       array('data'=>array(
-        '#type'=> 'item',
-        '#markup' => $staff['treasurer']['node']->title,
-      ));
+      $row2[] = _markup_row($staff['treasurer']['node']->title);
     }
     else {
-      $row2[] =  array('data'=>array(
-        '#type'=> 'item',
-        '#markup'=>'',
-      ));
+      $row2[] = _markup_row('');
+    }
+    if (isset($staff['clerk']['node'])) {
+      $row2[] = _markup_row($staff['clerk']['node']->title);
+    }
+    else {
+      $row2[] = _markup_row('');
     }
     $parishes_table['rows'][] = $row2;
-    $row3 = array(
-      array('data'=>array(
-        '#type'=> 'item',
-        '#markup'=>'<em>Matching:</em>',
-      )),
-    );
+   
+    $row3 = array();
+    $row3[] = _markup_row("<em>Matching:</em>");
+    
     $srwarden = admin_forms_match($row[1],$row2[1],$wardens[1],$staff['wardensr']['node']);
-    $row3[] = array('data'=>array(
-      '#type'=> 'item',
-      '#markup'=> $srwarden['markup'],
-    ));  
+    $row3[] = _markup_row($srwarden['markup']);
+
     $jrwarden =  admin_forms_match($row[2],$row2[2],$wardens[2],$staff['wardenjr']['node']);
-    $row3[] = array('data'=>array(
-      '#type'=> 'item',
-      '#markup'=> $jrwarden['markup'],
-    ));  
+    $row3[] = _markup_row($jrwarden['markup']);
 
     $treasurer = admin_forms_match($row[3],$row2[3],$finance[1],$staff['treasurer']['node']);
-    $row3[] = array('data'=>array(
-      '#type'=> 'item',
-      '#markup'=> $treasurer['markup'],
-    ));  
+    $row3[] = _markup_row($treasurer['markup']);
+
+    $clerk = admin_forms_match($row[4],$row2[4],$clerkdata[1],$staff['clerk']['node']);
+        $row3[] = _markup_row($clerk['markup']);
 
     $parishes_table['rows'][] = $row3;
 
-    $row4 = array(
-      array('data'=>array(
-        '#type'=> 'item',
-        '#markup'=>'<em>Proposed actions:</em>',
-      )),
+    $row4 = array();
+    $row4[] = _markup_row("<em>Proposed actions:</em>");
+
+    $row4[] = admin_forms_run_actions(
+      $srwarden['match'],
+      $wardens[1],
+      $staff['wardensr']['rel'],
+      $staff['wardensr']['node'],
+      $parish,
+      "Sr. Warden",
+      'wardensr',
+      $admin_form->changed,
+      $live
+    ); 
+
+    $row4[] = admin_forms_run_actions(
+      $jrwarden['match'],
+      $wardens[2],
+      $staff['wardenjr']['rel'],
+      $staff['wardenjr']['node'],
+      $parish,
+      "Jr. Warden",
+      'wardenjr',
+      $admin_form->changed,
+      $live
+    ); 
+
+    $row4[] = admin_forms_run_actions(
+      $treasurer['match'],
+      $finance[1],
+      $staff['treasurer']['rel'],
+      $staff['treasurer']['node'],
+      $parish,
+      "Treasurer",
+      'treasurer',
+      $admin_form->changed,
+      $live
+    );  
+
+    $row4[] = admin_forms_run_actions(
+      $clerk['match'],
+      $clerkdata[1],
+      $staff['clerk']['rel'],
+      $staff['clerk']['node'],
+      $parish,
+      "Clerk",
+      'clerk',
+      $admin_form->changed,
+      $live
     );
 
-
-    if ($srwarden['match']) {
-      $row4[] = array('data'=>array(
-        '#type'=> 'item',
-        '#markup'=>'Set senior warden to '.$srwarden['match']->title.
-        '<Br />'.
-        'End term of '.$staff['wardensr']['node']->title,
-      ),
-    );
-    }
-    elseif ($srwarden['markup'] == "NO MATCH") {
-      $row4[] = array('data'=>array(
-        '#type'=> 'item',
-        '#markup'=> 'Create record for '.$wardens[1][2]." ".$wardens[1][1].
-        '<Br />'.
-        '('.$wardens[1][3]." / ".$wardens[1][4].")".
-        '<Br />'.
-        'Set senior warden to '.$wardens[1][2]." ".$wardens[1][1].
-        '<Br />'.
-        'End term of '.$staff['wardensr']['node']->title,
-      ),
-    );
-    }
-    else {
-      $row4[] = array('data'=>array(
-        '#type'=> 'item',
-        '#markup'=> 'n/a',
-      ));
-    }
-
-    if ($jrwarden['match']) {
-      $row4[] = array('data'=>array(
-        '#type'=> 'item',
-        '#markup'=>'Set junior warden to '.$jrwarden['match']->title.
-        '<Br />'.
-        'End term of '.$staff['wardenjr']['node']->title,
-      ),
-    );
-    }
-    elseif ($jrwarden['markup'] == "NO MATCH") {
-      $row4[] = array('data'=>array(
-        '#type'=> 'item',
-        '#markup'=> 'Create record for '.$wardens[2][2]." ".$wardens[2][1].
-        '<Br />'.
-        '('.$wardens[2][3]." / ".$wardens[2][4].")".
-        '<Br />'.
-        'Set junior warden to '.$wardens[2][2]." ".$wardens[2][1].
-        '<Br />'.
-        'End term of '.$staff['wardenjr']['node']->title,
-      ),
-    );
-    }
-    else {
-      $row4[] = array('data'=>array(
-        '#type'=> 'item',
-        '#markup'=> 'n/a',
-      ));
-    }
-
-    if ($treasurer['match']) {
-      $row4[] = array('data'=>array(
-        '#type'=> 'item',
-        '#markup'=>'Set junior warden to '.$treasurer['match']->title.
-        '<Br />'.
-        'End term of '.$staff['treasurer']['node']->title,
-      ),
-    );
-    }
-    elseif ($treasurer['markup'] == "NO MATCH") {
-      $row4[] = array('data'=>array(
-        '#type'=> 'item',
-        '#markup'=> 'Create record for '.$finance[1][2]." ".$finance[1][1].
-        '<Br />'.
-        '('.$finance[1][3]." / ".$finance[1][4].")".
-        '<Br />'.
-        'Set treasurer to '.$finance[1][2]." ".$finance[1][1].
-        '<Br />'.
-        'End term of '.$staff['treasurer']['node']->title,
-      ),
-    );
-    }
-    else {
-      $row4[] = array('data'=>array(
-        '#type'=> 'item',
-        '#markup'=> 'n/a',
-      ));
-    }
-
-    $parishes_table['rows'][] = $row4;  
-
+    $parishes_table['rows'][] = $row4;
     $form['parish_'.$parish->nid] = array(
-      '#title' => $parish->title,
+      '#title' => $parish->title." ".l("(edit form)","node/".$admin_form->nid."/edit"),
       '#type' => 'item',
       '#markup' => theme_table($parishes_table)
     );
@@ -289,19 +226,127 @@ function admin_forms_process_form($form,&$form_state) {
   return $form;
 }
 
+function admin_forms_run_actions($match,$data,$rel,$current,$parish,$role,$type,$date,$live) {
+  if ($match && $match <> $current) {
+    $action = admin_forms_proposed_action(array("end","set"),$data,$current,$role);
+    if ($live) {
+        admin_forms_end_term($rel,$current,$date);
+      admin_forms_new_term($match,$parish,$date,$type);
+    }
+  }
+  elseif (!$match && !empty($data[1])) {
+    $action = admin_forms_proposed_action(array("create","end","set"),$data,$current,$role);
+    if ($live) {
+      admin_forms_end_term($rel,$current,$date);
+      $new_person = admin_forms_new_record($data);
+      admin_forms_new_term($new_person,$parish,$date,$type);
+    }
+  }
+  else {
+    $action  = _markup_row("n/a");
+  }
+  return $action;
+}
+
+function admin_forms_proposed_action($actions,$data,$person,$role) {
+  $markup = array();
+  if (in_array("create",$actions)) {
+    $markup[] = "Create record for ".$data[2]." ".$data[1];
+  }
+  if (in_array("end",$actions) && $person) {
+    $markup[] = "End term of ".$person->title;
+  }
+  if (in_array("set",$actions)) {
+    $markup[] = "Set ".$role." to ".$data[2]." ".$data[1];
+  }
+  if (empty($actions)) {
+    $markup[] = "n/a";
+  }
+  return _markup_row(implode("<br />",$markup));
+}
+
+function admin_forms_end_term($rel,$person,$date) {
+  if ($rel) {
+    $rel->field_pf_end = array(
+      'und' => array(
+        0=>array(
+          'value' => date('Y-m-d\T00:00',$date),
+        ),
+      ),
+    );
+    $rel->field_pf_end_reason = array(
+      'und' => array(
+        0=>array(
+          'value' => "term",
+        ),
+      ),
+    );
+    node_save($rel);
+    drupal_set_message("Ending term of ".$person->title);
+  }
+}
+
+function admin_forms_new_term($person,$parish,$date,$type) {
+  $rel = new StdClass();
+  $rel->bundle = "professional_relationship";
+  $rel->type = "professional_relationship";
+  $rel->title = "Organizational relationship";
+  $rel->field_pf_type = array(
+    'und' => array(
+      0=>array(
+        'value' => $type,
+      ),
+    ),
+  ); 
+  $rel->field_pf_start = array(
+    'und' => array(
+      0=>array(
+        'value' => date('Y-m-d\T00:00',$date),
+      ),
+    ),
+  );
+  $rel->field_pf_first = array(
+    'und' => array(
+      0=>array(
+        'nid' => $person->nid,
+      ),
+    ),
+  ); 
+  $rel->field_pf_second = array(
+    'und' => array(
+      0=>array(
+        'nid' => $parish->nid,
+      ),
+    ),
+  ); 
+  node_save($rel);
+  drupal_set_message("New term created for ".$person->title);
+}
+
+function admin_forms_new_record($data) {
+  $person = new StdClass();
+  $person->type = "person";
+  $person->bundle = "person";
+  $person->field_person_first_name = _field_init($data[2]);
+  $person->field_person_last_name = _field_init($data[1]);
+  $person->field_person_email_pref = _field_init($data[4]);
+  $person->field_person_phone_pref = _field_init($data[3]);
+  node_save($person);
+  drupal_set_message("New person ".$person->title);
+  return $person;
+}
+
 function admin_forms_match($input,$current,$table,$node) {
   $markup = "";
-  $match = false;
+  $match = person_find_person(trim($input['data']['#markup']),$table[4]);
   if (trim($input['data']['#markup'])) {
     if (trim($input['data']['#markup']) == trim($current['data']['#markup'])) {
       $markup = 'Same as current';
     }
     else {
-      $match = person_find_person(trim($input['data']['#markup']),$table[4]);
       if ($match) {
         if ($match == $node) {
           $markup = 'Same as current';
-          unset($match);
         }
         else {
           $markup = 'Match by name or email';

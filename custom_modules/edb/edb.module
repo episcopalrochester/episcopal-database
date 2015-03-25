@@ -86,3 +86,22 @@ function edb_check_editors($uid,$node) {
   }
   return false;
 }
+
+function _markup_row($markup) {
+  return array(
+    'data' => array(
+      '#type' => 'markup',
+      '#markup' => $markup,
+      ),
+    );
+}
+
+function _field_init($value,$key = "value") {
+  return array(
+    'und' => array(
+      '0' => array(
+        $key => $value,
+      ),
+    ),
+  );
+}
