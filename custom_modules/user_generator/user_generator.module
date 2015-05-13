@@ -94,7 +94,6 @@ function user_generator_scan_leaders() {
   $rid = user_role_load_by_name('leadership')->rid;
   foreach ($persons as $person) {
     $is_leader = person_is_leader($person);
-    var_dump($person->title);
     $email_field = field_get_items('node',$person,'field_person_email_pref');
     if ($email_field) {
       $email = trim(strtolower($email_field[0]['value']));
@@ -137,7 +136,6 @@ function user_generator_scan_admins() {
 }
 
 function user_generator_cron() {
-  var_dump("test");
   user_generator_run();
   user_generator_scan_admins();
   user_generator_scan_wardens();
@@ -219,7 +217,6 @@ function fix_names() {
   }
   foreach ($nodes as $node) {
     $node->title = person_get_full_name($node);
-    var_dump($node->title);
     node_save($node);
   }
 }
