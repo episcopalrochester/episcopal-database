@@ -89,6 +89,30 @@ function user_generator_scan_wardens() {
   }
 }
 
+function user_generator_scan_leaders() {
+  $persons = user_generator_scan_persons();
+  $rid = user_role_load_by_name('leadership')->rid;
+  foreach ($persons as $person) {
+    $is_leader = person_is_leader($person);
+    var_dump($person->title);
+    $email_field = field_get_items('node',$person,'field_person_email_pref');
+    if ($email_field) {
+      $email = trim(strtolower($email_field[0]['value']));
+      if($uid = user_generator_check_mail($email)) {
+        $account = user_load($uid);
+        if ($is_leader) {
+          $account->roles[$rid] = true;
+          user_save($account);
+        }
+        elseif (isset($account->roles[$rid])) {
+          unset( $account->roles[$rid]);
+          user_save($account);
+        }
+      }
+    }
+  }
+}
+
 function user_generator_scan_admins() {
   $persons = user_generator_scan_persons();
   $rid = user_role_load_by_name('parish administrator')->rid;
@@ -113,11 +137,13 @@ function user_generator_scan_admins() {
 }
 
 function user_generator_cron() {
+  var_dump("test");
   user_generator_run();
   user_generator_scan_admins();
   user_generator_scan_wardens();
   user_generator_scan_deans();
   user_generator_scan_clergy();
+  user_generator_scan_leaders();
 }
 
 function user_generator_flush_users() {
