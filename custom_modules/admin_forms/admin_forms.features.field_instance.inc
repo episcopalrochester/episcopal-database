@@ -10,7 +10,7 @@
 function admin_forms_field_default_field_instances() {
   $field_instances = array();
 
-  // Exported field_instance: 'node-admin_form-field_2015_apportionments'
+  // Exported field_instance: 'node-admin_form-field_2015_apportionments'.
   $field_instances['node-admin_form-field_2015_apportionments'] = array(
     'bundle' => 'admin_form',
     'default_value' => array(
@@ -129,7 +129,7 @@ function admin_forms_field_default_field_instances() {
         'label' => 'above',
         'module' => 'tablefield',
         'settings' => array(),
-        'type' => 'default',
+        'type' => 'tablefield_default',
         'weight' => 25,
       ),
       'teaser' => array(
@@ -155,7 +155,7 @@ function admin_forms_field_default_field_instances() {
     ),
   );
 
-  // Exported field_instance: 'node-admin_form-field_admin_form_alternates'
+  // Exported field_instance: 'node-admin_form-field_admin_form_alternates'.
   $field_instances['node-admin_form-field_admin_form_alternates'] = array(
     'bundle' => 'admin_form',
     'default_value' => array(
@@ -200,7 +200,7 @@ function admin_forms_field_default_field_instances() {
         'label' => 'above',
         'module' => 'tablefield',
         'settings' => array(),
-        'type' => 'default',
+        'type' => 'tablefield_default',
         'weight' => 11,
       ),
       'teaser' => array(
@@ -226,7 +226,7 @@ function admin_forms_field_default_field_instances() {
     ),
   );
 
-  // Exported field_instance: 'node-admin_form-field_admin_form_apmnt_cmt'
+  // Exported field_instance: 'node-admin_form-field_admin_form_apmnt_cmt'.
   $field_instances['node-admin_form-field_admin_form_apmnt_cmt'] = array(
     'bundle' => 'admin_form',
     'default_value' => NULL,
@@ -266,7 +266,8 @@ function admin_forms_field_default_field_instances() {
     ),
   );
 
-  // Exported field_instance: 'node-admin_form-field_admin_form_apmnt_signature'
+  // Exported field_instance:
+  // 'node-admin_form-field_admin_form_apmnt_signature'.
   $field_instances['node-admin_form-field_admin_form_apmnt_signature'] = array(
     'bundle' => 'admin_form',
     'default_value' => NULL,
@@ -306,7 +307,8 @@ function admin_forms_field_default_field_instances() {
     ),
   );
 
-  // Exported field_instance: 'node-admin_form-field_admin_form_apmnt_statement'
+  // Exported field_instance:
+  // 'node-admin_form-field_admin_form_apmnt_statement'.
   $field_instances['node-admin_form-field_admin_form_apmnt_statement'] = array(
     'bundle' => 'admin_form',
     'deleted' => 0,
@@ -342,7 +344,8 @@ function admin_forms_field_default_field_instances() {
     ),
   );
 
-  // Exported field_instance: 'node-admin_form-field_admin_form_audit_conflicts'
+  // Exported field_instance:
+  // 'node-admin_form-field_admin_form_audit_conflicts'.
   $field_instances['node-admin_form-field_admin_form_audit_conflicts'] = array(
     'bundle' => 'admin_form',
     'default_value' => NULL,
@@ -379,7 +382,7 @@ function admin_forms_field_default_field_instances() {
     ),
   );
 
-  // Exported field_instance: 'node-admin_form-field_admin_form_audit_fin'
+  // Exported field_instance: 'node-admin_form-field_admin_form_audit_fin'.
   $field_instances['node-admin_form-field_admin_form_audit_fin'] = array(
     'bundle' => 'admin_form',
     'deleted' => 0,
@@ -394,6 +397,7 @@ function admin_forms_field_default_field_instances() {
           'multiple_from' => '',
           'multiple_number' => '',
           'multiple_to' => '',
+          'show_remaining_days' => FALSE,
         ),
         'type' => 'date_default',
         'weight' => 19,
@@ -432,7 +436,50 @@ function admin_forms_field_default_field_instances() {
     ),
   );
 
-  // Exported field_instance: 'node-admin_form-field_admin_form_audit_team'
+  // Exported field_instance: 'node-admin_form-field_admin_form_audit_request'.
+  $field_instances['node-admin_form-field_admin_form_audit_request'] = array(
+    'bundle' => 'admin_form',
+    'default_value' => array(
+      0 => array(
+        'value' => 0,
+      ),
+    ),
+    'deleted' => 0,
+    'description' => '',
+    'display' => array(
+      'default' => array(
+        'label' => 'above',
+        'module' => 'list',
+        'settings' => array(),
+        'type' => 'list_default',
+        'weight' => 31,
+      ),
+      'teaser' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 0,
+      ),
+    ),
+    'entity_type' => 'node',
+    'field_name' => 'field_admin_form_audit_request',
+    'label' => 'I request an audit by the Diocesan Auditor',
+    'required' => 0,
+    'settings' => array(
+      'user_register_form' => FALSE,
+    ),
+    'widget' => array(
+      'active' => 1,
+      'module' => 'options',
+      'settings' => array(
+        'display_label' => 1,
+      ),
+      'type' => 'options_onoff',
+      'weight' => 39,
+    ),
+  );
+
+  // Exported field_instance: 'node-admin_form-field_admin_form_audit_team'.
   $field_instances['node-admin_form-field_admin_form_audit_team'] = array(
     'bundle' => 'admin_form',
     'default_value' => array(
@@ -465,7 +512,7 @@ function admin_forms_field_default_field_instances() {
         'label' => 'above',
         'module' => 'tablefield',
         'settings' => array(),
-        'type' => 'default',
+        'type' => 'tablefield_default',
         'weight' => 13,
       ),
       'teaser' => array(
@@ -487,11 +534,11 @@ function admin_forms_field_default_field_instances() {
       'module' => 'tablefield',
       'settings' => array(),
       'type' => 'tablefield',
-      'weight' => 12,
+      'weight' => 40,
     ),
   );
 
-  // Exported field_instance: 'node-admin_form-field_admin_form_certification'
+  // Exported field_instance: 'node-admin_form-field_admin_form_certification'.
   $field_instances['node-admin_form-field_admin_form_certification'] = array(
     'bundle' => 'admin_form',
     'default_value' => array(
@@ -518,7 +565,7 @@ function admin_forms_field_default_field_instances() {
     ),
     'entity_type' => 'node',
     'field_name' => 'field_admin_form_certification',
-    'label' => 'I hereby certify that this form is now complete.',
+    'label' => 'I hereby certify that the admin form packet is now complete.',
     'required' => 0,
     'settings' => array(
       'user_register_form' => FALSE,
@@ -534,7 +581,7 @@ function admin_forms_field_default_field_instances() {
     ),
   );
 
-  // Exported field_instance: 'node-admin_form-field_admin_form_clergy'
+  // Exported field_instance: 'node-admin_form-field_admin_form_clergy'.
   $field_instances['node-admin_form-field_admin_form_clergy'] = array(
     'bundle' => 'admin_form',
     'default_value' => array(
@@ -569,7 +616,7 @@ function admin_forms_field_default_field_instances() {
         'label' => 'above',
         'module' => 'tablefield',
         'settings' => array(),
-        'type' => 'default',
+        'type' => 'tablefield_default',
         'weight' => 6,
       ),
       'teaser' => array(
@@ -595,7 +642,7 @@ function admin_forms_field_default_field_instances() {
     ),
   );
 
-  // Exported field_instance: 'node-admin_form-field_admin_form_cpa_addr'
+  // Exported field_instance: 'node-admin_form-field_admin_form_cpa_addr'.
   $field_instances['node-admin_form-field_admin_form_cpa_addr'] = array(
     'bundle' => 'admin_form',
     'default_value' => NULL,
@@ -635,7 +682,7 @@ function admin_forms_field_default_field_instances() {
     ),
   );
 
-  // Exported field_instance: 'node-admin_form-field_admin_form_cpa_name'
+  // Exported field_instance: 'node-admin_form-field_admin_form_cpa_name'.
   $field_instances['node-admin_form-field_admin_form_cpa_name'] = array(
     'bundle' => 'admin_form',
     'default_value' => NULL,
@@ -675,7 +722,7 @@ function admin_forms_field_default_field_instances() {
     ),
   );
 
-  // Exported field_instance: 'node-admin_form-field_admin_form_delegates'
+  // Exported field_instance: 'node-admin_form-field_admin_form_delegates'.
   $field_instances['node-admin_form-field_admin_form_delegates'] = array(
     'bundle' => 'admin_form',
     'default_value' => array(
@@ -720,7 +767,7 @@ function admin_forms_field_default_field_instances() {
         'label' => 'above',
         'module' => 'tablefield',
         'settings' => array(),
-        'type' => 'default',
+        'type' => 'tablefield_default',
         'weight' => 10,
       ),
       'teaser' => array(
@@ -746,7 +793,7 @@ function admin_forms_field_default_field_instances() {
     ),
   );
 
-  // Exported field_instance: 'node-admin_form-field_admin_form_formation'
+  // Exported field_instance: 'node-admin_form-field_admin_form_formation'.
   $field_instances['node-admin_form-field_admin_form_formation'] = array(
     'bundle' => 'admin_form',
     'default_value' => array(
@@ -811,7 +858,7 @@ function admin_forms_field_default_field_instances() {
         'label' => 'above',
         'module' => 'tablefield',
         'settings' => array(),
-        'type' => 'default',
+        'type' => 'tablefield_default',
         'weight' => 8,
       ),
       'teaser' => array(
@@ -837,7 +884,7 @@ function admin_forms_field_default_field_instances() {
     ),
   );
 
-  // Exported field_instance: 'node-admin_form-field_admin_form_music'
+  // Exported field_instance: 'node-admin_form-field_admin_form_music'.
   $field_instances['node-admin_form-field_admin_form_music'] = array(
     'bundle' => 'admin_form',
     'default_value' => array(
@@ -897,7 +944,7 @@ function admin_forms_field_default_field_instances() {
         'label' => 'above',
         'module' => 'tablefield',
         'settings' => array(),
-        'type' => 'default',
+        'type' => 'tablefield_default',
         'weight' => 9,
       ),
       'teaser' => array(
@@ -923,7 +970,7 @@ function admin_forms_field_default_field_instances() {
     ),
   );
 
-  // Exported field_instance: 'node-admin_form-field_admin_form_parish'
+  // Exported field_instance: 'node-admin_form-field_admin_form_parish'.
   $field_instances['node-admin_form-field_admin_form_parish'] = array(
     'bundle' => 'admin_form',
     'default_value' => NULL,
@@ -960,7 +1007,7 @@ function admin_forms_field_default_field_instances() {
     ),
   );
 
-  // Exported field_instance: 'node-admin_form-field_admin_form_wardens'
+  // Exported field_instance: 'node-admin_form-field_admin_form_wardens'.
   $field_instances['node-admin_form-field_admin_form_wardens'] = array(
     'bundle' => 'admin_form',
     'default_value' => array(
@@ -1000,7 +1047,7 @@ function admin_forms_field_default_field_instances() {
         'label' => 'above',
         'module' => 'tablefield',
         'settings' => array(),
-        'type' => 'default',
+        'type' => 'tablefield_default',
         'weight' => 5,
       ),
       'teaser' => array(
@@ -1026,7 +1073,7 @@ function admin_forms_field_default_field_instances() {
     ),
   );
 
-  // Exported field_instance: 'node-admin_form-field_admin_form_year'
+  // Exported field_instance: 'node-admin_form-field_admin_form_year'.
   $field_instances['node-admin_form-field_admin_form_year'] = array(
     'bundle' => 'admin_form',
     'default_value' => array(
@@ -1070,7 +1117,7 @@ function admin_forms_field_default_field_instances() {
     ),
   );
 
-  // Exported field_instance: 'node-admin_form-field_apportmention_description'
+  // Exported field_instance: 'node-admin_form-field_apportmention_description'.
   $field_instances['node-admin_form-field_apportmention_description'] = array(
     'bundle' => 'admin_form',
     'deleted' => 0,
@@ -1106,7 +1153,7 @@ function admin_forms_field_default_field_instances() {
     ),
   );
 
-  // Exported field_instance: 'node-admin_form-field_audit_form_date'
+  // Exported field_instance: 'node-admin_form-field_audit_form_date'.
   $field_instances['node-admin_form-field_audit_form_date'] = array(
     'bundle' => 'admin_form',
     'deleted' => 0,
@@ -1121,6 +1168,7 @@ function admin_forms_field_default_field_instances() {
           'multiple_from' => '',
           'multiple_number' => '',
           'multiple_to' => '',
+          'show_remaining_days' => FALSE,
         ),
         'type' => 'date_default',
         'weight' => 24,
@@ -1159,7 +1207,7 @@ function admin_forms_field_default_field_instances() {
     ),
   );
 
-  // Exported field_instance: 'node-admin_form-field_audit_form_email'
+  // Exported field_instance: 'node-admin_form-field_audit_form_email'.
   $field_instances['node-admin_form-field_audit_form_email'] = array(
     'bundle' => 'admin_form',
     'default_value' => NULL,
@@ -1199,7 +1247,7 @@ function admin_forms_field_default_field_instances() {
     ),
   );
 
-  // Exported field_instance: 'node-admin_form-field_audit_form_name'
+  // Exported field_instance: 'node-admin_form-field_audit_form_name'.
   $field_instances['node-admin_form-field_audit_form_name'] = array(
     'bundle' => 'admin_form',
     'default_value' => NULL,
@@ -1239,7 +1287,7 @@ function admin_forms_field_default_field_instances() {
     ),
   );
 
-  // Exported field_instance: 'node-admin_form-field_audit_form_telephone'
+  // Exported field_instance: 'node-admin_form-field_audit_form_telephone'.
   $field_instances['node-admin_form-field_audit_form_telephone'] = array(
     'bundle' => 'admin_form',
     'default_value' => NULL,
@@ -1279,7 +1327,7 @@ function admin_forms_field_default_field_instances() {
     ),
   );
 
-  // Exported field_instance: 'node-admin_form-field_audit_form_title'
+  // Exported field_instance: 'node-admin_form-field_audit_form_title'.
   $field_instances['node-admin_form-field_audit_form_title'] = array(
     'bundle' => 'admin_form',
     'default_value' => NULL,
@@ -1319,7 +1367,7 @@ function admin_forms_field_default_field_instances() {
     ),
   );
 
-  // Exported field_instance: 'node-admin_form-field_editors'
+  // Exported field_instance: 'node-admin_form-field_editors'.
   $field_instances['node-admin_form-field_editors'] = array(
     'bundle' => 'admin_form',
     'default_value' => NULL,
@@ -1360,7 +1408,7 @@ function admin_forms_field_default_field_instances() {
     ),
   );
 
-  // Exported field_instance: 'node-admin_form-field_finance_ministry'
+  // Exported field_instance: 'node-admin_form-field_finance_ministry'.
   $field_instances['node-admin_form-field_finance_ministry'] = array(
     'bundle' => 'admin_form',
     'default_value' => array(
@@ -1420,7 +1468,7 @@ function admin_forms_field_default_field_instances() {
         'label' => 'above',
         'module' => 'tablefield',
         'settings' => array(),
-        'type' => 'default',
+        'type' => 'tablefield_default',
         'weight' => 7,
       ),
       'teaser' => array(
@@ -1446,7 +1494,7 @@ function admin_forms_field_default_field_instances() {
     ),
   );
 
-  // Exported field_instance: 'node-admin_form-field_office_staff'
+  // Exported field_instance: 'node-admin_form-field_office_staff'.
   $field_instances['node-admin_form-field_office_staff'] = array(
     'bundle' => 'admin_form',
     'default_value' => array(
@@ -1506,7 +1554,7 @@ function admin_forms_field_default_field_instances() {
         'label' => 'above',
         'module' => 'tablefield',
         'settings' => array(),
-        'type' => 'default',
+        'type' => 'tablefield_default',
         'weight' => 1,
       ),
       'teaser' => array(
@@ -1550,7 +1598,8 @@ function admin_forms_field_default_field_instances() {
   t('Email');
   t('Finance Ministry');
   t('Find your parish\'s 2015 Apportionment below.');
-  t('I hereby certify that this form is now complete.');
+  t('I hereby certify that the admin form packet is now complete.');
+  t('I request an audit by the Diocesan Auditor');
   t('Music Ministry');
   t('Name');
   t('Name of CPA');

@@ -135,10 +135,12 @@ function person_type_queries($type = FALSE) {
     'All People' => 'All People',
     'Clergy' => 'Clergy',
     'Clergy in Congregations' => 'Clergy in Congregations',
+    'Diocesan Staff' => 'Diocesan Staff',
     'Leadership' => 'Leadership',
     'Leadership including resigned this year' => 'Leadership including resigned this year',
     'Laity' => 'Laity',
     'Wardens' => 'Wardens',
+    'Treasurers' => 'Treasurers',
     'Parish Administrators' => 'Parish Administrators',
     'District Deans' => 'District Deans',
     'District Wardens' => 'District Wardens',
@@ -257,12 +259,14 @@ function person_lists_submit_form($form,&$form_state) {
         print ',"Type","Ordination","Ord Day","Ord Num"';
       }
     if (in_array('Wardens',$form['who']['#value']) ||
+in_array('Treasurers',$form['who']['#value']) ||
       in_array('Parish Administrators',$form['who']['#value']) ||
       in_array('District Deans',$form['who']['#value']) ||
       in_array('District Wardens',$form['who']['#value']) ||
       in_array('Clergy in Congregations',$form['who']['#value'])) {
         print ',"Organization","Title"';
       }
+
     if (in_array('Leadership',$form['who']['#value']) ||
       in_array('Leadership including resigned this year',$form['who']['#value'])) {
         print ',"Committee","Role","Membership","Ends"';
@@ -452,6 +456,7 @@ function person_lists_submit_form($form,&$form_state) {
           print ',""';
         }
       if (in_array('Wardens',$form['who']['#value']) ||
+in_array('Treasurers',$form['who']['#value']) ||
         in_array('Parish Administrators',$form['who']['#value']) ||
         in_array('District Deans',$form['who']['#value']) ||
         in_array('District Wardens',$form['who']['#value']) ||
@@ -981,15 +986,17 @@ function person_fetch_people($type="All People",$last="",$first="",$status="livi
       if (is_array($q)) {
         $query->leftJoin($q['table'],$q['abv'],$q['abv'].".entity_id = n.nid");
       }
-      elseif ($q == "District Deans" || $q == "District Wardens" || $q == "Wardens" || $q == "Clergy in Congregations" || $q == "Parish Administrators") {
+      elseif ($q == "District Deans" || $q == "District Wardens" || $q == "Treasurers" || $q == "Wardens" || $q == "Clergy in Congregations" || $q == "Parish Administrators" || $q === "Diocesan Staff") {
         $query->leftJoin("field_data_field_pf_first","ft","ft.field_pf_first_nid = n.nid");
         $query->leftJoin("field_data_field_pf_type","jt","jt.entity_id = ft.entity_id");
         $query->leftJoin("field_data_field_pf_start","js","js.entity_id = ft.entity_id");
         $query->leftJoin("field_data_field_pf_end","je","je.entity_id = ft.entity_id");
+        $query->leftJoin("field_data_field_org_nr","jorg","jorg.entity_id = ft.entity_id");
       }
       elseif ($q == "Leadership" || $q == "Leadership including resigned this year") {
         $query->leftJoin("field_data_field_cmt_first","ftc","ftc.field_cmt_first_nid = n.nid");
         $query->leftJoin("field_data_field_cmt_type","jtc","jtc.entity_id = ftc.entity_id");
+        $query->leftJoin("field_data_field_cmt_district","jtc","jtc.entity_id = ftc.entity_id");
         $query->leftJoin("field_data_field_cmt_start","jsc","jsc.entity_id = ftc.entity_id");
         $query->leftJoin("field_data_field_cmt_end","jec","jec.entity_id = ftc.entity_id");
       }
@@ -1169,6 +1176,22 @@ function person_fetch_people($type="All People",$last="",$first="",$status="livi
           ->condition($not_future);
         $who->condition($is_a_warden_now);
       }
+      elseif ($q == "Treasurers") {
+        $wardens = db_or();
+        $wardens->condition("jt.field_pf_type_value","treasurer");
+        $now = date("Y-m-d");
+        $not_past = db_or()
+          ->condition("js.field_pf_start_value",$now,"<")
+          ->isNull("js.field_pf_start_value");
+        $not_future = db_or()
+          ->condition("je.field_pf_end_value",$now,">")
+          ->isNull("je.field_pf_end_value");
+        $is_a_warden_now = db_and()
+          ->condition($wardens)
+          ->condition($not_past)
+          ->condition($not_future);
+        $who->condition($is_a_warden_now);
+      }
       elseif ($q == "Parish Administrators") {
         $admins = db_or();
         $admins->condition("jt.field_pf_type_value","admin");
@@ -1209,6 +1232,16 @@ function person_fetch_people($type="All People",$last="",$first="",$status="livi
           ->condition($not_past)
           ->condition($not_future);
         $who->condition($is_a_clergy_now);
+      }
+      elseif ($q == "Diocesan Staff") {
+	      $staff = db_and();
+	      $staff->condition("jorg.field_org_nr_value","Episcopal Diocese of Rochester");
+        $now = date("Y-m-d");
+	      $not_past = db_or()
+		      ->condition("je.field_pf_end_value",$now,">")
+		      ->isNull("je.field_pf_end_value");
+	      $staff->condition($not_past);
+	      $who->condition($staff);
       }
       elseif ($q == "Leadership" || $q == "Leadership including resigned this year") {
         $leader = db_or();
@@ -1969,22 +2002,26 @@ function person_form_person_node_form_alter(&$form, &$form_state, $form_id) {
       );
       $count++;
     }
+    /* Committee Memberships */
     if ($admin) {
-      $jobs = find_cmt_relationships(FALSE,$form['#node'],TRUE);
+      $committees = find_cmt_relationships(FALSE,$form['#node'],TRUE);
     }
     else {
-      $jobs = find_cmt_relationships(FALSE,$form['#node'],FALSE);
+      $committees = find_cmt_relationships(FALSE,$form['#node'],FALSE);
     }
     $count = 1;
-    foreach ($jobs as $job) {
-      $cmt_node = $job['node'];
+    foreach ($committees as $committee) {
+      $cmt_node = $committee['node'];
       $lang = $cmt_node->language;
       $nid = $cmt_node->nid;
       $form['#group_children']['field_cmt_head_'.$nid] = "group_committee_relationships";
       $form['#group_children']['field_cmt_add'] = "group_committee_relationships";
-      $form['#group_children']['field_cmt_job_'.$nid] = "group_committee_relationships";
+      $form['#group_children']['field_cmt_committee_'.$nid] = "group_committee_relationships";
       $form['#group_children']['field_cmt_type_'.$nid] = "group_committee_relationships";
-      $form['#group_children']['field_cmt_title_'.$nid] = "group_committee_relationships";
+      $form['#group_children']['field_cmt_district_'.$nid] = "group_committee_relationships";
+      $form['#group_children']['field_cmt_roles_'.$nid] = "group_committee_relationships";
+      $form['#group_children']['field_cmt_subcomittees_'.$nid] = "group_committee_relationships";
+      $form['#group_children']['field_cmt_job_'.$nid] = "group_committee_relationships";
       $form['#group_children']['field_cmt_start_'.$nid] = "group_committee_relationships";
       $form['#group_children']['field_cmt_end_'.$nid] = "group_committee_relationships";
       $form['#group_children']['field_cmt_end_reason_'.$nid] = "group_committee_relationships";
@@ -1993,61 +2030,79 @@ function person_form_person_node_form_alter(&$form, &$form_state, $form_id) {
         '#markup' => "<a href='/node/add/committee-relationship?edit[field_cmt_first][und][0][nid]=[nid:".$form['#node']->nid."]'>+Add</a>",
 
       );
-      if ($job['relative']) {
-        $job_title = $job['relative']->title;
+      if ($committee['relative']) {
+        $committee_title = $committee['relative']->title;
       }
       elseif(isset($cmt_node->field_cmt_nr[$lang][0]['value'])) {
-        $job_title = $cmt_node->field_cmt_nr[$lang][0]['value'];
+        $committee_title = $cmt_node->field_cmt_nr[$lang][0]['value'];
       }
       else {
-        $job_title = "No record entered for job";
+        $committee_title = "No record entered for committee";
       }
-      $title = "Job";
+      $title = "Committee Term";
       if (node_access("update",$cmt_node)) {
         $title .= " - ".l("edit","node/".$cmt_node->nid."/edit");
       }
-      if (!$job['active']) {
+      if (!$committee['active']) {
         $title .= " (inactive)";
       }
       $form['field_cmt_head_'.$nid] = array(
         '#type' => 'markup',
         '#markup' => '<h2>'.$title.'</h2>',
       );
-      $form['field_cmt_job_'.$nid] = array(
+      $form['field_cmt_committee_'.$nid] = array(
         '#type'=> 'item',
-        '#title' => 'Employer:',
-        '#markup'=>$job_title,
+        '#title' => 'Commitee:',
+        '#markup'=>$committee_title,
+      );
+
+      $form['field_cmt_roles_'.$nid] = array(
+        '#type'=> 'select',
+        '#title' => 'Roles:',
+        '#options' => cmt_relationship_roles(),
+        '#default_value' => $committee['roles'],
       );
       $form['field_cmt_type_'.$nid] = array(
         '#type'=> 'select',
-        '#title' => 'Job Type:',
+        '#title' => 'Membership Type:',
         '#options' => cmt_relationship_types(),
-        '#default_value' => $job['type'],
+        '#default_value' => $committee['type'],
       );
-      $form['field_cmt_title_'.$nid] = array(
+      $form['field_cmt_district_'.$nid] = array(
+        '#type'=> 'select',
+        '#title' => 'District:',
+        '#options' => cmt_districts(),
+        '#default_value' => $committee['district'],
+      );
+      $form['field_cmt_job_'.$nid] = array(
         '#type'=> 'textfield',
-        '#title' => 'Job Title:',
-        '#description' => 'Optional.',
-        '#default_value' => $job['title'],
+        '#title' => 'Election Specifics:',
+        '#description' => 'Optional. E.G. District, At-Large, Unexpired Term, etc.',
+        '#default_value' => $committee['title'],
+      );
+      $form['field_cmt_subcomittees_'.$nid] = array(
+        '#type'=> 'textfield',
+        '#title' => 'Subcommittees:',
+        '#default_value' => $committee['subcommittees'],
       );
       $form['field_cmt_start_'.$nid] = array(
         '#type'=> 'textfield',
-        '#title' => 'Job Start Date:',
+        '#title' => 'Term Start Date:',
         '#description' => 'Format: '.date('m/d/Y')." - not visible in directory",
-        '#default_value' => $job['start'],
+        '#default_value' => $committee['start'],
       );
       $form['field_cmt_end_'.$nid] = array(
         '#type'=> 'textfield',
-        '#title' => 'Job End Date:',
+        '#title' => 'Term End Date:',
         '#description' => 'Format: '.date('m/d/Y')." - not visible in directory",
-        '#default_value' => $job['end'],
+        '#default_value' => $committee['end'],
       );
       $form['field_cmt_end_reason_'.$nid] = array(
         '#type'=> 'select',
-        '#title' => 'Job End Reason:',
+        '#title' => 'Term End Reason:',
         '#description' => 'Not visible in directory',
         '#options' => cmt_relationship_splits(),
-        '#default_value' => $job['end_reason'],
+        '#default_value' => $committee['end_reason'],
       );
       $count++;
     }
@@ -2120,6 +2175,33 @@ function person_node_update($node) {
           $pf_node->field_pf_end_reason = NULL;
         }
         node_save($pf_node);
+      }
+    }
+    $cmts = find_cmt_relationships(array_filter(array_keys(cmt_relationship_types())),$node,TRUE);
+    foreach ($cmts as $cmt) {
+      $cmt_node = $cmt['node'];
+      $nid = $cmt_node->nid;
+      $lang = $cmt_node->language;
+      eval("\$editing = isset(\$node->field_cmt_type_".$nid.");");
+      if ($editing) {
+        eval("\$cmt_node->field_cmt_type[\$lang][0]['value']=\$node->field_cmt_type_".$nid.";");
+        eval("\$cmt_node->field_cmt_district[\$lang][0]['value']=\$node->field_cmt_district_".$nid.";");
+        eval("\$cmt_node->field_cmt_roles[\$lang][0]['value']=\$node->field_cmt_roles_".$nid.";");
+        eval("\$cmt_node->field_cmt_subcomittees[\$lang][0]['value']=\$node->field_cmt_subcomittees_".$nid.";");
+        eval("\$cmt_node->field_cmt_job[\$lang][0]['value']=\$node->field_cmt_job_".$nid.";");
+        eval("\$cmt_node->field_cmt_start[\$lang][0]['value'] = _date_to_utc(\$node->field_cmt_start_".$nid.");");
+        if (empty($cmt_node->field_cmt_start[$lang][0]['value'])) {
+          $cmt_node->field_cmt_start = NULL;
+        }
+        eval("\$cmt_node->field_cmt_end[\$lang][0]['value'] = _date_to_utc(\$node->field_cmt_end_".$nid.");");
+        if (empty($cmt_node->field_cmt_end[$lang][0]['value'])) {
+          $cmt_node->field_cmt_end = NULL;
+        } 
+        eval("\$cmt_node->field_cmt_end_reason[\$lang][0]['value']=\$node->field_cmt_end_reason_".$nid.";");
+        if (empty($cmt_node->field_cmt_end_reason[$lang][0]['value'])) {
+          $cmt_node->field_cmt_end_reason = NULL;
+        }
+        node_save($cmt_node);
       }
     }
   }

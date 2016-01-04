@@ -10,7 +10,7 @@
 function person_field_default_field_instances() {
   $field_instances = array();
 
-  // Exported field_instance: 'node-person-field_editors'
+  // Exported field_instance: 'node-person-field_editors'.
   $field_instances['node-person-field_editors'] = array(
     'bundle' => 'person',
     'default_value' => NULL,
@@ -50,7 +50,50 @@ function person_field_default_field_instances() {
     ),
   );
 
-  // Exported field_instance: 'node-person-field_person_baptism'
+  // Exported field_instance: 'node-person-field_person_antiracism'.
+  $field_instances['node-person-field_person_antiracism'] = array(
+    'bundle' => 'person',
+    'default_value' => array(
+      0 => array(
+        'value' => 0,
+      ),
+    ),
+    'deleted' => 0,
+    'description' => '',
+    'display' => array(
+      'default' => array(
+        'label' => 'above',
+        'module' => 'list',
+        'settings' => array(),
+        'type' => 'list_default',
+        'weight' => 69,
+      ),
+      'teaser' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 0,
+      ),
+    ),
+    'entity_type' => 'node',
+    'field_name' => 'field_person_antiracism',
+    'label' => 'Anti-Racism Training Complete',
+    'required' => 0,
+    'settings' => array(
+      'user_register_form' => FALSE,
+    ),
+    'widget' => array(
+      'active' => 1,
+      'module' => 'options',
+      'settings' => array(
+        'display_label' => 1,
+      ),
+      'type' => 'options_onoff',
+      'weight' => 72,
+    ),
+  );
+
+  // Exported field_instance: 'node-person-field_person_baptism'.
   $field_instances['node-person-field_person_baptism'] = array(
     'bundle' => 'person',
     'deleted' => 0,
@@ -65,6 +108,7 @@ function person_field_default_field_instances() {
           'multiple_from' => '',
           'multiple_number' => '',
           'multiple_to' => '',
+          'show_remaining_days' => FALSE,
         ),
         'type' => 'date_default',
         'weight' => 43,
@@ -103,7 +147,7 @@ function person_field_default_field_instances() {
     ),
   );
 
-  // Exported field_instance: 'node-person-field_person_clergy_spouse'
+  // Exported field_instance: 'node-person-field_person_clergy_spouse'.
   $field_instances['node-person-field_person_clergy_spouse'] = array(
     'bundle' => 'person',
     'default_value' => array(
@@ -146,7 +190,7 @@ function person_field_default_field_instances() {
     ),
   );
 
-  // Exported field_instance: 'node-person-field_person_confirmation'
+  // Exported field_instance: 'node-person-field_person_confirmation'.
   $field_instances['node-person-field_person_confirmation'] = array(
     'bundle' => 'person',
     'deleted' => 0,
@@ -161,6 +205,7 @@ function person_field_default_field_instances() {
           'multiple_from' => '',
           'multiple_number' => '',
           'multiple_to' => '',
+          'show_remaining_days' => FALSE,
         ),
         'type' => 'date_default',
         'weight' => 44,
@@ -199,7 +244,7 @@ function person_field_default_field_instances() {
     ),
   );
 
-  // Exported field_instance: 'node-person-field_person_consecration'
+  // Exported field_instance: 'node-person-field_person_consecration'.
   $field_instances['node-person-field_person_consecration'] = array(
     'bundle' => 'person',
     'deleted' => 0,
@@ -214,6 +259,7 @@ function person_field_default_field_instances() {
           'multiple_from' => '',
           'multiple_number' => '',
           'multiple_to' => '',
+          'show_remaining_days' => FALSE,
         ),
         'type' => 'date_default',
         'weight' => 47,
@@ -252,7 +298,7 @@ function person_field_default_field_instances() {
     ),
   );
 
-  // Exported field_instance: 'node-person-field_person_diaconate'
+  // Exported field_instance: 'node-person-field_person_diaconate'.
   $field_instances['node-person-field_person_diaconate'] = array(
     'bundle' => 'person',
     'deleted' => 0,
@@ -267,6 +313,7 @@ function person_field_default_field_instances() {
           'multiple_from' => '',
           'multiple_number' => '',
           'multiple_to' => '',
+          'show_remaining_days' => FALSE,
         ),
         'type' => 'date_default',
         'weight' => 45,
@@ -298,14 +345,14 @@ function person_field_default_field_instances() {
         'input_format_custom' => '',
         'label_position' => 'above',
         'text_parts' => array(),
-        'year_range' => '1901:2014',
+        'year_range' => '1901:2050',
       ),
       'type' => 'date_select',
       'weight' => 50,
     ),
   );
 
-  // Exported field_instance: 'node-person-field_person_directory'
+  // Exported field_instance: 'node-person-field_person_directory'.
   $field_instances['node-person-field_person_directory'] = array(
     'bundle' => 'person',
     'default_value' => array(
@@ -348,7 +395,7 @@ function person_field_default_field_instances() {
     ),
   );
 
-  // Exported field_instance: 'node-person-field_person_dob'
+  // Exported field_instance: 'node-person-field_person_dob'.
   $field_instances['node-person-field_person_dob'] = array(
     'bundle' => 'person',
     'deleted' => 0,
@@ -363,6 +410,7 @@ function person_field_default_field_instances() {
           'multiple_from' => '',
           'multiple_number' => '',
           'multiple_to' => '',
+          'show_remaining_days' => FALSE,
         ),
         'type' => 'date_default',
         'weight' => 11,
@@ -401,7 +449,7 @@ function person_field_default_field_instances() {
     ),
   );
 
-  // Exported field_instance: 'node-person-field_person_dod'
+  // Exported field_instance: 'node-person-field_person_dod'.
   $field_instances['node-person-field_person_dod'] = array(
     'bundle' => 'person',
     'deleted' => 0,
@@ -416,6 +464,7 @@ function person_field_default_field_instances() {
           'multiple_from' => '',
           'multiple_number' => '',
           'multiple_to' => '',
+          'show_remaining_days' => FALSE,
         ),
         'type' => 'date_default',
         'weight' => 12,
@@ -454,7 +503,7 @@ function person_field_default_field_instances() {
     ),
   );
 
-  // Exported field_instance: 'node-person-field_person_email_other'
+  // Exported field_instance: 'node-person-field_person_email_other'.
   $field_instances['node-person-field_person_email_other'] = array(
     'bundle' => 'person',
     'default_value' => NULL,
@@ -494,7 +543,7 @@ function person_field_default_field_instances() {
     ),
   );
 
-  // Exported field_instance: 'node-person-field_person_email_other_type'
+  // Exported field_instance: 'node-person-field_person_email_other_type'.
   $field_instances['node-person-field_person_email_other_type'] = array(
     'bundle' => 'person',
     'default_value' => NULL,
@@ -531,7 +580,7 @@ function person_field_default_field_instances() {
     ),
   );
 
-  // Exported field_instance: 'node-person-field_person_email_pref'
+  // Exported field_instance: 'node-person-field_person_email_pref'.
   $field_instances['node-person-field_person_email_pref'] = array(
     'bundle' => 'person',
     'default_value' => NULL,
@@ -571,7 +620,7 @@ function person_field_default_field_instances() {
     ),
   );
 
-  // Exported field_instance: 'node-person-field_person_email_pref_type'
+  // Exported field_instance: 'node-person-field_person_email_pref_type'.
   $field_instances['node-person-field_person_email_pref_type'] = array(
     'bundle' => 'person',
     'default_value' => NULL,
@@ -608,7 +657,7 @@ function person_field_default_field_instances() {
     ),
   );
 
-  // Exported field_instance: 'node-person-field_person_employment'
+  // Exported field_instance: 'node-person-field_person_employment'.
   $field_instances['node-person-field_person_employment'] = array(
     'bundle' => 'person',
     'default_value' => NULL,
@@ -645,7 +694,7 @@ function person_field_default_field_instances() {
     ),
   );
 
-  // Exported field_instance: 'node-person-field_person_enews'
+  // Exported field_instance: 'node-person-field_person_enews'.
   $field_instances['node-person-field_person_enews'] = array(
     'bundle' => 'person',
     'default_value' => array(
@@ -688,7 +737,7 @@ function person_field_default_field_instances() {
     ),
   );
 
-  // Exported field_instance: 'node-person-field_person_first_name'
+  // Exported field_instance: 'node-person-field_person_first_name'.
   $field_instances['node-person-field_person_first_name'] = array(
     'bundle' => 'person',
     'default_value' => NULL,
@@ -728,7 +777,7 @@ function person_field_default_field_instances() {
     ),
   );
 
-  // Exported field_instance: 'node-person-field_person_gender'
+  // Exported field_instance: 'node-person-field_person_gender'.
   $field_instances['node-person-field_person_gender'] = array(
     'bundle' => 'person',
     'default_value' => NULL,
@@ -765,7 +814,7 @@ function person_field_default_field_instances() {
     ),
   );
 
-  // Exported field_instance: 'node-person-field_person_home_1'
+  // Exported field_instance: 'node-person-field_person_home_1'.
   $field_instances['node-person-field_person_home_1'] = array(
     'bundle' => 'person',
     'default_value' => NULL,
@@ -805,7 +854,7 @@ function person_field_default_field_instances() {
     ),
   );
 
-  // Exported field_instance: 'node-person-field_person_home_2'
+  // Exported field_instance: 'node-person-field_person_home_2'.
   $field_instances['node-person-field_person_home_2'] = array(
     'bundle' => 'person',
     'default_value' => NULL,
@@ -845,7 +894,7 @@ function person_field_default_field_instances() {
     ),
   );
 
-  // Exported field_instance: 'node-person-field_person_home_city'
+  // Exported field_instance: 'node-person-field_person_home_city'.
   $field_instances['node-person-field_person_home_city'] = array(
     'bundle' => 'person',
     'default_value' => NULL,
@@ -885,7 +934,7 @@ function person_field_default_field_instances() {
     ),
   );
 
-  // Exported field_instance: 'node-person-field_person_home_other'
+  // Exported field_instance: 'node-person-field_person_home_other'.
   $field_instances['node-person-field_person_home_other'] = array(
     'bundle' => 'person',
     'default_value' => NULL,
@@ -925,7 +974,7 @@ function person_field_default_field_instances() {
     ),
   );
 
-  // Exported field_instance: 'node-person-field_person_home_postal'
+  // Exported field_instance: 'node-person-field_person_home_postal'.
   $field_instances['node-person-field_person_home_postal'] = array(
     'bundle' => 'person',
     'default_value' => NULL,
@@ -965,7 +1014,7 @@ function person_field_default_field_instances() {
     ),
   );
 
-  // Exported field_instance: 'node-person-field_person_home_state'
+  // Exported field_instance: 'node-person-field_person_home_state'.
   $field_instances['node-person-field_person_home_state'] = array(
     'bundle' => 'person',
     'default_value' => NULL,
@@ -1002,7 +1051,7 @@ function person_field_default_field_instances() {
     ),
   );
 
-  // Exported field_instance: 'node-person-field_person_invitations'
+  // Exported field_instance: 'node-person-field_person_invitations'.
   $field_instances['node-person-field_person_invitations'] = array(
     'bundle' => 'person',
     'default_value' => array(
@@ -1045,7 +1094,7 @@ function person_field_default_field_instances() {
     ),
   );
 
-  // Exported field_instance: 'node-person-field_person_last_name'
+  // Exported field_instance: 'node-person-field_person_last_name'.
   $field_instances['node-person-field_person_last_name'] = array(
     'bundle' => 'person',
     'default_value' => NULL,
@@ -1085,7 +1134,7 @@ function person_field_default_field_instances() {
     ),
   );
 
-  // Exported field_instance: 'node-person-field_person_license'
+  // Exported field_instance: 'node-person-field_person_license'.
   $field_instances['node-person-field_person_license'] = array(
     'bundle' => 'person',
     'deleted' => 0,
@@ -1100,6 +1149,7 @@ function person_field_default_field_instances() {
           'multiple_from' => '',
           'multiple_number' => '',
           'multiple_to' => '',
+          'show_remaining_days' => FALSE,
         ),
         'type' => 'date_default',
         'weight' => 64,
@@ -1138,7 +1188,7 @@ function person_field_default_field_instances() {
     ),
   );
 
-  // Exported field_instance: 'node-person-field_person_license_denom'
+  // Exported field_instance: 'node-person-field_person_license_denom'.
   $field_instances['node-person-field_person_license_denom'] = array(
     'bundle' => 'person',
     'default_value' => NULL,
@@ -1175,7 +1225,7 @@ function person_field_default_field_instances() {
     ),
   );
 
-  // Exported field_instance: 'node-person-field_person_license_renewal'
+  // Exported field_instance: 'node-person-field_person_license_renewal'.
   $field_instances['node-person-field_person_license_renewal'] = array(
     'bundle' => 'person',
     'deleted' => 0,
@@ -1190,6 +1240,7 @@ function person_field_default_field_instances() {
           'multiple_from' => '',
           'multiple_number' => '',
           'multiple_to' => '',
+          'show_remaining_days' => FALSE,
         ),
         'type' => 'date_default',
         'weight' => 65,
@@ -1228,7 +1279,7 @@ function person_field_default_field_instances() {
     ),
   );
 
-  // Exported field_instance: 'node-person-field_person_license_res'
+  // Exported field_instance: 'node-person-field_person_license_res'.
   $field_instances['node-person-field_person_license_res'] = array(
     'bundle' => 'person',
     'default_value' => NULL,
@@ -1268,7 +1319,7 @@ function person_field_default_field_instances() {
     ),
   );
 
-  // Exported field_instance: 'node-person-field_person_mail_1'
+  // Exported field_instance: 'node-person-field_person_mail_1'.
   $field_instances['node-person-field_person_mail_1'] = array(
     'bundle' => 'person',
     'default_value' => NULL,
@@ -1308,7 +1359,7 @@ function person_field_default_field_instances() {
     ),
   );
 
-  // Exported field_instance: 'node-person-field_person_mail_2'
+  // Exported field_instance: 'node-person-field_person_mail_2'.
   $field_instances['node-person-field_person_mail_2'] = array(
     'bundle' => 'person',
     'default_value' => NULL,
@@ -1348,7 +1399,7 @@ function person_field_default_field_instances() {
     ),
   );
 
-  // Exported field_instance: 'node-person-field_person_mail_city'
+  // Exported field_instance: 'node-person-field_person_mail_city'.
   $field_instances['node-person-field_person_mail_city'] = array(
     'bundle' => 'person',
     'default_value' => NULL,
@@ -1388,7 +1439,7 @@ function person_field_default_field_instances() {
     ),
   );
 
-  // Exported field_instance: 'node-person-field_person_mail_other'
+  // Exported field_instance: 'node-person-field_person_mail_other'.
   $field_instances['node-person-field_person_mail_other'] = array(
     'bundle' => 'person',
     'default_value' => NULL,
@@ -1428,7 +1479,7 @@ function person_field_default_field_instances() {
     ),
   );
 
-  // Exported field_instance: 'node-person-field_person_mail_postal'
+  // Exported field_instance: 'node-person-field_person_mail_postal'.
   $field_instances['node-person-field_person_mail_postal'] = array(
     'bundle' => 'person',
     'default_value' => NULL,
@@ -1468,7 +1519,7 @@ function person_field_default_field_instances() {
     ),
   );
 
-  // Exported field_instance: 'node-person-field_person_mail_state'
+  // Exported field_instance: 'node-person-field_person_mail_state'.
   $field_instances['node-person-field_person_mail_state'] = array(
     'bundle' => 'person',
     'default_value' => NULL,
@@ -1505,7 +1556,7 @@ function person_field_default_field_instances() {
     ),
   );
 
-  // Exported field_instance: 'node-person-field_person_middle_name'
+  // Exported field_instance: 'node-person-field_person_middle_name'.
   $field_instances['node-person-field_person_middle_name'] = array(
     'bundle' => 'person',
     'default_value' => NULL,
@@ -1545,7 +1596,50 @@ function person_field_default_field_instances() {
     ),
   );
 
-  // Exported field_instance: 'node-person-field_person_nickname'
+  // Exported field_instance: 'node-person-field_person_neighborhood'.
+  $field_instances['node-person-field_person_neighborhood'] = array(
+    'bundle' => 'person',
+    'default_value' => array(
+      0 => array(
+        'value' => 0,
+      ),
+    ),
+    'deleted' => 0,
+    'description' => '',
+    'display' => array(
+      'default' => array(
+        'label' => 'above',
+        'module' => 'list',
+        'settings' => array(),
+        'type' => 'list_default',
+        'weight' => 68,
+      ),
+      'teaser' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 0,
+      ),
+    ),
+    'entity_type' => 'node',
+    'field_name' => 'field_person_neighborhood',
+    'label' => 'Moving Back into the Neighborhood',
+    'required' => 0,
+    'settings' => array(
+      'user_register_form' => FALSE,
+    ),
+    'widget' => array(
+      'active' => 1,
+      'module' => 'options',
+      'settings' => array(
+        'display_label' => 1,
+      ),
+      'type' => 'options_onoff',
+      'weight' => 65,
+    ),
+  );
+
+  // Exported field_instance: 'node-person-field_person_nickname'.
   $field_instances['node-person-field_person_nickname'] = array(
     'bundle' => 'person',
     'default_value' => NULL,
@@ -1585,7 +1679,7 @@ function person_field_default_field_instances() {
     ),
   );
 
-  // Exported field_instance: 'node-person-field_person_no_directory'
+  // Exported field_instance: 'node-person-field_person_no_directory'.
   $field_instances['node-person-field_person_no_directory'] = array(
     'bundle' => 'person',
     'default_value' => array(
@@ -1628,7 +1722,7 @@ function person_field_default_field_instances() {
     ),
   );
 
-  // Exported field_instance: 'node-person-field_person_no_email'
+  // Exported field_instance: 'node-person-field_person_no_email'.
   $field_instances['node-person-field_person_no_email'] = array(
     'bundle' => 'person',
     'default_value' => array(
@@ -1671,7 +1765,7 @@ function person_field_default_field_instances() {
     ),
   );
 
-  // Exported field_instance: 'node-person-field_person_no_home'
+  // Exported field_instance: 'node-person-field_person_no_home'.
   $field_instances['node-person-field_person_no_home'] = array(
     'bundle' => 'person',
     'default_value' => array(
@@ -1714,7 +1808,7 @@ function person_field_default_field_instances() {
     ),
   );
 
-  // Exported field_instance: 'node-person-field_person_no_partnerships'
+  // Exported field_instance: 'node-person-field_person_no_partnerships'.
   $field_instances['node-person-field_person_no_partnerships'] = array(
     'bundle' => 'person',
     'default_value' => array(
@@ -1757,7 +1851,7 @@ function person_field_default_field_instances() {
     ),
   );
 
-  // Exported field_instance: 'node-person-field_person_no_phone'
+  // Exported field_instance: 'node-person-field_person_no_phone'.
   $field_instances['node-person-field_person_no_phone'] = array(
     'bundle' => 'person',
     'default_value' => array(
@@ -1800,7 +1894,7 @@ function person_field_default_field_instances() {
     ),
   );
 
-  // Exported field_instance: 'node-person-field_person_phone_other'
+  // Exported field_instance: 'node-person-field_person_phone_other'.
   $field_instances['node-person-field_person_phone_other'] = array(
     'bundle' => 'person',
     'default_value' => NULL,
@@ -1840,7 +1934,7 @@ function person_field_default_field_instances() {
     ),
   );
 
-  // Exported field_instance: 'node-person-field_person_phone_other_type'
+  // Exported field_instance: 'node-person-field_person_phone_other_type'.
   $field_instances['node-person-field_person_phone_other_type'] = array(
     'bundle' => 'person',
     'default_value' => NULL,
@@ -1877,7 +1971,7 @@ function person_field_default_field_instances() {
     ),
   );
 
-  // Exported field_instance: 'node-person-field_person_phone_pref'
+  // Exported field_instance: 'node-person-field_person_phone_pref'.
   $field_instances['node-person-field_person_phone_pref'] = array(
     'bundle' => 'person',
     'default_value' => NULL,
@@ -1917,7 +2011,7 @@ function person_field_default_field_instances() {
     ),
   );
 
-  // Exported field_instance: 'node-person-field_person_phone_pref_type'
+  // Exported field_instance: 'node-person-field_person_phone_pref_type'.
   $field_instances['node-person-field_person_phone_pref_type'] = array(
     'bundle' => 'person',
     'default_value' => NULL,
@@ -1954,7 +2048,7 @@ function person_field_default_field_instances() {
     ),
   );
 
-  // Exported field_instance: 'node-person-field_person_priesthood'
+  // Exported field_instance: 'node-person-field_person_priesthood'.
   $field_instances['node-person-field_person_priesthood'] = array(
     'bundle' => 'person',
     'deleted' => 0,
@@ -1969,6 +2063,7 @@ function person_field_default_field_instances() {
           'multiple_from' => '',
           'multiple_number' => '',
           'multiple_to' => '',
+          'show_remaining_days' => FALSE,
         ),
         'type' => 'date_default',
         'weight' => 46,
@@ -2000,14 +2095,14 @@ function person_field_default_field_instances() {
         'input_format_custom' => '',
         'label_position' => 'above',
         'text_parts' => array(),
-        'year_range' => '1901:2014',
+        'year_range' => '1901:2050',
       ),
       'type' => 'date_select',
       'weight' => 51,
     ),
   );
 
-  // Exported field_instance: 'node-person-field_person_printed_news'
+  // Exported field_instance: 'node-person-field_person_printed_news'.
   $field_instances['node-person-field_person_printed_news'] = array(
     'bundle' => 'person',
     'default_value' => array(
@@ -2050,7 +2145,7 @@ function person_field_default_field_instances() {
     ),
   );
 
-  // Exported field_instance: 'node-person-field_person_retirement_date'
+  // Exported field_instance: 'node-person-field_person_retirement_date'.
   $field_instances['node-person-field_person_retirement_date'] = array(
     'bundle' => 'person',
     'deleted' => 0,
@@ -2065,6 +2160,7 @@ function person_field_default_field_instances() {
           'multiple_from' => '',
           'multiple_number' => '',
           'multiple_to' => '',
+          'show_remaining_days' => FALSE,
         ),
         'type' => 'date_default',
         'weight' => 63,
@@ -2103,7 +2199,7 @@ function person_field_default_field_instances() {
     ),
   );
 
-  // Exported field_instance: 'node-person-field_person_safe_church'
+  // Exported field_instance: 'node-person-field_person_safe_church'.
   $field_instances['node-person-field_person_safe_church'] = array(
     'bundle' => 'person',
     'default_value' => array(
@@ -2146,7 +2242,7 @@ function person_field_default_field_instances() {
     ),
   );
 
-  // Exported field_instance: 'node-person-field_person_safe_it_happened'
+  // Exported field_instance: 'node-person-field_person_safe_it_happened'.
   $field_instances['node-person-field_person_safe_it_happened'] = array(
     'bundle' => 'person',
     'deleted' => 0,
@@ -2161,6 +2257,7 @@ function person_field_default_field_instances() {
           'multiple_from' => '',
           'multiple_number' => '',
           'multiple_to' => '',
+          'show_remaining_days' => FALSE,
         ),
         'type' => 'date_default',
         'weight' => 16,
@@ -2203,7 +2300,7 @@ function person_field_default_field_instances() {
     ),
   );
 
-  // Exported field_instance: 'node-person-field_person_safe_keeping_church'
+  // Exported field_instance: 'node-person-field_person_safe_keeping_church'.
   $field_instances['node-person-field_person_safe_keeping_church'] = array(
     'bundle' => 'person',
     'deleted' => 0,
@@ -2218,6 +2315,7 @@ function person_field_default_field_instances() {
           'multiple_from' => '',
           'multiple_number' => '',
           'multiple_to' => '',
+          'show_remaining_days' => FALSE,
         ),
         'type' => 'date_default',
         'weight' => 17,
@@ -2256,7 +2354,7 @@ function person_field_default_field_instances() {
     ),
   );
 
-  // Exported field_instance: 'node-person-field_person_safe_meet_sam'
+  // Exported field_instance: 'node-person-field_person_safe_meet_sam'.
   $field_instances['node-person-field_person_safe_meet_sam'] = array(
     'bundle' => 'person',
     'deleted' => 0,
@@ -2271,6 +2369,7 @@ function person_field_default_field_instances() {
           'multiple_from' => '',
           'multiple_number' => '',
           'multiple_to' => '',
+          'show_remaining_days' => FALSE,
         ),
         'type' => 'date_default',
         'weight' => 15,
@@ -2313,7 +2412,7 @@ function person_field_default_field_instances() {
     ),
   );
 
-  // Exported field_instance: 'node-person-field_person_safe_policies'
+  // Exported field_instance: 'node-person-field_person_safe_policies'.
   $field_instances['node-person-field_person_safe_policies'] = array(
     'bundle' => 'person',
     'deleted' => 0,
@@ -2328,6 +2427,7 @@ function person_field_default_field_instances() {
           'multiple_from' => '',
           'multiple_number' => '',
           'multiple_to' => '',
+          'show_remaining_days' => FALSE,
         ),
         'type' => 'date_default',
         'weight' => 18,
@@ -2366,7 +2466,7 @@ function person_field_default_field_instances() {
     ),
   );
 
-  // Exported field_instance: 'node-person-field_person_safe_refresher'
+  // Exported field_instance: 'node-person-field_person_safe_refresher'.
   $field_instances['node-person-field_person_safe_refresher'] = array(
     'bundle' => 'person',
     'deleted' => 0,
@@ -2381,6 +2481,7 @@ function person_field_default_field_instances() {
           'multiple_from' => '',
           'multiple_number' => '',
           'multiple_to' => '',
+          'show_remaining_days' => FALSE,
         ),
         'type' => 'date_default',
         'weight' => 20,
@@ -2419,7 +2520,7 @@ function person_field_default_field_instances() {
     ),
   );
 
-  // Exported field_instance: 'node-person-field_person_safe_risk'
+  // Exported field_instance: 'node-person-field_person_safe_risk'.
   $field_instances['node-person-field_person_safe_risk'] = array(
     'bundle' => 'person',
     'deleted' => 0,
@@ -2434,6 +2535,7 @@ function person_field_default_field_instances() {
           'multiple_from' => '',
           'multiple_number' => '',
           'multiple_to' => '',
+          'show_remaining_days' => FALSE,
         ),
         'type' => 'date_default',
         'weight' => 19,
@@ -2472,7 +2574,7 @@ function person_field_default_field_instances() {
     ),
   );
 
-  // Exported field_instance: 'node-person-field_person_suffix'
+  // Exported field_instance: 'node-person-field_person_suffix'.
   $field_instances['node-person-field_person_suffix'] = array(
     'bundle' => 'person',
     'default_value' => NULL,
@@ -2512,7 +2614,7 @@ function person_field_default_field_instances() {
     ),
   );
 
-  // Exported field_instance: 'node-person-field_person_supply_he'
+  // Exported field_instance: 'node-person-field_person_supply_he'.
   $field_instances['node-person-field_person_supply_he'] = array(
     'bundle' => 'person',
     'default_value' => array(
@@ -2551,11 +2653,11 @@ function person_field_default_field_instances() {
         'display_label' => 1,
       ),
       'type' => 'options_onoff',
-      'weight' => 65,
+      'weight' => 84,
     ),
   );
 
-  // Exported field_instance: 'node-person-field_person_supply_mp'
+  // Exported field_instance: 'node-person-field_person_supply_mp'.
   $field_instances['node-person-field_person_supply_mp'] = array(
     'bundle' => 'person',
     'default_value' => array(
@@ -2594,11 +2696,11 @@ function person_field_default_field_instances() {
         'display_label' => 1,
       ),
       'type' => 'options_onoff',
-      'weight' => 66,
+      'weight' => 85,
     ),
   );
 
-  // Exported field_instance: 'node-person-field_person_supply_notes'
+  // Exported field_instance: 'node-person-field_person_supply_notes'.
   $field_instances['node-person-field_person_supply_notes'] = array(
     'bundle' => 'person',
     'default_value' => NULL,
@@ -2634,11 +2736,11 @@ function person_field_default_field_instances() {
         'rows' => 5,
       ),
       'type' => 'text_textarea',
-      'weight' => 67,
+      'weight' => 86,
     ),
   );
 
-  // Exported field_instance: 'node-person-field_person_title'
+  // Exported field_instance: 'node-person-field_person_title'.
   $field_instances['node-person-field_person_title'] = array(
     'bundle' => 'person',
     'default_value' => NULL,
@@ -2678,7 +2780,7 @@ function person_field_default_field_instances() {
     ),
   );
 
-  // Exported field_instance: 'node-person-field_safe_church_training_date'
+  // Exported field_instance: 'node-person-field_safe_church_training_date'.
   $field_instances['node-person-field_safe_church_training_date'] = array(
     'bundle' => 'person',
     'deleted' => 0,
@@ -2693,6 +2795,7 @@ function person_field_default_field_instances() {
           'multiple_from' => '',
           'multiple_number' => '',
           'multiple_to' => '',
+          'show_remaining_days' => FALSE,
         ),
         'type' => 'date_default',
         'weight' => 14,
@@ -2737,6 +2840,7 @@ function person_field_default_field_instances() {
   t('Abuse Risk Management for Volunteers - Generic');
   t('Address (Line 1)');
   t('Address (Line 2)');
+  t('Anti-Racism Training Complete');
   t('Available for Sunday Eucharist (HE1/2)');
   t('Available for Sunday Morning Prayer (MP1/2)');
   t('Baptism');
@@ -2772,6 +2876,7 @@ function person_field_default_field_instances() {
   t('Last Safe Church Training Date');
   t('Meet Sam');
   t('Middle Name');
+  t('Moving Back into the Neighborhood');
   t('Nickname');
   t('Notes');
   t('Notes about seasonality, how far you will travel, etc.');

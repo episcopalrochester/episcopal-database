@@ -153,6 +153,34 @@ function person_field_group_info() {
   $field_group = new stdClass();
   $field_group->disabled = FALSE; /* Edit this to true to make a default field_group disabled initially */
   $field_group->api_version = 1;
+  $field_group->identifier = 'group_person_antiracism|node|person|form';
+  $field_group->group_name = 'group_person_antiracism';
+  $field_group->entity_type = 'node';
+  $field_group->bundle = 'person';
+  $field_group->mode = 'form';
+  $field_group->parent_name = 'group_person_training';
+  $field_group->data = array(
+    'label' => 'Anti-Racism Training',
+    'weight' => '71',
+    'children' => array(
+      0 => 'field_person_antiracism',
+    ),
+    'format_type' => 'fieldset',
+    'format_settings' => array(
+      'label' => 'Anti-Racism Training',
+      'instance_settings' => array(
+        'required_fields' => 1,
+        'classes' => 'group-person-antiracism field-group-fieldset',
+        'description' => '',
+      ),
+      'formatter' => 'open',
+    ),
+  );
+  $export['group_person_antiracism|node|person|form'] = $field_group;
+
+  $field_group = new stdClass();
+  $field_group->disabled = FALSE; /* Edit this to true to make a default field_group disabled initially */
+  $field_group->api_version = 1;
   $field_group->identifier = 'group_person_data|node|person|default';
   $field_group->group_name = 'group_person_data';
   $field_group->entity_type = 'node';
@@ -702,6 +730,7 @@ function person_field_group_info() {
       1 => 'field_person_printed_news',
       2 => 'field_person_directory',
       3 => 'field_person_invitations',
+      4 => 'field_person_neighborhood',
     ),
     'format_type' => 'tab',
     'format_settings' => array(
@@ -811,6 +840,7 @@ function person_field_group_info() {
     'weight' => '10',
     'children' => array(
       0 => 'group_person_safe_training',
+      1 => 'group_person_antiracism',
     ),
     'format_type' => 'tab',
     'format_settings' => array(

@@ -10,7 +10,7 @@
 function personal_relationships_field_default_field_instances() {
   $field_instances = array();
 
-  // Exported field_instance: 'node-personal_relationship-body'
+  // Exported field_instance: 'node-personal_relationship-body'.
   $field_instances['node-personal_relationship-body'] = array(
     'bundle' => 'personal_relationship',
     'default_value' => NULL,
@@ -55,7 +55,7 @@ function personal_relationships_field_default_field_instances() {
     ),
   );
 
-  // Exported field_instance: 'node-personal_relationship-field_person_2_nr'
+  // Exported field_instance: 'node-personal_relationship-field_person_2_nr'.
   $field_instances['node-personal_relationship-field_person_2_nr'] = array(
     'bundle' => 'personal_relationship',
     'default_value' => NULL,
@@ -95,7 +95,7 @@ function personal_relationships_field_default_field_instances() {
     ),
   );
 
-  // Exported field_instance: 'node-personal_relationship-field_pr_end'
+  // Exported field_instance: 'node-personal_relationship-field_pr_end'.
   $field_instances['node-personal_relationship-field_pr_end'] = array(
     'bundle' => 'personal_relationship',
     'deleted' => 0,
@@ -110,6 +110,7 @@ function personal_relationships_field_default_field_instances() {
           'multiple_from' => '',
           'multiple_number' => '',
           'multiple_to' => '',
+          'show_remaining_days' => FALSE,
         ),
         'type' => 'date_default',
         'weight' => 5,
@@ -148,7 +149,7 @@ function personal_relationships_field_default_field_instances() {
     ),
   );
 
-  // Exported field_instance: 'node-personal_relationship-field_pr_end_reason'
+  // Exported field_instance: 'node-personal_relationship-field_pr_end_reason'.
   $field_instances['node-personal_relationship-field_pr_end_reason'] = array(
     'bundle' => 'personal_relationship',
     'default_value' => NULL,
@@ -185,7 +186,7 @@ function personal_relationships_field_default_field_instances() {
     ),
   );
 
-  // Exported field_instance: 'node-personal_relationship-field_pr_first'
+  // Exported field_instance: 'node-personal_relationship-field_pr_first'.
   $field_instances['node-personal_relationship-field_pr_first'] = array(
     'bundle' => 'personal_relationship',
     'default_value' => NULL,
@@ -226,7 +227,7 @@ function personal_relationships_field_default_field_instances() {
     ),
   );
 
-  // Exported field_instance: 'node-personal_relationship-field_pr_second'
+  // Exported field_instance: 'node-personal_relationship-field_pr_second'.
   $field_instances['node-personal_relationship-field_pr_second'] = array(
     'bundle' => 'personal_relationship',
     'default_value' => NULL,
@@ -267,7 +268,7 @@ function personal_relationships_field_default_field_instances() {
     ),
   );
 
-  // Exported field_instance: 'node-personal_relationship-field_pr_start'
+  // Exported field_instance: 'node-personal_relationship-field_pr_start'.
   $field_instances['node-personal_relationship-field_pr_start'] = array(
     'bundle' => 'personal_relationship',
     'deleted' => 0,
@@ -282,6 +283,7 @@ function personal_relationships_field_default_field_instances() {
           'multiple_from' => '',
           'multiple_number' => '',
           'multiple_to' => '',
+          'show_remaining_days' => FALSE,
         ),
         'type' => 'date_default',
         'weight' => 4,
@@ -320,7 +322,7 @@ function personal_relationships_field_default_field_instances() {
     ),
   );
 
-  // Exported field_instance: 'node-personal_relationship-field_pr_type'
+  // Exported field_instance: 'node-personal_relationship-field_pr_type'.
   $field_instances['node-personal_relationship-field_pr_type'] = array(
     'bundle' => 'personal_relationship',
     'default_value' => NULL,

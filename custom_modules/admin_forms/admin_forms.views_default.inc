@@ -45,7 +45,7 @@ function admin_forms_views_default_views() {
   $handler->display->display_options['fields']['title']['alter']['ellipsis'] = FALSE;
   $handler->display->display_options['fields']['title']['element_type'] = 'h2';
   $handler->display->display_options['fields']['title']['element_label_colon'] = FALSE;
-  /* Field: Content: I hereby certify that this form is now complete. */
+  /* Field: Content: I hereby certify that the admin form packet is now complete. */
   $handler->display->display_options['fields']['field_admin_form_certification']['id'] = 'field_admin_form_certification';
   $handler->display->display_options['fields']['field_admin_form_certification']['table'] = 'field_data_field_admin_form_certification';
   $handler->display->display_options['fields']['field_admin_form_certification']['field'] = 'field_admin_form_certification';
@@ -66,12 +66,14 @@ function admin_forms_views_default_views() {
   $handler->display->display_options['fields']['field_admin_form_wardens']['field'] = 'field_admin_form_wardens';
   $handler->display->display_options['fields']['field_admin_form_wardens']['label'] = '';
   $handler->display->display_options['fields']['field_admin_form_wardens']['element_label_colon'] = FALSE;
+  $handler->display->display_options['fields']['field_admin_form_wardens']['type'] = 'default';
   /* Field: Content: Finance Ministry */
   $handler->display->display_options['fields']['field_finance_ministry']['id'] = 'field_finance_ministry';
   $handler->display->display_options['fields']['field_finance_ministry']['table'] = 'field_data_field_finance_ministry';
   $handler->display->display_options['fields']['field_finance_ministry']['field'] = 'field_finance_ministry';
   $handler->display->display_options['fields']['field_finance_ministry']['label'] = '';
   $handler->display->display_options['fields']['field_finance_ministry']['element_label_colon'] = FALSE;
+  $handler->display->display_options['fields']['field_finance_ministry']['type'] = 'default';
   /* Sort criterion: Content: Title */
   $handler->display->display_options['sorts']['title']['id'] = 'title';
   $handler->display->display_options['sorts']['title']['table'] = 'node';
@@ -90,7 +92,7 @@ function admin_forms_views_default_views() {
   $handler->display->display_options['filters']['type']['value'] = array(
     'admin_form' => 'admin_form',
   );
-  /* Filter criterion: Content: I hereby certify that this form is now complete. (field_admin_form_certification) */
+  /* Filter criterion: Content: I hereby certify that the admin form packet is now complete. (field_admin_form_certification) */
   $handler->display->display_options['filters']['field_admin_form_certification_value']['id'] = 'field_admin_form_certification_value';
   $handler->display->display_options['filters']['field_admin_form_certification_value']['table'] = 'field_data_field_admin_form_certification';
   $handler->display->display_options['filters']['field_admin_form_certification_value']['field'] = 'field_admin_form_certification_value';
@@ -189,6 +191,12 @@ function admin_forms_views_default_views() {
   $handler->display->display_options['defaults']['style_options'] = FALSE;
   $handler->display->display_options['defaults']['row_plugin'] = FALSE;
   $handler->display->display_options['defaults']['row_options'] = FALSE;
+  $handler->display->display_options['defaults']['header'] = FALSE;
+  /* Header: Global: Unfiltered text */
+  $handler->display->display_options['header']['area_text_custom']['id'] = 'area_text_custom';
+  $handler->display->display_options['header']['area_text_custom']['table'] = 'views';
+  $handler->display->display_options['header']['area_text_custom']['field'] = 'area_text_custom';
+  $handler->display->display_options['header']['area_text_custom']['content'] = '<a href="/staff/admin-forms/process"><strong>Process admin forms</strong></a>';
   $handler->display->display_options['defaults']['fields'] = FALSE;
   /* Field: Content: Title */
   $handler->display->display_options['fields']['title']['id'] = 'title';
@@ -197,7 +205,7 @@ function admin_forms_views_default_views() {
   $handler->display->display_options['fields']['title']['alter']['word_boundary'] = FALSE;
   $handler->display->display_options['fields']['title']['alter']['ellipsis'] = FALSE;
   $handler->display->display_options['fields']['title']['element_label_colon'] = FALSE;
-  /* Field: Content: I hereby certify that this form is now complete. */
+  /* Field: Content: I hereby certify that the admin form packet is now complete. */
   $handler->display->display_options['fields']['field_admin_form_certification']['id'] = 'field_admin_form_certification';
   $handler->display->display_options['fields']['field_admin_form_certification']['table'] = 'field_data_field_admin_form_certification';
   $handler->display->display_options['fields']['field_admin_form_certification']['field'] = 'field_admin_form_certification';
@@ -229,7 +237,7 @@ function admin_forms_views_default_views() {
   $handler->display->display_options['filters']['type']['value'] = array(
     'admin_form' => 'admin_form',
   );
-  /* Filter criterion: Content: I hereby certify that this form is now complete. (field_admin_form_certification) */
+  /* Filter criterion: Content: I hereby certify that the admin form packet is now complete. (field_admin_form_certification) */
   $handler->display->display_options['filters']['field_admin_form_certification_value']['id'] = 'field_admin_form_certification_value';
   $handler->display->display_options['filters']['field_admin_form_certification_value']['table'] = 'field_data_field_admin_form_certification';
   $handler->display->display_options['filters']['field_admin_form_certification_value']['field'] = 'field_admin_form_certification_value';

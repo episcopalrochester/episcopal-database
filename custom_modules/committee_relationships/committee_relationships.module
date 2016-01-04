@@ -26,12 +26,18 @@ function find_cmt_relationships($types = FALSE, $person,$inactive = FALSE) {
   $query->leftJoin("field_data_field_cmt_first","f","f.entity_id = n.nid");
   $query->leftJoin("field_data_field_cmt_second","s","s.entity_id = n.nid");
   $query->leftJoin("field_data_field_cmt_type","t","t.entity_id = n.nid");
+  $query->leftJoin("field_data_field_cmt_district","d","d.entity_id = n.nid");
+  $query->leftJoin("field_data_field_cmt_roles","y","y.entity_id = n.nid");
+  $query->leftJoin("field_data_field_cmt_subcomittees","z","z.entity_id = n.nid");
   $query->leftJoin("field_data_field_cmt_job","j","j.entity_id = n.nid");
   $query->leftJoin("field_data_field_cmt_start","p","p.entity_id = n.nid");
   $query->leftJoin("field_data_field_cmt_end","e","e.entity_id = n.nid");
   $query->leftJoin("field_data_field_cmt_end_reason","r","r.entity_id = n.nid");
   $query->fields('n',array('nid'))
     ->fields('t',array('field_cmt_type_value'))
+    ->fields('d',array('field_cmt_district_value'))
+    ->fields('z',array('field_cmt_subcomittees_value'))
+    ->fields('y',array('field_cmt_roles_value'))
     ->fields('j',array('field_cmt_job_value'))
     ->fields('f',array('field_cmt_first_nid'))
     ->fields('s',array('field_cmt_second_nid'))
@@ -74,6 +80,24 @@ function find_cmt_relationships($types = FALSE, $person,$inactive = FALSE) {
     $relationship['title'] = "";
     if ($record['field_cmt_job_value']) {
       $relationship['title'] = $record['field_cmt_job_value'];
+    }
+    if ($record['field_cmt_district_value']) {
+      $relationship['district'] = $record['field_cmt_district_value'];
+    }
+    else {
+      $relationship['district'] = '';
+    }
+    if ($record['field_cmt_subcomittees_value']) {
+      $relationship['subcommittees'] = $record['field_cmt_subcomittees_value'];
+    }
+    else {
+      $relationship['subcommittees'] = '';
+    }
+    if ($record['field_cmt_roles_value']) {
+      $relationship['roles'] = $record['field_cmt_roles_value'];
+    }
+    else {
+      $relationship['roles'] = '';
     }
     $relationship['start'] = "";
     if ($record['field_cmt_start_value']) {

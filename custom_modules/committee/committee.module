@@ -96,3 +96,14 @@ function committee_fetch_committees() {
   }
   return $committees;
 }
+
+function cmt_districts() {
+  return array(
+'',
+  'Monroe'=>'Monroe',
+'Northeast'=>'Northeast',
+'Rochester'=>'Rochester',
+'Southeast'=>'Southeast',
+'Southwest'=>'Southwest'
+  );
+}

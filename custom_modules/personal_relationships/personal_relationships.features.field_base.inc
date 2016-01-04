@@ -10,7 +10,7 @@
 function personal_relationships_field_default_field_bases() {
   $field_bases = array();
 
-  // Exported field_base: 'body'
+  // Exported field_base: 'body'.
   $field_bases['body'] = array(
     'active' => 1,
     'cardinality' => 1,
@@ -19,14 +19,6 @@ function personal_relationships_field_default_field_bases() {
       0 => 'node',
     ),
     'field_name' => 'body',
-    'foreign keys' => array(
-      'format' => array(
-        'columns' => array(
-          'format' => 'format',
-        ),
-        'table' => 'filter_format',
-      ),
-    ),
     'indexes' => array(
       'format' => array(
         0 => 'format',
@@ -39,21 +31,13 @@ function personal_relationships_field_default_field_bases() {
     'type' => 'text_with_summary',
   );
 
-  // Exported field_base: 'field_person_2_nr'
+  // Exported field_base: 'field_person_2_nr'.
   $field_bases['field_person_2_nr'] = array(
     'active' => 1,
     'cardinality' => 1,
     'deleted' => 0,
     'entity_types' => array(),
     'field_name' => 'field_person_2_nr',
-    'foreign keys' => array(
-      'format' => array(
-        'columns' => array(
-          'format' => 'format',
-        ),
-        'table' => 'filter_format',
-      ),
-    ),
     'indexes' => array(
       'format' => array(
         0 => 'format',
@@ -68,14 +52,13 @@ function personal_relationships_field_default_field_bases() {
     'type' => 'text',
   );
 
-  // Exported field_base: 'field_pr_end'
+  // Exported field_base: 'field_pr_end'.
   $field_bases['field_pr_end'] = array(
     'active' => 1,
     'cardinality' => 1,
     'deleted' => 0,
     'entity_types' => array(),
     'field_name' => 'field_pr_end',
-    'foreign keys' => array(),
     'indexes' => array(),
     'locked' => 0,
     'module' => 'date',
@@ -98,14 +81,13 @@ function personal_relationships_field_default_field_bases() {
     'type' => 'date',
   );
 
-  // Exported field_base: 'field_pr_end_reason'
+  // Exported field_base: 'field_pr_end_reason'.
   $field_bases['field_pr_end_reason'] = array(
     'active' => 1,
     'cardinality' => 1,
     'deleted' => 0,
     'entity_types' => array(),
     'field_name' => 'field_pr_end_reason',
-    'foreign keys' => array(),
     'indexes' => array(
       'value' => array(
         0 => 'value',
@@ -126,21 +108,13 @@ function personal_relationships_field_default_field_bases() {
     'type' => 'list_text',
   );
 
-  // Exported field_base: 'field_pr_first'
+  // Exported field_base: 'field_pr_first'.
   $field_bases['field_pr_first'] = array(
     'active' => 1,
     'cardinality' => 1,
     'deleted' => 0,
     'entity_types' => array(),
     'field_name' => 'field_pr_first',
-    'foreign keys' => array(
-      'nid' => array(
-        'columns' => array(
-          'nid' => 'nid',
-        ),
-        'table' => 'node',
-      ),
-    ),
     'indexes' => array(
       'nid' => array(
         0 => 'nid',
@@ -163,21 +137,13 @@ function personal_relationships_field_default_field_bases() {
     'type' => 'node_reference',
   );
 
-  // Exported field_base: 'field_pr_second'
+  // Exported field_base: 'field_pr_second'.
   $field_bases['field_pr_second'] = array(
     'active' => 1,
     'cardinality' => 1,
     'deleted' => 0,
     'entity_types' => array(),
     'field_name' => 'field_pr_second',
-    'foreign keys' => array(
-      'nid' => array(
-        'columns' => array(
-          'nid' => 'nid',
-        ),
-        'table' => 'node',
-      ),
-    ),
     'indexes' => array(
       'nid' => array(
         0 => 'nid',
@@ -200,14 +166,13 @@ function personal_relationships_field_default_field_bases() {
     'type' => 'node_reference',
   );
 
-  // Exported field_base: 'field_pr_start'
+  // Exported field_base: 'field_pr_start'.
   $field_bases['field_pr_start'] = array(
     'active' => 1,
     'cardinality' => 1,
     'deleted' => 0,
     'entity_types' => array(),
     'field_name' => 'field_pr_start',
-    'foreign keys' => array(),
     'indexes' => array(),
     'locked' => 0,
     'module' => 'date',
@@ -230,14 +195,13 @@ function personal_relationships_field_default_field_bases() {
     'type' => 'date',
   );
 
-  // Exported field_base: 'field_pr_type'
+  // Exported field_base: 'field_pr_type'.
   $field_bases['field_pr_type'] = array(
     'active' => 1,
     'cardinality' => 1,
     'deleted' => 0,
     'entity_types' => array(),
     'field_name' => 'field_pr_type',
-    'foreign keys' => array(),
     'indexes' => array(
       'value' => array(
         0 => 'value',

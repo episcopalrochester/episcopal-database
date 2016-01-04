@@ -10,7 +10,44 @@
 function committee_relationships_field_default_field_instances() {
   $field_instances = array();
 
-  // Exported field_instance: 'node-committee_relationship-field_cmt_end'
+  // Exported field_instance: 'node-committee_relationship-field_cmt_district'.
+  $field_instances['node-committee_relationship-field_cmt_district'] = array(
+    'bundle' => 'committee_relationship',
+    'default_value' => NULL,
+    'deleted' => 0,
+    'description' => '',
+    'display' => array(
+      'default' => array(
+        'label' => 'above',
+        'module' => 'list',
+        'settings' => array(),
+        'type' => 'list_default',
+        'weight' => 11,
+      ),
+      'teaser' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 0,
+      ),
+    ),
+    'entity_type' => 'node',
+    'field_name' => 'field_cmt_district',
+    'label' => 'District',
+    'required' => 0,
+    'settings' => array(
+      'user_register_form' => FALSE,
+    ),
+    'widget' => array(
+      'active' => 1,
+      'module' => 'options',
+      'settings' => array(),
+      'type' => 'options_select',
+      'weight' => 7,
+    ),
+  );
+
+  // Exported field_instance: 'node-committee_relationship-field_cmt_end'.
   $field_instances['node-committee_relationship-field_cmt_end'] = array(
     'bundle' => 'committee_relationship',
     'deleted' => 0,
@@ -25,6 +62,7 @@ function committee_relationships_field_default_field_instances() {
           'multiple_from' => '',
           'multiple_number' => '',
           'multiple_to' => '',
+          'show_remaining_days' => FALSE,
         ),
         'type' => 'date_default',
         'weight' => 5,
@@ -59,11 +97,12 @@ function committee_relationships_field_default_field_instances() {
         'year_range' => '-3:+3',
       ),
       'type' => 'date_text',
-      'weight' => 8,
+      'weight' => 10,
     ),
   );
 
-  // Exported field_instance: 'node-committee_relationship-field_cmt_end_reason'
+  // Exported field_instance:
+  // 'node-committee_relationship-field_cmt_end_reason'.
   $field_instances['node-committee_relationship-field_cmt_end_reason'] = array(
     'bundle' => 'committee_relationship',
     'default_value' => NULL,
@@ -96,11 +135,11 @@ function committee_relationships_field_default_field_instances() {
       'module' => 'options',
       'settings' => array(),
       'type' => 'options_select',
-      'weight' => 9,
+      'weight' => 11,
     ),
   );
 
-  // Exported field_instance: 'node-committee_relationship-field_cmt_first'
+  // Exported field_instance: 'node-committee_relationship-field_cmt_first'.
   $field_instances['node-committee_relationship-field_cmt_first'] = array(
     'bundle' => 'committee_relationship',
     'default_value' => NULL,
@@ -137,11 +176,11 @@ function committee_relationships_field_default_field_instances() {
         'size' => 60,
       ),
       'type' => 'node_reference_autocomplete',
-      'weight' => 4,
+      'weight' => 1,
     ),
   );
 
-  // Exported field_instance: 'node-committee_relationship-field_cmt_job'
+  // Exported field_instance: 'node-committee_relationship-field_cmt_job'.
   $field_instances['node-committee_relationship-field_cmt_job'] = array(
     'bundle' => 'committee_relationship',
     'default_value' => NULL,
@@ -177,11 +216,11 @@ function committee_relationships_field_default_field_instances() {
         'size' => 60,
       ),
       'type' => 'text_textfield',
-      'weight' => 3,
+      'weight' => 5,
     ),
   );
 
-  // Exported field_instance: 'node-committee_relationship-field_cmt_nr'
+  // Exported field_instance: 'node-committee_relationship-field_cmt_nr'.
   $field_instances['node-committee_relationship-field_cmt_nr'] = array(
     'bundle' => 'committee_relationship',
     'default_value' => NULL,
@@ -204,7 +243,7 @@ function committee_relationships_field_default_field_instances() {
     ),
     'entity_type' => 'node',
     'field_name' => 'field_cmt_nr',
-    'label' => 'Organization (if no record)',
+    'label' => 'Committee (if no record)',
     'required' => 0,
     'settings' => array(
       'text_processing' => 0,
@@ -217,11 +256,11 @@ function committee_relationships_field_default_field_instances() {
         'size' => 60,
       ),
       'type' => 'text_textfield',
-      'weight' => 6,
+      'weight' => 3,
     ),
   );
 
-  // Exported field_instance: 'node-committee_relationship-field_cmt_roles'
+  // Exported field_instance: 'node-committee_relationship-field_cmt_roles'.
   $field_instances['node-committee_relationship-field_cmt_roles'] = array(
     'bundle' => 'committee_relationship',
     'default_value' => NULL,
@@ -254,11 +293,11 @@ function committee_relationships_field_default_field_instances() {
       'module' => 'options',
       'settings' => array(),
       'type' => 'options_select',
-      'weight' => 2,
+      'weight' => 6,
     ),
   );
 
-  // Exported field_instance: 'node-committee_relationship-field_cmt_second'
+  // Exported field_instance: 'node-committee_relationship-field_cmt_second'.
   $field_instances['node-committee_relationship-field_cmt_second'] = array(
     'bundle' => 'committee_relationship',
     'default_value' => NULL,
@@ -281,7 +320,7 @@ function committee_relationships_field_default_field_instances() {
     ),
     'entity_type' => 'node',
     'field_name' => 'field_cmt_second',
-    'label' => 'Organization',
+    'label' => 'Committee',
     'required' => 0,
     'settings' => array(
       'user_register_form' => FALSE,
@@ -295,11 +334,11 @@ function committee_relationships_field_default_field_instances() {
         'size' => 60,
       ),
       'type' => 'node_reference_autocomplete',
-      'weight' => 5,
+      'weight' => 2,
     ),
   );
 
-  // Exported field_instance: 'node-committee_relationship-field_cmt_start'
+  // Exported field_instance: 'node-committee_relationship-field_cmt_start'.
   $field_instances['node-committee_relationship-field_cmt_start'] = array(
     'bundle' => 'committee_relationship',
     'deleted' => 0,
@@ -314,6 +353,7 @@ function committee_relationships_field_default_field_instances() {
           'multiple_from' => '',
           'multiple_number' => '',
           'multiple_to' => '',
+          'show_remaining_days' => FALSE,
         ),
         'type' => 'date_default',
         'weight' => 4,
@@ -348,11 +388,52 @@ function committee_relationships_field_default_field_instances() {
         'year_range' => '-3:+3',
       ),
       'type' => 'date_text',
-      'weight' => 7,
+      'weight' => 9,
     ),
   );
 
-  // Exported field_instance: 'node-committee_relationship-field_cmt_type'
+  // Exported field_instance:
+  // 'node-committee_relationship-field_cmt_subcomittees'.
+  $field_instances['node-committee_relationship-field_cmt_subcomittees'] = array(
+    'bundle' => 'committee_relationship',
+    'default_value' => NULL,
+    'deleted' => 0,
+    'description' => '',
+    'display' => array(
+      'default' => array(
+        'label' => 'above',
+        'module' => 'text',
+        'settings' => array(),
+        'type' => 'text_default',
+        'weight' => 10,
+      ),
+      'teaser' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 0,
+      ),
+    ),
+    'entity_type' => 'node',
+    'field_name' => 'field_cmt_subcomittees',
+    'label' => 'Subcommittees',
+    'required' => 0,
+    'settings' => array(
+      'text_processing' => 0,
+      'user_register_form' => FALSE,
+    ),
+    'widget' => array(
+      'active' => 1,
+      'module' => 'text',
+      'settings' => array(
+        'size' => 60,
+      ),
+      'type' => 'text_textfield',
+      'weight' => 8,
+    ),
+  );
+
+  // Exported field_instance: 'node-committee_relationship-field_cmt_type'.
   $field_instances['node-committee_relationship-field_cmt_type'] = array(
     'bundle' => 'committee_relationship',
     'default_value' => NULL,
@@ -385,23 +466,72 @@ function committee_relationships_field_default_field_instances() {
       'module' => 'options',
       'settings' => array(),
       'type' => 'options_select',
-      'weight' => 1,
+      'weight' => 4,
+    ),
+  );
+
+  // Exported field_instance: 'node-committee_relationship-field_sort'.
+  $field_instances['node-committee_relationship-field_sort'] = array(
+    'bundle' => 'committee_relationship',
+    'default_value' => NULL,
+    'deleted' => 0,
+    'description' => '',
+    'display' => array(
+      'default' => array(
+        'label' => 'above',
+        'module' => 'number',
+        'settings' => array(
+          'decimal_separator' => '.',
+          'prefix_suffix' => TRUE,
+          'scale' => 0,
+          'thousand_separator' => '',
+        ),
+        'type' => 'number_integer',
+        'weight' => 12,
+      ),
+      'teaser' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 0,
+      ),
+    ),
+    'entity_type' => 'node',
+    'field_name' => 'field_sort',
+    'label' => 'Sort',
+    'required' => 0,
+    'settings' => array(
+      'max' => '',
+      'min' => '',
+      'prefix' => '',
+      'suffix' => '',
+      'user_register_form' => FALSE,
+    ),
+    'widget' => array(
+      'active' => 0,
+      'module' => 'number',
+      'settings' => array(),
+      'type' => 'number',
+      'weight' => 12,
     ),
   );
 
   // Translatables
   // Included for use with string extractors like potx.
+  t('Committee');
+  t('Committee (if no record)');
   t('Committee Roles');
+  t('District');
   t('E.G. District, At-Large, Unexpired Term, etc.');
   t('Election Specifics');
   t('End Date');
   t('Membership Type');
   t('Name of organization if there is no record.');
-  t('Organization');
-  t('Organization (if no record)');
   t('Person');
   t('Reason for End');
+  t('Sort');
   t('Start Date');
+  t('Subcommittees');
 
   return $field_instances;
 }

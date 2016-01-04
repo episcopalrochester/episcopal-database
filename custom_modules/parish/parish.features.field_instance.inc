@@ -10,7 +10,7 @@
 function parish_field_default_field_instances() {
   $field_instances = array();
 
-  // Exported field_instance: 'node-parish-field_parish_cluster'
+  // Exported field_instance: 'node-parish-field_parish_cluster'.
   $field_instances['node-parish-field_parish_cluster'] = array(
     'bundle' => 'parish',
     'default_value' => array(
@@ -53,7 +53,7 @@ function parish_field_default_field_instances() {
     ),
   );
 
-  // Exported field_instance: 'node-parish-field_parish_district'
+  // Exported field_instance: 'node-parish-field_parish_district'.
   $field_instances['node-parish-field_parish_district'] = array(
     'bundle' => 'parish',
     'default_value' => NULL,
@@ -90,7 +90,7 @@ function parish_field_default_field_instances() {
     ),
   );
 
-  // Exported field_instance: 'node-parish-field_parish_email'
+  // Exported field_instance: 'node-parish-field_parish_email'.
   $field_instances['node-parish-field_parish_email'] = array(
     'bundle' => 'parish',
     'default_value' => NULL,
@@ -130,7 +130,7 @@ function parish_field_default_field_instances() {
     ),
   );
 
-  // Exported field_instance: 'node-parish-field_parish_home_1'
+  // Exported field_instance: 'node-parish-field_parish_home_1'.
   $field_instances['node-parish-field_parish_home_1'] = array(
     'bundle' => 'parish',
     'default_value' => NULL,
@@ -170,7 +170,7 @@ function parish_field_default_field_instances() {
     ),
   );
 
-  // Exported field_instance: 'node-parish-field_parish_home_2'
+  // Exported field_instance: 'node-parish-field_parish_home_2'.
   $field_instances['node-parish-field_parish_home_2'] = array(
     'bundle' => 'parish',
     'default_value' => NULL,
@@ -210,7 +210,7 @@ function parish_field_default_field_instances() {
     ),
   );
 
-  // Exported field_instance: 'node-parish-field_parish_home_city'
+  // Exported field_instance: 'node-parish-field_parish_home_city'.
   $field_instances['node-parish-field_parish_home_city'] = array(
     'bundle' => 'parish',
     'default_value' => NULL,
@@ -250,7 +250,7 @@ function parish_field_default_field_instances() {
     ),
   );
 
-  // Exported field_instance: 'node-parish-field_parish_home_other'
+  // Exported field_instance: 'node-parish-field_parish_home_other'.
   $field_instances['node-parish-field_parish_home_other'] = array(
     'bundle' => 'parish',
     'default_value' => NULL,
@@ -290,7 +290,7 @@ function parish_field_default_field_instances() {
     ),
   );
 
-  // Exported field_instance: 'node-parish-field_parish_home_postal'
+  // Exported field_instance: 'node-parish-field_parish_home_postal'.
   $field_instances['node-parish-field_parish_home_postal'] = array(
     'bundle' => 'parish',
     'default_value' => NULL,
@@ -330,7 +330,7 @@ function parish_field_default_field_instances() {
     ),
   );
 
-  // Exported field_instance: 'node-parish-field_parish_home_state'
+  // Exported field_instance: 'node-parish-field_parish_home_state'.
   $field_instances['node-parish-field_parish_home_state'] = array(
     'bundle' => 'parish',
     'default_value' => NULL,
@@ -367,7 +367,7 @@ function parish_field_default_field_instances() {
     ),
   );
 
-  // Exported field_instance: 'node-parish-field_parish_mail_1'
+  // Exported field_instance: 'node-parish-field_parish_mail_1'.
   $field_instances['node-parish-field_parish_mail_1'] = array(
     'bundle' => 'parish',
     'default_value' => NULL,
@@ -407,7 +407,7 @@ function parish_field_default_field_instances() {
     ),
   );
 
-  // Exported field_instance: 'node-parish-field_parish_mail_2'
+  // Exported field_instance: 'node-parish-field_parish_mail_2'.
   $field_instances['node-parish-field_parish_mail_2'] = array(
     'bundle' => 'parish',
     'default_value' => NULL,
@@ -447,7 +447,7 @@ function parish_field_default_field_instances() {
     ),
   );
 
-  // Exported field_instance: 'node-parish-field_parish_mail_city'
+  // Exported field_instance: 'node-parish-field_parish_mail_city'.
   $field_instances['node-parish-field_parish_mail_city'] = array(
     'bundle' => 'parish',
     'default_value' => NULL,
@@ -487,7 +487,7 @@ function parish_field_default_field_instances() {
     ),
   );
 
-  // Exported field_instance: 'node-parish-field_parish_mail_other'
+  // Exported field_instance: 'node-parish-field_parish_mail_other'.
   $field_instances['node-parish-field_parish_mail_other'] = array(
     'bundle' => 'parish',
     'default_value' => NULL,
@@ -527,7 +527,7 @@ function parish_field_default_field_instances() {
     ),
   );
 
-  // Exported field_instance: 'node-parish-field_parish_mail_postal'
+  // Exported field_instance: 'node-parish-field_parish_mail_postal'.
   $field_instances['node-parish-field_parish_mail_postal'] = array(
     'bundle' => 'parish',
     'default_value' => NULL,
@@ -567,7 +567,7 @@ function parish_field_default_field_instances() {
     ),
   );
 
-  // Exported field_instance: 'node-parish-field_parish_mail_state'
+  // Exported field_instance: 'node-parish-field_parish_mail_state'.
   $field_instances['node-parish-field_parish_mail_state'] = array(
     'bundle' => 'parish',
     'default_value' => NULL,
@@ -604,7 +604,7 @@ function parish_field_default_field_instances() {
     ),
   );
 
-  // Exported field_instance: 'node-parish-field_parish_phone'
+  // Exported field_instance: 'node-parish-field_parish_phone'.
   $field_instances['node-parish-field_parish_phone'] = array(
     'bundle' => 'parish',
     'default_value' => NULL,
@@ -644,7 +644,7 @@ function parish_field_default_field_instances() {
     ),
   );
 
-  // Exported field_instance: 'node-parish-field_parish_site'
+  // Exported field_instance: 'node-parish-field_parish_site'.
   $field_instances['node-parish-field_parish_site'] = array(
     'bundle' => 'parish',
     'default_value' => NULL,

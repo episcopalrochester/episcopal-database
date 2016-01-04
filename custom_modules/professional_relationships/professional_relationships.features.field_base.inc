@@ -10,21 +10,13 @@
 function professional_relationships_field_default_field_bases() {
   $field_bases = array();
 
-  // Exported field_base: 'field_org_nr'
+  // Exported field_base: 'field_org_nr'.
   $field_bases['field_org_nr'] = array(
     'active' => 1,
     'cardinality' => 1,
     'deleted' => 0,
     'entity_types' => array(),
     'field_name' => 'field_org_nr',
-    'foreign keys' => array(
-      'format' => array(
-        'columns' => array(
-          'format' => 'format',
-        ),
-        'table' => 'filter_format',
-      ),
-    ),
     'indexes' => array(
       'format' => array(
         0 => 'format',
@@ -39,14 +31,13 @@ function professional_relationships_field_default_field_bases() {
     'type' => 'text',
   );
 
-  // Exported field_base: 'field_pf_end'
+  // Exported field_base: 'field_pf_end'.
   $field_bases['field_pf_end'] = array(
     'active' => 1,
     'cardinality' => 1,
     'deleted' => 0,
     'entity_types' => array(),
     'field_name' => 'field_pf_end',
-    'foreign keys' => array(),
     'indexes' => array(),
     'locked' => 0,
     'module' => 'date',
@@ -69,14 +60,13 @@ function professional_relationships_field_default_field_bases() {
     'type' => 'date',
   );
 
-  // Exported field_base: 'field_pf_end_reason'
+  // Exported field_base: 'field_pf_end_reason'.
   $field_bases['field_pf_end_reason'] = array(
     'active' => 1,
     'cardinality' => 1,
     'deleted' => 0,
     'entity_types' => array(),
     'field_name' => 'field_pf_end_reason',
-    'foreign keys' => array(),
     'indexes' => array(
       'value' => array(
         0 => 'value',
@@ -92,21 +82,13 @@ function professional_relationships_field_default_field_bases() {
     'type' => 'list_text',
   );
 
-  // Exported field_base: 'field_pf_first'
+  // Exported field_base: 'field_pf_first'.
   $field_bases['field_pf_first'] = array(
     'active' => 1,
     'cardinality' => 1,
     'deleted' => 0,
     'entity_types' => array(),
     'field_name' => 'field_pf_first',
-    'foreign keys' => array(
-      'nid' => array(
-        'columns' => array(
-          'nid' => 'nid',
-        ),
-        'table' => 'node',
-      ),
-    ),
     'indexes' => array(
       'nid' => array(
         0 => 'nid',
@@ -129,21 +111,13 @@ function professional_relationships_field_default_field_bases() {
     'type' => 'node_reference',
   );
 
-  // Exported field_base: 'field_pf_job'
+  // Exported field_base: 'field_pf_job'.
   $field_bases['field_pf_job'] = array(
     'active' => 1,
     'cardinality' => 1,
     'deleted' => 0,
     'entity_types' => array(),
     'field_name' => 'field_pf_job',
-    'foreign keys' => array(
-      'format' => array(
-        'columns' => array(
-          'format' => 'format',
-        ),
-        'table' => 'filter_format',
-      ),
-    ),
     'indexes' => array(
       'format' => array(
         0 => 'format',
@@ -158,21 +132,13 @@ function professional_relationships_field_default_field_bases() {
     'type' => 'text',
   );
 
-  // Exported field_base: 'field_pf_second'
+  // Exported field_base: 'field_pf_second'.
   $field_bases['field_pf_second'] = array(
     'active' => 1,
     'cardinality' => 1,
     'deleted' => 0,
     'entity_types' => array(),
     'field_name' => 'field_pf_second',
-    'foreign keys' => array(
-      'nid' => array(
-        'columns' => array(
-          'nid' => 'nid',
-        ),
-        'table' => 'node',
-      ),
-    ),
     'indexes' => array(
       'nid' => array(
         0 => 'nid',
@@ -195,14 +161,13 @@ function professional_relationships_field_default_field_bases() {
     'type' => 'node_reference',
   );
 
-  // Exported field_base: 'field_pf_start'
+  // Exported field_base: 'field_pf_start'.
   $field_bases['field_pf_start'] = array(
     'active' => 1,
     'cardinality' => 1,
     'deleted' => 0,
     'entity_types' => array(),
     'field_name' => 'field_pf_start',
-    'foreign keys' => array(),
     'indexes' => array(),
     'locked' => 0,
     'module' => 'date',
@@ -225,14 +190,13 @@ function professional_relationships_field_default_field_bases() {
     'type' => 'date',
   );
 
-  // Exported field_base: 'field_pf_type'
+  // Exported field_base: 'field_pf_type'.
   $field_bases['field_pf_type'] = array(
     'active' => 1,
     'cardinality' => 1,
     'deleted' => 0,
     'entity_types' => array(),
     'field_name' => 'field_pf_type',
-    'foreign keys' => array(),
     'indexes' => array(
       'value' => array(
         0 => 'value',

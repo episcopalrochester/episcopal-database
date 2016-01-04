@@ -45,6 +45,10 @@ function mailchimp_merge_form($form,&$form_state) {
   return $form;
 }
 
+function mailchimp_merge_cron() {
+  mailchimp_merge_run_batch();
+}
+
 function mailchimp_merge_reset() {
   variable_del("mm_subscribe_merge");
   mailchimp_merge_prepare_batch();
@@ -74,7 +78,7 @@ function mailchimp_merge_prepare_batch() {
         if (person_is_clergy_in_cong($person)) {
           $internal[] = "Clergy in Congregations";
         }
-        if (person_is_staff($person)) {
+        if (person_is_staff($person) || person_is_dean($person)) {
           $internal[] = "Bishop's Staff";
         }
         if (person_is_leader($person)) {
@@ -151,5 +155,8 @@ function mailchimp_merge_run_batch() {
       $n++;
     }
     variable_set("mm_subscribe_merge",$cache);
+  }
+  else {
+    mailchimp_merge_reset();
   }
 }

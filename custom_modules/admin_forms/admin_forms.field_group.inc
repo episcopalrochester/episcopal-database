@@ -80,10 +80,9 @@ function admin_forms_field_group_info() {
   $field_group->parent_name = 'group_admin_form_audit';
   $field_group->data = array(
     'label' => 'Audit Dates',
-    'weight' => '15',
+    'weight' => '43',
     'children' => array(
       0 => 'field_admin_form_audit_fin',
-      1 => 'field_audit_form_aud_mgmt',
     ),
     'format_type' => 'fieldset',
     'format_settings' => array(
@@ -116,6 +115,7 @@ function admin_forms_field_group_info() {
       2 => 'group_admin_form_conflicts',
       3 => 'group_admin_form_cpa',
       4 => 'group_audit_form_info',
+      5 => 'group_audit_diocesan',
     ),
     'format_type' => 'multipage',
     'format_settings' => array(
@@ -140,7 +140,7 @@ function admin_forms_field_group_info() {
   $field_group->parent_name = 'group_admin_form_audit';
   $field_group->data = array(
     'label' => 'Conflicts of Interest',
-    'weight' => '14',
+    'weight' => '42',
     'children' => array(
       0 => 'field_admin_form_audit_conflicts',
     ),
@@ -168,7 +168,7 @@ function admin_forms_field_group_info() {
   $field_group->parent_name = 'group_admin_form_audit';
   $field_group->data = array(
     'label' => 'Certified Public Accountant',
-    'weight' => '13',
+    'weight' => '41',
     'children' => array(
       0 => 'field_admin_form_cpa_addr',
       1 => 'field_admin_form_cpa_name',
@@ -282,6 +282,34 @@ function admin_forms_field_group_info() {
   $field_group = new stdClass();
   $field_group->disabled = FALSE; /* Edit this to true to make a default field_group disabled initially */
   $field_group->api_version = 1;
+  $field_group->identifier = 'group_audit_diocesan|node|admin_form|form';
+  $field_group->group_name = 'group_audit_diocesan';
+  $field_group->entity_type = 'node';
+  $field_group->bundle = 'admin_form';
+  $field_group->mode = 'form';
+  $field_group->parent_name = 'group_admin_form_audit';
+  $field_group->data = array(
+    'label' => 'Request a Diocesan Audit',
+    'weight' => '38',
+    'children' => array(
+      0 => 'field_admin_form_audit_request',
+    ),
+    'format_type' => 'fieldset',
+    'format_settings' => array(
+      'label' => 'Request a Diocesan Audit',
+      'instance_settings' => array(
+        'required_fields' => 1,
+        'classes' => 'group-audit-diocesan field-group-fieldset',
+        'description' => 'If you request an audit by the Diocesan Auditor, Catherine Shoemaker, please contact her at <a href="mailto:catherine@episcopaldioceseofrochester.org">catherine@episcopaldioceseofrochester.org</a>.',
+      ),
+      'formatter' => 'open',
+    ),
+  );
+  $export['group_audit_diocesan|node|admin_form|form'] = $field_group;
+
+  $field_group = new stdClass();
+  $field_group->disabled = FALSE; /* Edit this to true to make a default field_group disabled initially */
+  $field_group->api_version = 1;
   $field_group->identifier = 'group_audit_form_info|node|admin_form|form';
   $field_group->group_name = 'group_audit_form_info';
   $field_group->entity_type = 'node';
@@ -289,8 +317,8 @@ function admin_forms_field_group_info() {
   $field_group->mode = 'form';
   $field_group->parent_name = 'group_admin_form_audit';
   $field_group->data = array(
-    'label' => 'Audit information has been provided by',
-    'weight' => '16',
+    'label' => 'The above information has been provided by',
+    'weight' => '44',
     'children' => array(
       0 => 'field_audit_form_date',
       1 => 'field_audit_form_email',
@@ -300,7 +328,7 @@ function admin_forms_field_group_info() {
     ),
     'format_type' => 'fieldset',
     'format_settings' => array(
-      'label' => 'Audit information has been provided by',
+      'label' => 'The above information has been provided by',
       'instance_settings' => array(
         'required_fields' => 1,
         'classes' => 'group-audit-form-info field-group-fieldset',

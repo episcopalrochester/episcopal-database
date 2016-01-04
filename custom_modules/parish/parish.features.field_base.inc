@@ -10,14 +10,13 @@
 function parish_field_default_field_bases() {
   $field_bases = array();
 
-  // Exported field_base: 'field_parish_cluster'
+  // Exported field_base: 'field_parish_cluster'.
   $field_bases['field_parish_cluster'] = array(
     'active' => 1,
     'cardinality' => 1,
     'deleted' => 0,
     'entity_types' => array(),
     'field_name' => 'field_parish_cluster',
-    'foreign keys' => array(),
     'indexes' => array(
       'value' => array(
         0 => 'value',
@@ -36,14 +35,13 @@ function parish_field_default_field_bases() {
     'type' => 'list_boolean',
   );
 
-  // Exported field_base: 'field_parish_district'
+  // Exported field_base: 'field_parish_district'.
   $field_bases['field_parish_district'] = array(
     'active' => 1,
     'cardinality' => 1,
     'deleted' => 0,
     'entity_types' => array(),
     'field_name' => 'field_parish_district',
-    'foreign keys' => array(),
     'indexes' => array(
       'value' => array(
         0 => 'value',
@@ -65,21 +63,13 @@ function parish_field_default_field_bases() {
     'type' => 'list_text',
   );
 
-  // Exported field_base: 'field_parish_email'
+  // Exported field_base: 'field_parish_email'.
   $field_bases['field_parish_email'] = array(
     'active' => 1,
     'cardinality' => 1,
     'deleted' => 0,
     'entity_types' => array(),
     'field_name' => 'field_parish_email',
-    'foreign keys' => array(
-      'format' => array(
-        'columns' => array(
-          'format' => 'format',
-        ),
-        'table' => 'filter_format',
-      ),
-    ),
     'indexes' => array(
       'format' => array(
         0 => 'format',
@@ -94,21 +84,13 @@ function parish_field_default_field_bases() {
     'type' => 'text',
   );
 
-  // Exported field_base: 'field_parish_home_1'
+  // Exported field_base: 'field_parish_home_1'.
   $field_bases['field_parish_home_1'] = array(
     'active' => 1,
     'cardinality' => 1,
     'deleted' => 0,
     'entity_types' => array(),
     'field_name' => 'field_parish_home_1',
-    'foreign keys' => array(
-      'format' => array(
-        'columns' => array(
-          'format' => 'format',
-        ),
-        'table' => 'filter_format',
-      ),
-    ),
     'indexes' => array(
       'format' => array(
         0 => 'format',
@@ -123,21 +105,13 @@ function parish_field_default_field_bases() {
     'type' => 'text',
   );
 
-  // Exported field_base: 'field_parish_home_2'
+  // Exported field_base: 'field_parish_home_2'.
   $field_bases['field_parish_home_2'] = array(
     'active' => 1,
     'cardinality' => 1,
     'deleted' => 0,
     'entity_types' => array(),
     'field_name' => 'field_parish_home_2',
-    'foreign keys' => array(
-      'format' => array(
-        'columns' => array(
-          'format' => 'format',
-        ),
-        'table' => 'filter_format',
-      ),
-    ),
     'indexes' => array(
       'format' => array(
         0 => 'format',
@@ -152,21 +126,13 @@ function parish_field_default_field_bases() {
     'type' => 'text',
   );
 
-  // Exported field_base: 'field_parish_home_city'
+  // Exported field_base: 'field_parish_home_city'.
   $field_bases['field_parish_home_city'] = array(
     'active' => 1,
     'cardinality' => 1,
     'deleted' => 0,
     'entity_types' => array(),
     'field_name' => 'field_parish_home_city',
-    'foreign keys' => array(
-      'format' => array(
-        'columns' => array(
-          'format' => 'format',
-        ),
-        'table' => 'filter_format',
-      ),
-    ),
     'indexes' => array(
       'format' => array(
         0 => 'format',
@@ -181,21 +147,13 @@ function parish_field_default_field_bases() {
     'type' => 'text',
   );
 
-  // Exported field_base: 'field_parish_home_other'
+  // Exported field_base: 'field_parish_home_other'.
   $field_bases['field_parish_home_other'] = array(
     'active' => 1,
     'cardinality' => 1,
     'deleted' => 0,
     'entity_types' => array(),
     'field_name' => 'field_parish_home_other',
-    'foreign keys' => array(
-      'format' => array(
-        'columns' => array(
-          'format' => 'format',
-        ),
-        'table' => 'filter_format',
-      ),
-    ),
     'indexes' => array(
       'format' => array(
         0 => 'format',
@@ -210,21 +168,13 @@ function parish_field_default_field_bases() {
     'type' => 'text',
   );
 
-  // Exported field_base: 'field_parish_home_postal'
+  // Exported field_base: 'field_parish_home_postal'.
   $field_bases['field_parish_home_postal'] = array(
     'active' => 1,
     'cardinality' => 1,
     'deleted' => 0,
     'entity_types' => array(),
     'field_name' => 'field_parish_home_postal',
-    'foreign keys' => array(
-      'format' => array(
-        'columns' => array(
-          'format' => 'format',
-        ),
-        'table' => 'filter_format',
-      ),
-    ),
     'indexes' => array(
       'format' => array(
         0 => 'format',
@@ -239,14 +189,13 @@ function parish_field_default_field_bases() {
     'type' => 'text',
   );
 
-  // Exported field_base: 'field_parish_home_state'
+  // Exported field_base: 'field_parish_home_state'.
   $field_bases['field_parish_home_state'] = array(
     'active' => 1,
     'cardinality' => 1,
     'deleted' => 0,
     'entity_types' => array(),
     'field_name' => 'field_parish_home_state',
-    'foreign keys' => array(),
     'indexes' => array(
       'value' => array(
         0 => 'value',
@@ -335,21 +284,13 @@ function parish_field_default_field_bases() {
     'type' => 'list_text',
   );
 
-  // Exported field_base: 'field_parish_mail_1'
+  // Exported field_base: 'field_parish_mail_1'.
   $field_bases['field_parish_mail_1'] = array(
     'active' => 1,
     'cardinality' => 1,
     'deleted' => 0,
     'entity_types' => array(),
     'field_name' => 'field_parish_mail_1',
-    'foreign keys' => array(
-      'format' => array(
-        'columns' => array(
-          'format' => 'format',
-        ),
-        'table' => 'filter_format',
-      ),
-    ),
     'indexes' => array(
       'format' => array(
         0 => 'format',
@@ -364,21 +305,13 @@ function parish_field_default_field_bases() {
     'type' => 'text',
   );
 
-  // Exported field_base: 'field_parish_mail_2'
+  // Exported field_base: 'field_parish_mail_2'.
   $field_bases['field_parish_mail_2'] = array(
     'active' => 1,
     'cardinality' => 1,
     'deleted' => 0,
     'entity_types' => array(),
     'field_name' => 'field_parish_mail_2',
-    'foreign keys' => array(
-      'format' => array(
-        'columns' => array(
-          'format' => 'format',
-        ),
-        'table' => 'filter_format',
-      ),
-    ),
     'indexes' => array(
       'format' => array(
         0 => 'format',
@@ -393,21 +326,13 @@ function parish_field_default_field_bases() {
     'type' => 'text',
   );
 
-  // Exported field_base: 'field_parish_mail_city'
+  // Exported field_base: 'field_parish_mail_city'.
   $field_bases['field_parish_mail_city'] = array(
     'active' => 1,
     'cardinality' => 1,
     'deleted' => 0,
     'entity_types' => array(),
     'field_name' => 'field_parish_mail_city',
-    'foreign keys' => array(
-      'format' => array(
-        'columns' => array(
-          'format' => 'format',
-        ),
-        'table' => 'filter_format',
-      ),
-    ),
     'indexes' => array(
       'format' => array(
         0 => 'format',
@@ -422,21 +347,13 @@ function parish_field_default_field_bases() {
     'type' => 'text',
   );
 
-  // Exported field_base: 'field_parish_mail_other'
+  // Exported field_base: 'field_parish_mail_other'.
   $field_bases['field_parish_mail_other'] = array(
     'active' => 1,
     'cardinality' => 1,
     'deleted' => 0,
     'entity_types' => array(),
     'field_name' => 'field_parish_mail_other',
-    'foreign keys' => array(
-      'format' => array(
-        'columns' => array(
-          'format' => 'format',
-        ),
-        'table' => 'filter_format',
-      ),
-    ),
     'indexes' => array(
       'format' => array(
         0 => 'format',
@@ -451,21 +368,13 @@ function parish_field_default_field_bases() {
     'type' => 'text',
   );
 
-  // Exported field_base: 'field_parish_mail_postal'
+  // Exported field_base: 'field_parish_mail_postal'.
   $field_bases['field_parish_mail_postal'] = array(
     'active' => 1,
     'cardinality' => 1,
     'deleted' => 0,
     'entity_types' => array(),
     'field_name' => 'field_parish_mail_postal',
-    'foreign keys' => array(
-      'format' => array(
-        'columns' => array(
-          'format' => 'format',
-        ),
-        'table' => 'filter_format',
-      ),
-    ),
     'indexes' => array(
       'format' => array(
         0 => 'format',
@@ -480,14 +389,13 @@ function parish_field_default_field_bases() {
     'type' => 'text',
   );
 
-  // Exported field_base: 'field_parish_mail_state'
+  // Exported field_base: 'field_parish_mail_state'.
   $field_bases['field_parish_mail_state'] = array(
     'active' => 1,
     'cardinality' => 1,
     'deleted' => 0,
     'entity_types' => array(),
     'field_name' => 'field_parish_mail_state',
-    'foreign keys' => array(),
     'indexes' => array(
       'value' => array(
         0 => 'value',
@@ -576,21 +484,13 @@ function parish_field_default_field_bases() {
     'type' => 'list_text',
   );
 
-  // Exported field_base: 'field_parish_phone'
+  // Exported field_base: 'field_parish_phone'.
   $field_bases['field_parish_phone'] = array(
     'active' => 1,
     'cardinality' => 1,
     'deleted' => 0,
     'entity_types' => array(),
     'field_name' => 'field_parish_phone',
-    'foreign keys' => array(
-      'format' => array(
-        'columns' => array(
-          'format' => 'format',
-        ),
-        'table' => 'filter_format',
-      ),
-    ),
     'indexes' => array(
       'format' => array(
         0 => 'format',
@@ -605,21 +505,13 @@ function parish_field_default_field_bases() {
     'type' => 'text',
   );
 
-  // Exported field_base: 'field_parish_site'
+  // Exported field_base: 'field_parish_site'.
   $field_bases['field_parish_site'] = array(
     'active' => 1,
     'cardinality' => 1,
     'deleted' => 0,
     'entity_types' => array(),
     'field_name' => 'field_parish_site',
-    'foreign keys' => array(
-      'format' => array(
-        'columns' => array(
-          'format' => 'format',
-        ),
-        'table' => 'filter_format',
-      ),
-    ),
     'indexes' => array(
       'format' => array(
         0 => 'format',

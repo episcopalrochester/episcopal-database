@@ -10,14 +10,41 @@
 function committee_relationships_field_default_field_bases() {
   $field_bases = array();
 
-  // Exported field_base: 'field_cmt_end'
+  // Exported field_base: 'field_cmt_district'.
+  $field_bases['field_cmt_district'] = array(
+    'active' => 1,
+    'cardinality' => 1,
+    'deleted' => 0,
+    'entity_types' => array(),
+    'field_name' => 'field_cmt_district',
+    'indexes' => array(
+      'value' => array(
+        0 => 'value',
+      ),
+    ),
+    'locked' => 0,
+    'module' => 'list',
+    'settings' => array(
+      'allowed_values' => array(
+        'Monroe' => 'Monroe',
+        'Northeast' => 'Northeast',
+        'Rochester' => 'Rochester',
+        'Southeast' => 'Southeast',
+        'Southwest' => 'Southwest',
+      ),
+      'allowed_values_function' => '',
+    ),
+    'translatable' => 0,
+    'type' => 'list_text',
+  );
+
+  // Exported field_base: 'field_cmt_end'.
   $field_bases['field_cmt_end'] = array(
     'active' => 1,
     'cardinality' => 1,
     'deleted' => 0,
     'entity_types' => array(),
     'field_name' => 'field_cmt_end',
-    'foreign keys' => array(),
     'indexes' => array(),
     'locked' => 0,
     'module' => 'date',
@@ -40,14 +67,13 @@ function committee_relationships_field_default_field_bases() {
     'type' => 'date',
   );
 
-  // Exported field_base: 'field_cmt_end_reason'
+  // Exported field_base: 'field_cmt_end_reason'.
   $field_bases['field_cmt_end_reason'] = array(
     'active' => 1,
     'cardinality' => 1,
     'deleted' => 0,
     'entity_types' => array(),
     'field_name' => 'field_cmt_end_reason',
-    'foreign keys' => array(),
     'indexes' => array(
       'value' => array(
         0 => 'value',
@@ -63,21 +89,13 @@ function committee_relationships_field_default_field_bases() {
     'type' => 'list_text',
   );
 
-  // Exported field_base: 'field_cmt_first'
+  // Exported field_base: 'field_cmt_first'.
   $field_bases['field_cmt_first'] = array(
     'active' => 1,
     'cardinality' => 1,
     'deleted' => 0,
     'entity_types' => array(),
     'field_name' => 'field_cmt_first',
-    'foreign keys' => array(
-      'nid' => array(
-        'columns' => array(
-          'nid' => 'nid',
-        ),
-        'table' => 'node',
-      ),
-    ),
     'indexes' => array(
       'nid' => array(
         0 => 'nid',
@@ -100,21 +118,13 @@ function committee_relationships_field_default_field_bases() {
     'type' => 'node_reference',
   );
 
-  // Exported field_base: 'field_cmt_job'
+  // Exported field_base: 'field_cmt_job'.
   $field_bases['field_cmt_job'] = array(
     'active' => 1,
     'cardinality' => 1,
     'deleted' => 0,
     'entity_types' => array(),
     'field_name' => 'field_cmt_job',
-    'foreign keys' => array(
-      'format' => array(
-        'columns' => array(
-          'format' => 'format',
-        ),
-        'table' => 'filter_format',
-      ),
-    ),
     'indexes' => array(
       'format' => array(
         0 => 'format',
@@ -129,21 +139,13 @@ function committee_relationships_field_default_field_bases() {
     'type' => 'text',
   );
 
-  // Exported field_base: 'field_cmt_nr'
+  // Exported field_base: 'field_cmt_nr'.
   $field_bases['field_cmt_nr'] = array(
     'active' => 1,
     'cardinality' => 1,
     'deleted' => 0,
     'entity_types' => array(),
     'field_name' => 'field_cmt_nr',
-    'foreign keys' => array(
-      'format' => array(
-        'columns' => array(
-          'format' => 'format',
-        ),
-        'table' => 'filter_format',
-      ),
-    ),
     'indexes' => array(
       'format' => array(
         0 => 'format',
@@ -158,14 +160,13 @@ function committee_relationships_field_default_field_bases() {
     'type' => 'text',
   );
 
-  // Exported field_base: 'field_cmt_roles'
+  // Exported field_base: 'field_cmt_roles'.
   $field_bases['field_cmt_roles'] = array(
     'active' => 1,
     'cardinality' => 1,
     'deleted' => 0,
     'entity_types' => array(),
     'field_name' => 'field_cmt_roles',
-    'foreign keys' => array(),
     'indexes' => array(
       'value' => array(
         0 => 'value',
@@ -181,21 +182,13 @@ function committee_relationships_field_default_field_bases() {
     'type' => 'list_text',
   );
 
-  // Exported field_base: 'field_cmt_second'
+  // Exported field_base: 'field_cmt_second'.
   $field_bases['field_cmt_second'] = array(
     'active' => 1,
     'cardinality' => 1,
     'deleted' => 0,
     'entity_types' => array(),
     'field_name' => 'field_cmt_second',
-    'foreign keys' => array(
-      'nid' => array(
-        'columns' => array(
-          'nid' => 'nid',
-        ),
-        'table' => 'node',
-      ),
-    ),
     'indexes' => array(
       'nid' => array(
         0 => 'nid',
@@ -205,8 +198,15 @@ function committee_relationships_field_default_field_bases() {
     'module' => 'node_reference',
     'settings' => array(
       'referenceable_types' => array(
+        'admin_form' => 0,
         'committee' => 'committee',
         'committee_relationship' => 0,
+        'parish' => 0,
+        'person' => 0,
+        'personal_relationship' => 0,
+        'prayer' => 0,
+        'professional_relationship' => 0,
+        'webform' => 0,
       ),
       'view' => array(
         'args' => array(),
@@ -218,14 +218,13 @@ function committee_relationships_field_default_field_bases() {
     'type' => 'node_reference',
   );
 
-  // Exported field_base: 'field_cmt_start'
+  // Exported field_base: 'field_cmt_start'.
   $field_bases['field_cmt_start'] = array(
     'active' => 1,
     'cardinality' => 1,
     'deleted' => 0,
     'entity_types' => array(),
     'field_name' => 'field_cmt_start',
-    'foreign keys' => array(),
     'indexes' => array(),
     'locked' => 0,
     'module' => 'date',
@@ -248,14 +247,34 @@ function committee_relationships_field_default_field_bases() {
     'type' => 'date',
   );
 
-  // Exported field_base: 'field_cmt_type'
+  // Exported field_base: 'field_cmt_subcomittees'.
+  $field_bases['field_cmt_subcomittees'] = array(
+    'active' => 1,
+    'cardinality' => 1,
+    'deleted' => 0,
+    'entity_types' => array(),
+    'field_name' => 'field_cmt_subcomittees',
+    'indexes' => array(
+      'format' => array(
+        0 => 'format',
+      ),
+    ),
+    'locked' => 0,
+    'module' => 'text',
+    'settings' => array(
+      'max_length' => 255,
+    ),
+    'translatable' => 0,
+    'type' => 'text',
+  );
+
+  // Exported field_base: 'field_cmt_type'.
   $field_bases['field_cmt_type'] = array(
     'active' => 1,
     'cardinality' => 1,
     'deleted' => 0,
     'entity_types' => array(),
     'field_name' => 'field_cmt_type',
-    'foreign keys' => array(),
     'indexes' => array(
       'value' => array(
         0 => 'value',
@@ -269,6 +288,21 @@ function committee_relationships_field_default_field_bases() {
     ),
     'translatable' => 0,
     'type' => 'list_text',
+  );
+
+  // Exported field_base: 'field_sort'.
+  $field_bases['field_sort'] = array(
+    'active' => 1,
+    'cardinality' => 1,
+    'deleted' => 0,
+    'entity_types' => array(),
+    'field_name' => 'field_sort',
+    'indexes' => array(),
+    'locked' => 0,
+    'module' => 'number',
+    'settings' => array(),
+    'translatable' => 0,
+    'type' => 'number_integer',
   );
 
   return $field_bases;

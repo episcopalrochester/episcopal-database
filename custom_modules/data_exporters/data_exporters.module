@@ -1,0 +1,7 @@
+<?php
+/**
+ * @file
+ * Code for the Data Exporters feature.
+ */
+
+include_once 'data_exporters.features.inc';

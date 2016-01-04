@@ -10,7 +10,7 @@
 function professional_relationships_field_default_field_instances() {
   $field_instances = array();
 
-  // Exported field_instance: 'node-professional_relationship-field_org_nr'
+  // Exported field_instance: 'node-professional_relationship-field_org_nr'.
   $field_instances['node-professional_relationship-field_org_nr'] = array(
     'bundle' => 'professional_relationship',
     'default_value' => NULL,
@@ -50,7 +50,7 @@ function professional_relationships_field_default_field_instances() {
     ),
   );
 
-  // Exported field_instance: 'node-professional_relationship-field_pf_end'
+  // Exported field_instance: 'node-professional_relationship-field_pf_end'.
   $field_instances['node-professional_relationship-field_pf_end'] = array(
     'bundle' => 'professional_relationship',
     'deleted' => 0,
@@ -65,6 +65,7 @@ function professional_relationships_field_default_field_instances() {
           'multiple_from' => '',
           'multiple_number' => '',
           'multiple_to' => '',
+          'show_remaining_days' => FALSE,
         ),
         'type' => 'date_default',
         'weight' => 5,
@@ -103,7 +104,8 @@ function professional_relationships_field_default_field_instances() {
     ),
   );
 
-  // Exported field_instance: 'node-professional_relationship-field_pf_end_reason'
+  // Exported field_instance:
+  // 'node-professional_relationship-field_pf_end_reason'.
   $field_instances['node-professional_relationship-field_pf_end_reason'] = array(
     'bundle' => 'professional_relationship',
     'default_value' => NULL,
@@ -140,7 +142,7 @@ function professional_relationships_field_default_field_instances() {
     ),
   );
 
-  // Exported field_instance: 'node-professional_relationship-field_pf_first'
+  // Exported field_instance: 'node-professional_relationship-field_pf_first'.
   $field_instances['node-professional_relationship-field_pf_first'] = array(
     'bundle' => 'professional_relationship',
     'default_value' => NULL,
@@ -181,7 +183,7 @@ function professional_relationships_field_default_field_instances() {
     ),
   );
 
-  // Exported field_instance: 'node-professional_relationship-field_pf_job'
+  // Exported field_instance: 'node-professional_relationship-field_pf_job'.
   $field_instances['node-professional_relationship-field_pf_job'] = array(
     'bundle' => 'professional_relationship',
     'default_value' => NULL,
@@ -221,7 +223,7 @@ function professional_relationships_field_default_field_instances() {
     ),
   );
 
-  // Exported field_instance: 'node-professional_relationship-field_pf_second'
+  // Exported field_instance: 'node-professional_relationship-field_pf_second'.
   $field_instances['node-professional_relationship-field_pf_second'] = array(
     'bundle' => 'professional_relationship',
     'default_value' => NULL,
@@ -262,7 +264,7 @@ function professional_relationships_field_default_field_instances() {
     ),
   );
 
-  // Exported field_instance: 'node-professional_relationship-field_pf_start'
+  // Exported field_instance: 'node-professional_relationship-field_pf_start'.
   $field_instances['node-professional_relationship-field_pf_start'] = array(
     'bundle' => 'professional_relationship',
     'deleted' => 0,
@@ -277,6 +279,7 @@ function professional_relationships_field_default_field_instances() {
           'multiple_from' => '',
           'multiple_number' => '',
           'multiple_to' => '',
+          'show_remaining_days' => FALSE,
         ),
         'type' => 'date_default',
         'weight' => 4,
@@ -315,7 +318,7 @@ function professional_relationships_field_default_field_instances() {
     ),
   );
 
-  // Exported field_instance: 'node-professional_relationship-field_pf_type'
+  // Exported field_instance: 'node-professional_relationship-field_pf_type'.
   $field_instances['node-professional_relationship-field_pf_type'] = array(
     'bundle' => 'professional_relationship',
     'default_value' => NULL,
